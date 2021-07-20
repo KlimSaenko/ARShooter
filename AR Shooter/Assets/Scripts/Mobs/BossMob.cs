@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mobs;
 using UnityEngine;
 
 public class BossMob : MainMob
@@ -13,9 +14,9 @@ public class BossMob : MainMob
 
     private void Update()
     {
-        if (!UI.isPaused && playerStatusScript.IsAlive)
+        if (!UI.isPaused && PlayerStatusScript.IsAlive)
         {
-            Vector3 moveDir = targetPos - mobTransform.position;
+            Vector3 moveDir = TargetPos - MobTransform.position;
 
             MobMove(moveDir, 0.55f);
         }
@@ -28,15 +29,15 @@ public class BossMob : MainMob
 
     protected override void Attack(bool start)
     {
-        isAttacking = start;
+        IsAttacking = start;
         mobAnimator.SetBool("Attack", start);
 
         if (start)
         {
-            playerStatusScript.ApplyDamage(mobDamage);
-            damageTimeDelay = 0.7f;
+            PlayerStatusScript.ApplyDamage(mobDamage);
+            DamageTimeDelay = 0.7f;
         }
-        else mobSpeed = 0.32f;
+        else MobSpeed = 0.32f;
     }
 
     public override IEnumerator Death(int deathType)
@@ -45,7 +46,7 @@ public class BossMob : MainMob
 
         yield return new WaitForSeconds(3.4f);
 
-        mobSpeed = 0.32f;
+        MobSpeed = 0.32f;
         HP = mobHP;
 
         foreach (Collider collider in colliders) collider.enabled = true;

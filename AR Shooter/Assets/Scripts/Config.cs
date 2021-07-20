@@ -2,81 +2,74 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Weapons;
 
 public static class Config
 {
     public static WeaponStats AKM;
     public static WeaponStats Sniper;
 
-    public static Vector3 standartFreePos = new Vector3(0.122f, -0.122f, 0.25f);
-    public static Vector3 standartBackwardPos = new Vector3(0.167f, -0.167f, -0.1f);
+    public static Vector3 StandardFreePos = new Vector3(0.122f, -0.122f, 0.25f);
+    public static Vector3 StandardBackwardPos = new Vector3(0.167f, -0.167f, -0.1f);
 
     public static Vector3 AKMAimingPos = new Vector3(0, -0.115f, 0.178f);
     public static Vector3 SniperAimingPos = new Vector3(0, -0.1335f, 0.26f);
 
     public struct WeaponStats
     {
-        public int damage;
-        public float timeDelay;
-        public Vector3 aimingPos;
-        public MainWeapon weaponScript;
+        public readonly int Damage;
+        public float TimeDelay;
+        public Vector3 AimingPos;
+        public MainWeapon WeaponScript;
 
         public WeaponStats(int damage, float timeDelay, Vector3 aimingPos, MainWeapon weaponScript)
         {
-            this.damage = damage;
-            this.timeDelay = timeDelay;
-            this.aimingPos = aimingPos;
-            this.weaponScript = weaponScript;
+            Damage = damage;
+            TimeDelay = timeDelay;
+            AimingPos = aimingPos;
+            WeaponScript = weaponScript;
         }
     }
 
     internal static WeaponStats? GetStats(MainWeapon.WeaponType weaponType)
     {
-        switch (weaponType)
+        return weaponType switch
         {
-            case MainWeapon.WeaponType.AKM:
-                return AKM;
-            case MainWeapon.WeaponType.Sniper:
-                return Sniper;
-            default:
-                return null;
-        }
+            MainWeapon.WeaponType.AKM => AKM,
+            MainWeapon.WeaponType.Sniper => Sniper,
+            _ => null
+        };
     }
 
     #region Singleplayer
 
-    private static int mobsKills = 0;
+    private static int _mobsKills = 0;
     internal static int MobsKills
     {
-        get
-        {
-            return mobsKills;
-        }
+        get => _mobsKills;
         set
         {
             try
             {
                 UI.KillsUI(value);
                 RecordKills = value;
-                mobsKills = value;
+                _mobsKills = value;
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
     }
 
-    private static int recordKills;
+    private static int _recordKills;
     internal static int RecordKills
     {
-        get
+        get => _recordKills;
+        private set
         {
-            return recordKills;
-        }
-        set
-        {
-            if (recordKills < value)
-            {
-                recordKills = value;
-            }
+            if (_recordKills < value)
+                _recordKills = value;
         }
     }
 
@@ -84,28 +77,27 @@ public static class Config
 
     #region Settings
 
-    public static bool isStaticSpawnZone = false;
+    public static bool IsStaticSpawnZone = false;
 
-    public static int occlusionLevel = 2;
+    public static int OcclusionLevel = 2;
 
     #endregion
 
     internal static void SaveGame()
     {
-        PlayerPrefs.SetInt("KillsRecord", recordKills);
-        PlayerPrefs.SetInt("IsStaticSpawnZone", isStaticSpawnZone ? 1 : 0);
-        PlayerPrefs.SetInt("OcclusionLevel", occlusionLevel);
+        PlayerPrefs.SetInt("KillsRecord", _recordKills);
+        PlayerPrefs.SetInt("IsStaticSpawnZone", IsStaticSpawnZone ? 1 : 0);
+        PlayerPrefs.SetInt("OcclusionLevel", OcclusionLevel);
 
         PlayerPrefs.Save();
     }
 
     internal static void LoadGame()
     {
-        if (PlayerPrefs.HasKey("KillsRecord"))
-        {
-            recordKills = PlayerPrefs.GetInt("KillsRecord");
-            isStaticSpawnZone = PlayerPrefs.GetInt("IsStaticSpawnZone") == 1;
-            occlusionLevel = PlayerPrefs.GetInt("OcclusionLevel");
-        }
+        if (!PlayerPrefs.HasKey("KillsRecord") || !PlayerPrefs.HasKey("IsStaticSpawnZone") || !PlayerPrefs.HasKey("OcclusionLevel")) return;
+        
+        _recordKills = PlayerPrefs.GetInt("KillsRecord");
+        IsStaticSpawnZone = PlayerPrefs.GetInt("IsStaticSpawnZone") == 1;
+        OcclusionLevel = PlayerPrefs.GetInt("OcclusionLevel");
     }
 }

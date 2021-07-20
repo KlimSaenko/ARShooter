@@ -1,23 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class DynamicHolder : MonoBehaviour
+namespace Weapons
 {
-    [SerializeField] private Transform joint;
-    private Transform thisTransform;
-
-    private void Awake()
+    public class DynamicHolder : MonoBehaviour
     {
-        thisTransform = transform;
-    }
+        [SerializeField] private Transform joint;
+        private Transform _thisTransform;
 
-    private void Update()
-    {
-        if (joint != null)
+        private void Awake() =>
+            _thisTransform = transform;
+
+        private void Update()
         {
-            thisTransform.position = Vector3.Lerp(thisTransform.position, joint.position, Mathf.Lerp(15, 29, 29 * Vector3.Distance(thisTransform.position, joint.position)) * Time.deltaTime);
-            thisTransform.rotation = Quaternion.Lerp(thisTransform.rotation, joint.rotation, 25 * Time.deltaTime);
+            if (joint == null) return;
+
+            var thisPosition = _thisTransform.position;
+            var jointPosition = joint.position;
+        
+            thisPosition = Vector3.Lerp(thisPosition, jointPosition, 
+                Mathf.Lerp(15, 29, 29 * Vector3.Distance(thisPosition, jointPosition)) * Time.deltaTime);
+        
+            _thisTransform.position = thisPosition;
+            _thisTransform.rotation = Quaternion.Lerp(_thisTransform.rotation, joint.rotation, 25 * Time.deltaTime);
         }
     }
 }

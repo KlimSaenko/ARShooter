@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Player;
 
 public class NetworkedPlayerStatus : PlayerStatus
 {

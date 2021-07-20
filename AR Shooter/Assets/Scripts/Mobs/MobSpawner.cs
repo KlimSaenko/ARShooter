@@ -28,7 +28,7 @@ public class MobSpawner : MonoBehaviour
     {
         instance = this;
 
-        AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)Config.occlusionLevel;
+        AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)Config.OcclusionLevel;
     }
 
     private float spawnHeight = -0.1f;
@@ -80,7 +80,7 @@ public class MobSpawner : MonoBehaviour
         timerText.gameObject.SetActive(false);
         spawnZone.gameObject.SetActive(false);
 
-        if (!Config.isStaticSpawnZone)
+        if (!Config.IsStaticSpawnZone)
         {
             while (true)
             {

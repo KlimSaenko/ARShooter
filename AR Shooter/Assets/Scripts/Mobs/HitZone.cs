@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mobs;
+using Player;
 using UnityEngine;
 
 public class HitZone : MonoBehaviour

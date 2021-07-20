@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Weapons;
 
 public class NetworkedWeaponHolder : WeaponHolderAndSwitcher
 {
@@ -12,19 +13,19 @@ public class NetworkedWeaponHolder : WeaponHolderAndSwitcher
 
     public override void Shoot(bool start)
     {
-        currentWeaponShoot = start;
+        CurrentWeaponShoot = start;
         photonView.RPC("ShootServer", RpcTarget.All, start);
     }
 
     [PunRPC]
     private void ShootServer(bool start)
     {
-        if (!switchAnimation && mainWeapons.TryGetValue(currentWeaponIndex, out MainWeapon mainWeaponScript)) mainWeaponScript.Shoot(start, photonView.IsMine);
+        if (!SwitchAnimation && MainWeapons.TryGetValue(CurrentWeaponIndex, out MainWeapon mainWeaponScript)) mainWeaponScript.Shoot(start, photonView.IsMine);
     }
 
     public override void SwitchWeapon(int toWeaponIndex)
     {
-        if (toWeaponIndex != currentWeaponIndex)
+        if (toWeaponIndex != CurrentWeaponIndex)
         {
             photonView.RPC("SwitchWeaponServer", RpcTarget.All, toWeaponIndex);
         }
@@ -33,10 +34,10 @@ public class NetworkedWeaponHolder : WeaponHolderAndSwitcher
     [PunRPC]
     private void SwitchWeaponServer(int toWeaponIndex)
     {
-        currentWeaponIndex = toWeaponIndex;
-        currentWeaponScript.Shoot(false);
+        CurrentWeaponIndex = toWeaponIndex;
+        CurrentWeaponScript.Shoot(false);
         StopAllCoroutines();
-        mainWeapons.TryGetValue(currentWeaponIndex, out MainWeapon newWeaponScript);
+        MainWeapons.TryGetValue(CurrentWeaponIndex, out MainWeapon newWeaponScript);
         StartCoroutine(Switching(newWeaponScript));
     }
 }

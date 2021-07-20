@@ -1,98 +1,102 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
+using static Config;
 
-public class MainWeapon : MonoBehaviour
-{   
-    private Camera mainCam;
-    [SerializeField] private Transform aim, virtualAim;
+namespace Weapons
+{
+    public class MainWeapon : MonoBehaviour
+    {   
+        private Camera _mainCam;
+        [SerializeField] private Transform aim, virtualAim;
 
-    internal enum WeaponType
-    {
-        AKM = 0,
-        Sniper
-    }
-
-    [SerializeField] internal WeaponType weaponType;
-
-    [Header("Weapon Attachments")]
-    [SerializeField] protected ParticleSystem shellsParticle;
-    [SerializeField] protected ParticleSystem flashParticle;
-    [SerializeField] protected Animation shootAnimation;
-    [SerializeField] protected AudioSource audioSource;
-    [SerializeField] protected AudioClip shootAudio;
-
-    protected bool isShoot = false;
-
-    private int damage;
-    private Vector3 standartWeaponPos;
-    private Quaternion standartWeaponRot;
-
-    private void Awake()
-    {
-        standartWeaponPos = transform.localPosition;
-        standartWeaponRot = transform.localRotation;
-    }
-
-    private void Start()
-    {
-        damage = Config.GetStats(weaponType).Value.damage;
-        mainCam = Camera.main;
-    }
-
-    private void OnEnable()
-    {
-        transform.localPosition = standartWeaponPos;
-        transform.localRotation = standartWeaponRot;
-    }
-
-    public void Shoot(bool start, bool isMine = true)
-    {
-        isShoot = start;
-        if (start && !IsAnimating())
+        internal enum WeaponType
         {
-            StartCoroutine(Shooting(isMine));
+            AKM = 0,
+            Sniper
         }
-    }
 
-    private IEnumerator Shooting(bool isMine)
-    {
-        if (isMine)
+        [SerializeField] internal WeaponType weaponType;
+
+        [Header("Weapon Attachments")]
+        [SerializeField] protected ParticleSystem shellsParticle;
+        [SerializeField] protected ParticleSystem flashParticle;
+        [SerializeField] protected Animation shootAnimation;
+        [SerializeField] protected AudioSource audioSource;
+        [SerializeField] protected AudioClip shootAudio;
+
+        private bool _isShoot;
+
+        private int _damage;
+        private Vector3 _standardWeaponPos;
+        private Quaternion _standardWeaponRot;
+
+        private void Awake()
         {
-            while (isShoot)
+            var thisTransform = transform;
+            _standardWeaponPos = thisTransform.localPosition;
+            _standardWeaponRot = thisTransform.localRotation;
+        }
+
+        private void Start()
+        {
+            _damage = GetStats(weaponType).Value.Damage;
+            _mainCam = Camera.main;
+        }
+
+        private void OnEnable()
+        {
+            var thisTransform = transform;
+            thisTransform.localPosition = _standardWeaponPos;
+            thisTransform.localRotation = _standardWeaponRot;
+        }
+
+        public void Shoot(bool start, bool isMine = true)
+        {
+            _isShoot = start;
+            if (start && !IsAnimating())
             {
-                shellsParticle.Play();
-                shootAnimation.Play();
-                flashParticle.Play(true);
-                audioSource.pitch = Random.Range(0.94f, 1.06f);
-                audioSource.PlayOneShot(shootAudio);
+                StartCoroutine(Shooting(isMine));
+            }
+        }
 
-                Vector3 startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
-
-                if (Physics.Raycast(startPos, (startPos - mainCam.transform.position).normalized, out RaycastHit hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+        private IEnumerator Shooting(bool isMine)
+        {
+            if (isMine)
+            {
+                while (_isShoot)
                 {
-                    hitZone.ApplyDamage(damage, hitInfo.point);
+                    shellsParticle.Play();
+                    shootAnimation.Play();
+                    flashParticle.Play(true);
+                    audioSource.pitch = Random.Range(0.94f, 1.06f);
+                    audioSource.PlayOneShot(shootAudio);
+
+                    Vector3 startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
+
+                    if (Physics.Raycast(startPos, (startPos - _mainCam.transform.position).normalized, out RaycastHit hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+                    {
+                        hitZone.ApplyDamage(_damage, hitInfo.point);
+                    }
+
+                    yield return new WaitWhile(IsAnimating);
                 }
-
-                yield return new WaitWhile(IsAnimating);
             }
-        }
-        else
-        {
-            while (isShoot)
+            else
             {
-                shellsParticle.Play();
-                shootAnimation.Play();
-                flashParticle.Play(true);
+                while (_isShoot)
+                {
+                    shellsParticle.Play();
+                    shootAnimation.Play();
+                    flashParticle.Play(true);
 
-                yield return new WaitWhile(IsAnimating);
+                    yield return new WaitWhile(IsAnimating);
+                }
             }
         }
-    }
 
-    protected bool IsAnimating()
-    {
-        return shootAnimation.isPlaying;
+        private bool IsAnimating()
+        {
+            return shootAnimation.isPlaying;
+        }
     }
 }

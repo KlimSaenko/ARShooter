@@ -29,8 +29,8 @@ public class MainMenu : MonoBehaviour
         multiPlayerLoaded = false;
 
         recordText.text = Config.RecordKills.ToString();
-        togglesSettings[0].isOn = Config.isStaticSpawnZone;
-        sliderSettings.value = Config.occlusionLevel;
+        togglesSettings[0].isOn = Config.IsStaticSpawnZone;
+        sliderSettings.value = Config.OcclusionLevel;
     }
 
     private void Update()
@@ -142,12 +142,12 @@ public class MainMenu : MonoBehaviour
 
     public void ChangeSpawnHeight(bool isStatic)
     {
-        Config.isStaticSpawnZone = isStatic;
+        Config.IsStaticSpawnZone = isStatic;
     }
 
     public void ChangeOcclusionLevel(float level)
     {
-        Config.occlusionLevel = (int)level;
+        Config.OcclusionLevel = (int)level;
     }
 
     #endregion

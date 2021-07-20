@@ -60,7 +60,7 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
         SceneManager.LoadScene(0);
     }
 
-    public override void OnPlayerEnteredRoom(Player newPlayer)
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         textPlayersCount.text = "players: " + CountOfPlayers;
 
@@ -70,7 +70,7 @@ public class MultiplayerController : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnPlayerLeftRoom(Player otherPlayer)
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         textPlayersCount.text = "players: " + CountOfPlayers;
 

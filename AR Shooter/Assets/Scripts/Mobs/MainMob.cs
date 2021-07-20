@@ -1,130 +1,130 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using Player;
 using UnityEngine;
 
-public class MainMob : MonoBehaviour, IDamageable
+namespace Mobs
 {
-    [SerializeField] protected Animator mobAnimator;
-    [SerializeField] protected Collider[] colliders;
-    [SerializeField] protected GameObject mapMarkerPrefab;
-    [SerializeField] protected int mobHP;
-    [SerializeField] protected int mobDamage;
-
-    protected static Transform target;
-    protected RectTransform mapMarker;
-    protected Vector3 targetPos;
-    protected Transform mobTransform;
-    protected PlayerStatus playerStatusScript;
-
-    internal float mobSpeed = 0.35f;
-    protected float damageTimeDelay;
-    protected bool isAttacking = false;
-
-    public int HP { get; set; }
-    public bool IsAlive => HP > 0;
-
-    private void OnEnable()
+    public class MainMob : MonoBehaviour, IDamageable
     {
-        if (mapMarker != null) mapMarker.gameObject.SetActive(true);
-    }
+        [SerializeField] protected Animator mobAnimator;
+        [SerializeField] protected Collider[] colliders;
+        [SerializeField] protected GameObject mapMarkerPrefab;
+        [SerializeField] protected int mobHP;
+        [SerializeField] protected int mobDamage;
 
-    public void ApplyDamage(int damage)
-    {
-        HP -= damage;
-        if (!IsAlive)
+        private static Transform _target;
+        private RectTransform _mapMarker;
+        protected Vector3 TargetPos;
+        protected Transform MobTransform;
+        protected PlayerStatus PlayerStatusScript;
+
+        internal float MobSpeed = 0.35f;
+        protected float DamageTimeDelay;
+        protected bool IsAttacking;
+
+        public event Action<MobStats> OnApplyDamage;
+
+        public int HP { get; set; }
+        public bool IsAlive => HP > 0;
+
+        private void OnEnable()
         {
-            foreach (Collider hitBox in colliders) hitBox.enabled = false;
-            mapMarker.gameObject.SetActive(false);
+            if (_mapMarker != null) _mapMarker.gameObject.SetActive(true);
+        }
+        
+        public void ApplyDamage(int damage)
+        {
+            HP -= damage;
+            
+            if (IsAlive) return;
+            
+            foreach (var hitBox in colliders) hitBox.enabled = false;
+            _mapMarker.gameObject.SetActive(false);
 
             Config.MobsKills++;
 
             StartCoroutine(Death(DeathType(damage)));
         }
-    }
 
-    protected void MobAppeared()
-    {
-        mobTransform = transform;
-        target = MobSpawner.instance.target;
-        playerStatusScript = target.GetComponentInParent<PlayerStatus>();
-        HP = mobHP;
-
-        targetPos = target.position;
-        targetPos.y = mobTransform.position.y;
-
-        mapMarker = Instantiate(mapMarkerPrefab, UI.MapCircle).GetComponent<RectTransform>();
-        mapMarker.anchoredPosition = new Vector2((targetPos - mobTransform.position).x, (targetPos - mobTransform.position).z) * -80;
-    }
-
-    protected void MobMove(Vector3 moveDir, float closeDistance)
-    {
-        targetPos = target.position;
-        targetPos.y = mobTransform.position.y;
-        mobTransform.LookAt(targetPos, Vector3.up);
-
-        //Vector3 moveDir = targetPos - mobTransform.position;
-
-        if (mobSpeed > 0)
+        protected void MobAppeared()
         {
-            if (!IsAlive)
-            {
-                mobSpeed -= Time.deltaTime;
+            MobTransform = transform;
+            _target = MobSpawner.instance.target;
+            PlayerStatusScript = _target.GetComponentInParent<PlayerStatus>();
+            HP = mobHP;
 
-                if (isAttacking) Attack(false);
-            }
-            else if (moveDir.magnitude < closeDistance)
-            {
-                mobSpeed -= Time.deltaTime;
+            TargetPos = _target.position;
+            TargetPos.y = MobTransform.position.y;
 
-                if (!isAttacking) Attack(true);
-            }
-
-            mobTransform.Translate(Vector3.forward * Time.deltaTime * mobSpeed);
-            mapMarker.anchoredPosition = new Vector2(moveDir.x, moveDir.z) * -80;
+            _mapMarker = Instantiate(mapMarkerPrefab, UI.MapCircle).GetComponent<RectTransform>();
+            _mapMarker.anchoredPosition = new Vector2((TargetPos - MobTransform.position).x, (TargetPos - MobTransform.position).z) * -80;
         }
 
-        if (isAttacking && IsAlive)
+        protected void MobMove(Vector3 moveDir, float closeDistance)
         {
-            damageTimeDelay -= Time.deltaTime;
+            TargetPos = _target.position;
+            TargetPos.y = MobTransform.position.y;
+            MobTransform.LookAt(TargetPos, Vector3.up);
 
-            if (damageTimeDelay <= 0)
+            //Vector3 moveDir = targetPos - mobTransform.position;
+
+            if (MobSpeed > 0)
             {
-                playerStatusScript.ApplyDamage(mobDamage);
-                damageTimeDelay = 0.7f;
+                if (!IsAlive)
+                {
+                    MobSpeed -= Time.deltaTime;
+
+                    if (IsAttacking) Attack(false);
+                }
+                else if (moveDir.magnitude < closeDistance)
+                {
+                    MobSpeed -= Time.deltaTime;
+
+                    if (!IsAttacking) Attack(true);
+                }
+
+                MobTransform.Translate(Vector3.forward * Time.deltaTime * MobSpeed);
+                _mapMarker.anchoredPosition = new Vector2(moveDir.x, moveDir.z) * -80;
+            }
+
+            if (!IsAttacking || !IsAlive) return;
+            
+            DamageTimeDelay -= Time.deltaTime;
+
+            if (DamageTimeDelay <= 0)
+            {
+                PlayerStatusScript.ApplyDamage(mobDamage);
+                DamageTimeDelay = 0.7f;
             }
 
             if (moveDir.magnitude > closeDistance * 1.3f) Attack(false);
         }
-    }
 
-    public virtual IEnumerator Death(int deathType)
-    {
-        mobAnimator.SetTrigger("Death Trigger " + deathType);
-
-        yield return new WaitForSeconds(2.7f);
-
-        MobSpawner.instance.mobPool.AddFirst(gameObject);
-        mobSpeed = 0.35f;
-        HP = mobHP;
-
-        foreach (Collider collider in colliders) collider.enabled = true;
-        gameObject.SetActive(false);
-    }
-
-    private int DeathType(int damage)
-    {
-        if (damage / (float)mobHP >= 0.5f)
+        public virtual IEnumerator Death(int deathType)
         {
-            return 2;
+            mobAnimator.SetTrigger("Death Trigger " + deathType);
+
+            yield return new WaitForSeconds(2.7f);
+
+            MobSpawner.instance.mobPool.AddFirst(gameObject);
+            MobSpeed = 0.35f;
+            HP = mobHP;
+
+            foreach (var collider in colliders) collider.enabled = true;
+            gameObject.SetActive(false);
         }
-        else
+
+        private int DeathType(int damage) => damage / (float)mobHP >= 0.5f ? 2 : 1;
+
+        protected virtual void Attack(bool start)
         {
-            return 1;
+            IsAttacking = start;
         }
     }
 
-    protected virtual void Attack(bool start)
+    public struct MobStats
     {
-        isAttacking = start;
+        private int HP;
     }
 }
