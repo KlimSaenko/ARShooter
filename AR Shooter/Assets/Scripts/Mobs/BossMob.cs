@@ -14,7 +14,7 @@ public class BossMob : MainMob
 
     private void Update()
     {
-        if (!UI.isPaused && PlayerStatusScript.IsAlive)
+        if (!UI.IsPaused && PlayerStatusScript.IsAlive)
         {
             Vector3 moveDir = TargetPos - MobTransform.position;
 

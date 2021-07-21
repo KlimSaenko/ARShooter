@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using static Config;
 
 public class MainMenu : MonoBehaviour
 {
@@ -12,25 +13,25 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Slider sliderSettings;
     //[SerializeField] private TextMeshProUGUI textDebug;
 
-    private float translationTime;
-    private Vector2 menuPosTo;
-    private Vector3 startCamPos;
+    private float _translationTime;
+    private Vector2 _menuPosTo;
+    private Vector3 _startCamPos;
 
-    private bool singlePlayerLoaded;
-    private bool multiPlayerLoaded;
-    private bool previewLoaded;
+    private bool _singlePlayerLoaded;
+    private bool _multiPlayerLoaded;
+    private bool _previewLoaded;
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
-        menuPosTo = rectTransform.anchoredPosition;
+        _menuPosTo = rectTransform.anchoredPosition;
 
-        singlePlayerLoaded = false;
-        multiPlayerLoaded = false;
+        _singlePlayerLoaded = false;
+        _multiPlayerLoaded = false;
 
-        recordText.text = Config.RecordKills.ToString();
-        togglesSettings[0].isOn = Config.IsStaticSpawnZone;
-        sliderSettings.value = Config.OcclusionLevel;
+        recordText.text = RecordKills.ToString();
+        togglesSettings[0].isOn = GameSettings.IsStaticSpawnZone;
+        sliderSettings.value = GameSettings.OcclusionLevel;
     }
 
     private void Update()
@@ -42,48 +43,46 @@ public class MainMenu : MonoBehaviour
 
     public void MovePages(bool newPage)
     {
-        translationTime = 0.23f - translationTime;
-        menuPosTo += newPage ? new Vector2(-1100, 0) : new Vector2(1100, 0);
+        _translationTime = 0.23f - _translationTime;
+        _menuPosTo += newPage ? new Vector2(-1100, 0) : new Vector2(1100, 0);
     }
 
     private void Translation()
     {
-        rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, menuPosTo, Time.deltaTime / translationTime);
-        translationTime -= Time.deltaTime;
-        if (translationTime < Time.deltaTime) rectTransform.anchoredPosition = menuPosTo;
+        rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, _menuPosTo, Time.deltaTime / _translationTime);
+        _translationTime -= Time.deltaTime;
+        if (_translationTime < Time.deltaTime) rectTransform.anchoredPosition = _menuPosTo;
     }
 
     private bool IsTranslating()
     {
-        return translationTime > 0;
+        return _translationTime > 0;
     }
 
     public void StartMultiplayer(bool isOwner)
     {
-        if (!multiPlayerLoaded)
-        {
-            multiPlayerLoaded = true;
+        if (_multiPlayerLoaded) return;
+        
+        _multiPlayerLoaded = true;
 
-            if (isOwner) Lobby.CreateRoom();
-            else Lobby.JoinRoom();
-        }
+        if (isOwner) Lobby.CreateRoom();
+        else Lobby.JoinRoom();
     }
 
     public void StartSingleplayer()
     {
-        if (!singlePlayerLoaded)
-        {
-            singlePlayerLoaded = true;
+        if (_singlePlayerLoaded) return;
+        
+        _singlePlayerLoaded = true;
 
-            SceneManager.LoadSceneAsync(1);
-        }
+        SceneManager.LoadSceneAsync(1);
     }
 
     public void StartPreview()
     {
-        if (!previewLoaded)
+        if (!_previewLoaded)
         {
-            previewLoaded = true;
+            _previewLoaded = true;
 
             SceneManager.LoadSceneAsync(3);
         }
@@ -91,12 +90,12 @@ public class MainMenu : MonoBehaviour
 
     public void ExitGame()
     {
-        Config.SaveGame();
+        SaveGame();
 
         Application.Quit();
     }
 
-    #if UNITY_ANDROID
+    #if UNITY_ANDROID && !UNITY_EDITOR
 
     private void OnApplicationPause(bool pause)
     {
@@ -108,47 +107,44 @@ public class MainMenu : MonoBehaviour
             recordText.text = Config.RecordKills.ToString();
         }
     }
+    
     #endif
 
     #region Background
 
-    private Vector3 accelerationBefore = Vector3.zero;
-    private Vector3 acceleration = Vector3.zero;
+    private Vector3 _accelerationBefore = Vector3.zero;
+    private Vector3 _acceleration = Vector3.zero;
 
-    void Start()
+    private void Start()
     {
-        startCamPos = mainCam.position;
-        accelerationBefore = Input.acceleration;
-        acceleration = Input.acceleration;
+        _startCamPos = mainCam.position;
+        _accelerationBefore = Input.acceleration;
+        _acceleration = Input.acceleration;
     }
 
-    private Vector3 LowPassFilterAccelerometer(Vector3 prevValue)
+    private static Vector3 LowPassFilterAccelerometer(Vector3 prevValue)
     {
-        Vector3 newValue = Vector3.Lerp(prevValue, Input.acceleration, Time.deltaTime);
+        var newValue = Vector3.Lerp(prevValue, Input.acceleration, Time.deltaTime);
         return newValue;
     }
 
     private void CamTranslation()
     {
-        acceleration = LowPassFilterAccelerometer(acceleration);
-        Vector3 accelerationDelta = acceleration - accelerationBefore;
-        mainCam.position = Vector3.Lerp(mainCam.position + 2.5f * accelerationDelta, startCamPos, 10 * Time.deltaTime);
-        accelerationBefore = acceleration;
+        _acceleration = LowPassFilterAccelerometer(_acceleration);
+        var accelerationDelta = _acceleration - _accelerationBefore;
+        mainCam.position = Vector3.Lerp(mainCam.position + 2.5f * accelerationDelta, _startCamPos, 10 * Time.deltaTime);
+        _accelerationBefore = _acceleration;
     }
 
     #endregion
 
     #region Settings
 
-    public void ChangeSpawnHeight(bool isStatic)
-    {
-        Config.IsStaticSpawnZone = isStatic;
-    }
+    public void ChangeSpawnHeight(bool isStatic) =>
+        GameSettings.IsStaticSpawnZone = isStatic;
 
-    public void ChangeOcclusionLevel(float level)
-    {
-        Config.OcclusionLevel = (int)level;
-    }
+    public void ChangeOcclusionLevel(float level) =>
+        GameSettings.OcclusionLevel = (int)level;
 
     #endregion
 }

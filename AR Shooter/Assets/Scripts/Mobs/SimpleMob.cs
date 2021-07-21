@@ -10,7 +10,7 @@ public class SimpleMob : MainMob
 
     private void Update()
     {
-        if (UI.isPaused || !PlayerStatusScript.IsAlive) return;
+        if (UI.IsPaused || !PlayerStatusScript.IsAlive) return;
         
         var moveDir = TargetPos - MobTransform.position;
 

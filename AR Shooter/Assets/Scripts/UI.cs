@@ -13,13 +13,13 @@ public class UI : MonoBehaviour
     [SerializeField] private RectTransform pauseMenu;
     [SerializeField] private TextMeshProUGUI killsText;
 
-    internal static GameObject aliveStateUI;
-    internal static GameObject deadStateUI;
+    internal static GameObject AliveStateUI;
+    internal static GameObject DeadStateUI;
 
     internal static Transform MapCircle { get; set; }
 
     private static RectTransform[] hitMarkers;
-    private static Camera MainCam { get { return Camera.main; } }
+    private static Camera MainCam => Camera.main;
     private static TextMeshProUGUI KillsText { get; set; }
 
     public static WeaponHolderAndSwitcher weaponHolderScript;
@@ -29,12 +29,12 @@ public class UI : MonoBehaviour
     {
         MapCircle = mapCircle;
 
-        hitMarkers = new RectTransform[] { normalMarker, critMarker };
+        hitMarkers = new[] { normalMarker, critMarker };
         KillsText = killsText;
         Config.MobsKills = 0;
 
-        aliveStateUI = transform.GetChild(0).gameObject;
-        deadStateUI = transform.GetChild(1).gameObject;
+        AliveStateUI = transform.GetChild(0).gameObject;
+        DeadStateUI = transform.GetChild(1).gameObject;
     }
 
     public void Aiming(bool toAim)
@@ -42,10 +42,8 @@ public class UI : MonoBehaviour
         weaponHolderScript.Aiming(toAim);
     }
 
-    public void Shoot(bool start)
-    {
+    public void Shoot(bool start) =>
         weaponHolderScript.Shoot(start);
-    }
 
     public void SwitchWeapon(int toWeaponIndex)
     {
@@ -59,7 +57,7 @@ public class UI : MonoBehaviour
         if (hitTimeThreshold > 0 && hitMarkers.Length > 0)
         {
             hitTimeThreshold -= Time.deltaTime;
-            if (hitTimeThreshold <= 0) foreach (RectTransform marker in hitMarkers) marker.gameObject.SetActive(false);
+            if (hitTimeThreshold <= 0) foreach (var marker in hitMarkers) marker.gameObject.SetActive(false);
         }
 
         if (player != null)
@@ -87,15 +85,15 @@ public class UI : MonoBehaviour
 
     public void Quit()
     {
-        isPaused = false;
+        IsPaused = false;
 
         SceneManager.LoadScene(0);
     }
 
-    private float translationTime;
-    private Vector2 menuPosTo;
+    private float _translationTime;
+    private Vector2 _menuPosTo;
 
-    internal static bool isPaused = false;
+    internal static bool IsPaused = false;
 
     public void Pause(bool pause)
     {
@@ -106,33 +104,33 @@ public class UI : MonoBehaviour
 
             pauseMenu.gameObject.SetActive(true);
         }
-        isPaused = pause;
+        IsPaused = pause;
 
-        translationTime = 0.19f - translationTime;
-        menuPosTo = pause ? new Vector2(0, 0) : new Vector2(850, 0);
+        _translationTime = 0.19f - _translationTime;
+        _menuPosTo = pause ? new Vector2(0, 0) : new Vector2(850, 0);
     }
 
     public void Restart()
     {
-        isPaused = false;
+        IsPaused = false;
 
         SceneManager.LoadScene(1);
     }
 
     private void Translation()
     {
-        pauseMenu.anchoredPosition = Vector2.Lerp(pauseMenu.anchoredPosition, menuPosTo, Time.deltaTime / translationTime);
-        translationTime -= Time.deltaTime;
-        if (translationTime < Time.deltaTime)
-        {
-            pauseMenu.anchoredPosition = menuPosTo;
-            if (!isPaused) pauseMenu.gameObject.SetActive(false);
-        }
+        pauseMenu.anchoredPosition = Vector2.Lerp(pauseMenu.anchoredPosition, _menuPosTo, Time.deltaTime / _translationTime);
+        _translationTime -= Time.deltaTime;
+        
+        if (!(_translationTime < Time.deltaTime)) return;
+        
+        pauseMenu.anchoredPosition = _menuPosTo;
+        if (!IsPaused) pauseMenu.gameObject.SetActive(false);
     }
 
     private bool IsTranslating()
     {
-        return translationTime > 0;
+        return _translationTime > 0;
     }
 
     internal static void KillsUI(int kills)

@@ -7,7 +7,7 @@ public class FPS : MonoBehaviour
 
     private void Awake()
     {
-        Application.targetFrameRate = 30;
+        Application.targetFrameRate = 60;
     }
 
     private int accumulator = 0;

@@ -1,154 +1,157 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using TMPro;
+using static Config;
     
-public class MobSpawner : MonoBehaviour
+namespace Mobs
 {
-    [SerializeField] private GameObject mobPrefab;
-    [SerializeField] private GameObject bossMob;
-    [SerializeField] private Transform spawnZone;
-    [SerializeField] internal Transform target;
-    [SerializeField] private TextMeshProUGUI timerText;
-    [SerializeField] private GameObject prediction;
-    [SerializeField] private AROcclusionManager AROcclusion;
-
-    private Transform poolFolder;
-    private int mobsSpawned = 1;
-
-    [SerializeField] private ARRaycastManager raycastManager;
-    internal static MobSpawner instance;
-
-    internal LinkedList<GameObject> mobPool = new LinkedList<GameObject>();
-    private Vector2 screenCenter;
-
-    private void Awake()
+    public class MobSpawner : MonoBehaviour
     {
-        instance = this;
+        [SerializeField] private GameObject mobPrefab;
+        [SerializeField] private GameObject bossMob;
+        [SerializeField] private Transform spawnZone;
+        [SerializeField] internal Transform target;
+        [SerializeField] private TextMeshProUGUI timerText;
+        [SerializeField] private GameObject prediction;
+        [SerializeField] private AROcclusionManager AROcclusion;
 
-        AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)Config.OcclusionLevel;
-    }
+        private Transform _poolFolder;
+        private int _mobsSpawned = 1;
 
-    private float spawnHeight = -0.1f;
-    private bool timer = false;
+        [SerializeField] private ARRaycastManager raycastManager;
+        internal static MobSpawner Instance;
 
-    private void Start()
-    {
-        poolFolder = transform;
-        screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        internal readonly LinkedList<GameObject> MobPool = new();
+        private Vector2 _screenCenter;
 
-        StartCoroutine(Timer());
-    }
-
-    private IEnumerator Timer()
-    {
-        yield return new WaitUntil(FindSurface);
-
-        timer = true;
-
-        spawnZone.position = new Vector3(target.position.x, spawnHeight, target.position.z);
-        spawnZone.gameObject.SetActive(true);
-
-        StartCoroutine(EnemiesSpawn());
-
-        while (!FullPool())
+        private void Awake()
         {
-            GameObject mob = Instantiate(mobPrefab, new Vector3(0, -1, 1), Quaternion.Euler(0, 0, 0), poolFolder);
-            mobPool.AddLast(mob);
-            mob.SetActive(false);
+            Instance = this;
 
-            yield return new WaitForEndOfFrame();
+            AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)GameSettings.OcclusionLevel;
         }
 
-        timerText.gameObject.SetActive(true);
+        private float _spawnHeight = -0.1f;
+        private bool _timer = false;
 
-        for (int i = 9; i > 0; i--)
+        private void Start()
         {
+            _poolFolder = transform;
+            _screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+
+            StartCoroutine(Timer());
+        }
+
+        private IEnumerator Timer()
+        {
+            yield return new WaitUntil(FindSurface);
+
+            _timer = true;
+
+            spawnZone.position = new Vector3(target.position.x, _spawnHeight, target.position.z);
+            spawnZone.gameObject.SetActive(true);
+
+            StartCoroutine(EnemiesSpawn());
+
+            while (!FullPool())
+            {
+                var mob = Instantiate(mobPrefab, new Vector3(0, -1, 1), Quaternion.Euler(0, 0, 0), _poolFolder);
+                MobPool.AddLast(mob);
+                mob.SetActive(false);
+
+                yield return new WaitForEndOfFrame();
+            }
+
+            timerText.gameObject.SetActive(true);
+
+            for (var i = 9; i > 0; i--)
+            {
+                yield return new WaitForSeconds(1);
+
+                timerText.text = i.ToString();
+
+                if (i == 5) prediction.SetActive(false);
+            }
+
             yield return new WaitForSeconds(1);
 
-            timerText.text = i.ToString();
+            _timer = false;
 
-            if (i == 5) prediction.SetActive(false);
-        }
+            timerText.gameObject.SetActive(false);
+            spawnZone.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(1);
-
-        timer = false;
-
-        timerText.gameObject.SetActive(false);
-        spawnZone.gameObject.SetActive(false);
-
-        if (!Config.IsStaticSpawnZone)
-        {
+            if (GameSettings.IsStaticSpawnZone) yield break;
+        
             while (true)
             {
-                if (FindSurface()) spawnHeight = hitResults[0].pose.position.y;
+                if (FindSurface()) _spawnHeight = hitResults[0].pose.position.y;
 
                 yield return new WaitForFixedUpdate();
             }
         }
-    }
 
-    private List<ARRaycastHit> hitResults = new List<ARRaycastHit>();
+        private readonly List<ARRaycastHit> hitResults = new();
 
-    private bool FindSurface()
-    {
-        return target != null && raycastManager.Raycast(screenCenter, hitResults, TrackableType.PlaneWithinPolygon | TrackableType.PlaneWithinBounds);
-    }
-
-    private IEnumerator EnemiesSpawn()
-    {
-        while (timer)
+        private bool FindSurface()
         {
-            if (FindSurface()) spawnHeight = hitResults[0].pose.position.y;
-
-            if (target != null) spawnZone.position = new Vector3(target.position.x, spawnHeight, target.position.z);
-
-            yield return new WaitForEndOfFrame();
+            return target != null && raycastManager.Raycast(_screenCenter, hitResults, TrackableType.PlaneWithinPolygon | TrackableType.PlaneWithinBounds);
         }
 
-        while (true)
+        private IEnumerator EnemiesSpawn()
         {
-            if (!UI.isPaused)
+            while (_timer)
             {
-                if (mobPool.Count > 0 && target != null)
-                {
-                    float angle = Random.Range(-Mathf.PI / 8f, Mathf.PI / 8f) + target.rotation.eulerAngles.y * Mathf.Deg2Rad;
-                    GameObject mob;
+                if (FindSurface()) _spawnHeight = hitResults[0].pose.position.y;
 
-                    if (mobsSpawned % 25 == 0)
-                    {
-                        yield return new WaitUntil(FullPool);
+                if (target != null) spawnZone.position = new Vector3(target.position.x, _spawnHeight, target.position.z);
 
-                        mob = bossMob;
-                    }
-                    else
-                    {
-                        yield return new WaitWhile(BossActive);
-
-                        mob = mobPool.Last.Value;
-                        mobPool.RemoveLast();
-                    }
-
-                    mob.transform.position = new Vector3(target.position.x + 4.5f * Mathf.Sin(angle), spawnHeight, target.position.z + 4.5f * Mathf.Cos(angle));
-                    mob.SetActive(true);
-                    mobsSpawned++;
-                }
+                yield return new WaitForEndOfFrame();
             }
 
-            yield return new WaitForSeconds(2);
+            while (true)
+            {
+                if (!UI.IsPaused)
+                {
+                    if (MobPool.Count > 0 && target != null)
+                    {
+                        var angle = Random.Range(-Mathf.PI / 8f, Mathf.PI / 8f) + target.rotation.eulerAngles.y * Mathf.Deg2Rad;
+                        GameObject mob;
+
+                        if (_mobsSpawned % 25 == 0)
+                        {
+                            yield return new WaitUntil(FullPool);
+
+                            mob = bossMob;
+                        }
+                        else
+                        {
+                            yield return new WaitWhile(BossActive);
+
+                            mob = MobPool.Last.Value;
+                            MobPool.RemoveLast();
+                        }
+
+                        mob.transform.position = new Vector3(target.position.x + 4.5f * Mathf.Sin(angle), _spawnHeight, target.position.z + 4.5f * Mathf.Cos(angle));
+                        mob.SetActive(true);
+                        _mobsSpawned++;
+                    }
+                }
+
+                yield return new WaitForSeconds(2);
+            }
         }
-    }
 
-    private bool FullPool()
-    {
-        return mobPool.Count == 6;
-    }
+        private bool FullPool()
+        {
+            return MobPool.Count == 6;
+        }
 
-    private bool BossActive()
-    {
-        return bossMob.activeSelf;
+        private bool BossActive()
+        {
+            return bossMob.activeSelf;
+        }
     }
 }

@@ -70,8 +70,8 @@ public class NetworkedPlayerStatus : PlayerStatus
 
         if (photonView.IsMine)
         {
-            UI.aliveStateUI.SetActive(true);
-            UI.deadStateUI.SetActive(false);
+            UI.AliveStateUI.SetActive(true);
+            UI.DeadStateUI.SetActive(false);
         }
     }
 }

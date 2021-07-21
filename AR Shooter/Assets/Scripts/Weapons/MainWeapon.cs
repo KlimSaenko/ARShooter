@@ -59,7 +59,7 @@ namespace Weapons
             }
         }
 
-        private IEnumerator Shooting(bool isMine)
+        protected virtual IEnumerator Shooting(bool isMine)
         {
             if (isMine)
             {
@@ -68,15 +68,15 @@ namespace Weapons
                     shellsParticle.Play();
                     shootAnimation.Play();
                     flashParticle.Play(true);
-                    audioSource.pitch = Random.Range(0.94f, 1.06f);
-                    audioSource.PlayOneShot(shootAudio);
+                    // audioSource.pitch = Random.Range(0.94f, 1.06f);
+                    // audioSource.PlayOneShot(shootAudio);
 
-                    Vector3 startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
+                    // var startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
 
-                    if (Physics.Raycast(startPos, (startPos - _mainCam.transform.position).normalized, out RaycastHit hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
-                    {
-                        hitZone.ApplyDamage(_damage, hitInfo.point);
-                    }
+                    // if (Physics.Raycast(startPos, (startPos - _mainCam.transform.position).normalized, out var hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+                    // {
+                    //     hitZone.ApplyDamage(_damage, hitInfo.point);
+                    // }
 
                     yield return new WaitWhile(IsAnimating);
                 }
@@ -94,9 +94,7 @@ namespace Weapons
             }
         }
 
-        private bool IsAnimating()
-        {
-            return shootAnimation.isPlaying;
-        }
+        private bool IsAnimating() =>
+            shootAnimation.isPlaying;
     }
 }

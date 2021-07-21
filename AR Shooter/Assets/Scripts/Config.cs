@@ -41,35 +41,35 @@ public static class Config
         };
     }
 
-    #region Singleplayer
+    #region SingleplayerStats
 
-    private static int _mobsKills = 0;
+    // private static int _mobsKills = 0;
     internal static int MobsKills
     {
-        get => _mobsKills;
+        get => MobsKills;
         set
         {
             try
             {
                 UI.KillsUI(value);
                 RecordKills = value;
-                _mobsKills = value;
+                MobsKills = value;
             }
-            catch
-            {
-                // ignored
-            }
+            catch { /* ignored */ }
         }
     }
 
-    private static int _recordKills;
+    // private static int _recordKills;
     internal static int RecordKills
     {
-        get => _recordKills;
+        get => RecordKills;
+        
         private set
         {
-            if (_recordKills < value)
-                _recordKills = value;
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value) + " <= 0");
+            
+            if (RecordKills < value)
+                RecordKills = value;
         }
     }
 
@@ -77,27 +77,33 @@ public static class Config
 
     #region Settings
 
-    public static bool IsStaticSpawnZone = false;
-
-    public static int OcclusionLevel = 2;
+    public struct GameSettings
+    {
+        public static bool IsStaticSpawnZone = false;
+        
+        public static int OcclusionLevel = 2;
+    }
 
     #endregion
 
     internal static void SaveGame()
     {
-        PlayerPrefs.SetInt("KillsRecord", _recordKills);
-        PlayerPrefs.SetInt("IsStaticSpawnZone", IsStaticSpawnZone ? 1 : 0);
-        PlayerPrefs.SetInt("OcclusionLevel", OcclusionLevel);
+        PlayerPrefs.SetInt(nameof(RecordKills), RecordKills);
+        PlayerPrefs.SetInt(nameof(GameSettings.IsStaticSpawnZone), GameSettings.IsStaticSpawnZone ? 1 : 0);
+        PlayerPrefs.SetInt(nameof(GameSettings.OcclusionLevel), GameSettings.OcclusionLevel);
 
         PlayerPrefs.Save();
     }
 
     internal static void LoadGame()
     {
-        if (!PlayerPrefs.HasKey("KillsRecord") || !PlayerPrefs.HasKey("IsStaticSpawnZone") || !PlayerPrefs.HasKey("OcclusionLevel")) return;
+        if (PlayerPrefs.HasKey(nameof(RecordKills)))
+            RecordKills = PlayerPrefs.GetInt(nameof(RecordKills));
         
-        _recordKills = PlayerPrefs.GetInt("KillsRecord");
-        IsStaticSpawnZone = PlayerPrefs.GetInt("IsStaticSpawnZone") == 1;
-        OcclusionLevel = PlayerPrefs.GetInt("OcclusionLevel");
+        if (PlayerPrefs.HasKey(nameof(GameSettings.IsStaticSpawnZone)))
+            GameSettings.IsStaticSpawnZone = PlayerPrefs.GetInt(nameof(GameSettings.IsStaticSpawnZone)) == 1;
+        
+        if (PlayerPrefs.HasKey(nameof(GameSettings.OcclusionLevel)))
+            GameSettings.OcclusionLevel = PlayerPrefs.GetInt(nameof(GameSettings.OcclusionLevel));
     }
 }

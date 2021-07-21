@@ -50,7 +50,7 @@ namespace Mobs
         protected void MobAppeared()
         {
             MobTransform = transform;
-            _target = MobSpawner.instance.target;
+            _target = MobSpawner.Instance.target;
             PlayerStatusScript = _target.GetComponentInParent<PlayerStatus>();
             HP = mobHP;
 
@@ -107,7 +107,7 @@ namespace Mobs
 
             yield return new WaitForSeconds(2.7f);
 
-            MobSpawner.instance.mobPool.AddFirst(gameObject);
+            MobSpawner.Instance.MobPool.AddFirst(gameObject);
             MobSpeed = 0.35f;
             HP = mobHP;
 

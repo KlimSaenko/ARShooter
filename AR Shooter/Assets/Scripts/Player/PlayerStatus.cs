@@ -45,14 +45,14 @@ namespace Player
 
         public IEnumerator Death(int deathType)
         {
-            UI.aliveStateUI.SetActive(false);
+            UI.AliveStateUI.SetActive(false);
 
             for (int i = 0; i < hpImages.childCount; i++)
             {
                 hpImages.GetChild(i).gameObject.SetActive(true);
             }
 
-            GameObject deadStateUI = UI.deadStateUI;
+            GameObject deadStateUI = UI.DeadStateUI;
             Image dark = deadStateUI.GetComponent<Image>();
             TextMeshProUGUI[] texts = deadStateUI.GetComponentsInChildren<TextMeshProUGUI>();
 
