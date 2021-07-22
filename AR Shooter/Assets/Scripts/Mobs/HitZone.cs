@@ -12,17 +12,16 @@ public class HitZone : MonoBehaviour
 
     private IDamageable Damageable
     {
-        get 
+        get
         {
             if (transformWithController.TryGetComponent(out MainMob mainMob)) return mainMob;
-            else if (transformWithController.TryGetComponent(out PlayerStatus playerStatus)) return playerStatus;
-            else return null;
+            return transformWithController.TryGetComponent(out PlayerStatus playerStatus) ? playerStatus : null;
         }
     }
 
     internal enum ZoneType
     {
-        Standart = 0,
+        Standard = 0,
         Critical
     }
 
@@ -30,13 +29,12 @@ public class HitZone : MonoBehaviour
 
     public void ApplyDamage(int damage, Vector3 hitPos)
     {
-        if (Damageable != null)
-        {
-            damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
-            UI.ActivateMarker((int)zoneType, hitPos);
-            HitDecal.instance.NewDecal(hitPos, damage, zoneType);
-            Damageable.ApplyDamage(damage);
-        }
+        if (Damageable == null) return;
+        
+        damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
+        UI.ActivateMarker((int)zoneType, hitPos);
+        HitDecal.instance.NewDecal(hitPos, damage, zoneType);
+        Damageable.ApplyDamage(damage);
     }
     
     //public IEnumerator Death()

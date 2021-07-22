@@ -1,8 +1,11 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Weapons;
+using Random = UnityEngine.Random;
 
 public class UI : MonoBehaviour
 {
@@ -35,6 +38,8 @@ public class UI : MonoBehaviour
 
         AliveStateUI = transform.GetChild(0).gameObject;
         DeadStateUI = transform.GetChild(1).gameObject;
+
+        Aim_ = new Aim(aimAnimation, aimTransform);
     }
 
     public void Aiming(bool toAim)
@@ -73,6 +78,8 @@ public class UI : MonoBehaviour
         }
 
         if (IsTranslating()) Translation();
+        
+        Aim_.Update();
     }
 
     public static void ActivateMarker(int type, Vector3 pos)
@@ -142,5 +149,42 @@ public class UI : MonoBehaviour
     {
         if (pause) Config.SaveGame();
         else Config.LoadGame();
+    }
+    
+    [Header("Aim")]
+    [SerializeField] private Animation aimAnimation;
+    [SerializeField] private RectTransform aimTransform;
+
+    internal static Aim Aim_;
+    
+    public class Aim
+    {
+        public Aim(Animation aimAnimation, RectTransform aimTransform)
+        {
+            _aimAnimation = aimAnimation;
+            _aimTransform = aimTransform;
+        }
+
+        private readonly RectTransform _aimTransform;
+        private readonly Animation _aimAnimation;
+
+        private int StartAimSpreadRadius = 110;
+        internal float TransformTime = 1.5f;
+    
+        internal Ray StartAnim()
+        {
+            _aimAnimation.Play();
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _aimTransform.rect.width + 100);
+
+            return Camera.main.ScreenPointToRay(_aimTransform.rect.width * Random.insideUnitCircle);
+        }
+    
+        internal void Update()
+        {
+            if (_aimTransform.rect.width <= StartAimSpreadRadius) return;
+            
+            var rect = _aimTransform.rect;
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.width - Time.deltaTime * rect.width);
+        }
     }
 }

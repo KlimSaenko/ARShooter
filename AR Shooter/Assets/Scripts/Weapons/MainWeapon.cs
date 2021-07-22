@@ -7,7 +7,7 @@ namespace Weapons
     public class MainWeapon : MonoBehaviour
     {   
         private Camera _mainCam;
-        [SerializeField] private Transform aim, virtualAim;
+        [SerializeField] protected Transform virtualAim;
 
         internal enum WeaponType
         {
@@ -26,7 +26,7 @@ namespace Weapons
 
         private bool _isShoot;
 
-        private int _damage;
+        protected int Damage;
         private Vector3 _standardWeaponPos;
         private Quaternion _standardWeaponRot;
 
@@ -39,7 +39,7 @@ namespace Weapons
 
         private void Start()
         {
-            _damage = GetStats(weaponType).Value.Damage;
+            Damage = GetStats(weaponType).Value.Damage;
             _mainCam = Camera.main;
         }
 
@@ -53,48 +53,60 @@ namespace Weapons
         public void Shoot(bool start, bool isMine = true)
         {
             _isShoot = start;
-            if (start && !IsAnimating())
+            if (start && !IsRunning())
             {
                 StartCoroutine(Shooting(isMine));
             }
         }
 
-        protected virtual IEnumerator Shooting(bool isMine)
+        private IEnumerator Shooting(bool isMine)
         {
             if (isMine)
             {
                 while (_isShoot)
                 {
-                    shellsParticle.Play();
-                    shootAnimation.Play();
-                    flashParticle.Play(true);
-                    // audioSource.pitch = Random.Range(0.94f, 1.06f);
-                    // audioSource.PlayOneShot(shootAudio);
+                    VisualizeFiring();
+
+                    RunWeaponLogic();
 
                     // var startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
+                    // var startBulletPos = virtualAim.position;
 
                     // if (Physics.Raycast(startPos, (startPos - _mainCam.transform.position).normalized, out var hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
                     // {
                     //     hitZone.ApplyDamage(_damage, hitInfo.point);
                     // }
-
-                    yield return new WaitWhile(IsAnimating);
+                    
+                    yield return new WaitWhile(IsRunning);
+                    // yield return StartCoroutine(RunGunLogic());
                 }
             }
             else
             {
                 while (_isShoot)
                 {
-                    shellsParticle.Play();
-                    shootAnimation.Play();
-                    flashParticle.Play(true);
+                    VisualizeFiring();
 
-                    yield return new WaitWhile(IsAnimating);
+                    yield return new WaitWhile(IsRunning);
                 }
             }
         }
 
-        private bool IsAnimating() =>
+        private bool IsRunning() =>
             shootAnimation.isPlaying;
+
+        protected virtual void VisualizeFiring()
+        {
+            shellsParticle.Play();
+            shootAnimation.Play();
+            flashParticle.Play(true);
+            // audioSource.pitch = Random.Range(0.94f, 1.06f);
+            // audioSource.PlayOneShot(shootAudio);
+        }
+
+        protected virtual void RunWeaponLogic()
+        {
+            
+        }
     }
 }

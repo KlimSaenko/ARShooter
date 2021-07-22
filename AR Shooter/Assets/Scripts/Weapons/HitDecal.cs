@@ -11,14 +11,14 @@ public class HitDecal : MonoBehaviour
 
     private static Camera MainCam { get { return Camera.main; } }
 
-    private static LinkedList<TextMeshPro> decals = new LinkedList<TextMeshPro>();
+    private static LinkedList<TextMeshPro> decals = new ();
     public static HitDecal instance;
 
     private void Start()
     {
         poolFolder = transform;
         instance = this;
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             decals.AddLast(Instantiate(decalPrefab, poolFolder).GetComponent<TextMeshPro>());
         }
@@ -26,26 +26,25 @@ public class HitDecal : MonoBehaviour
 
     internal void NewDecal(Vector3 pos, int damage, HitZone.ZoneType zoneType)
     {
-        if (decals.Count > 0)
+        if (decals.Count <= 0) return;
+        
+        var decalText = decals.First.Value;
+        decals.RemoveFirst();
+
+        decalText.transform.position = pos + new Vector3(Random.Range(-0.1f, 0.1f), 0, Random.Range(-0.1f, 0.1f));
+        decalText.transform.rotation = MainCam.transform.rotation;
+        decalText.text = damage.ToString();
+        if (zoneType == HitZone.ZoneType.Standard)
         {
-            TextMeshPro decalText = decals.First.Value;
-            decals.RemoveFirst();
-
-            decalText.transform.position = pos + new Vector3(Random.Range(-0.1f, 0.1f), 0, Random.Range(-0.1f, 0.1f));
-            decalText.transform.rotation = MainCam.transform.rotation;
-            decalText.text = damage.ToString();
-            if (zoneType == HitZone.ZoneType.Standart)
-            {
-                decalText.color = Color.white;
-            }
-            else if (zoneType == HitZone.ZoneType.Critical)
-            {
-                decalText.color = Color.red;
-            }
-            decalText.gameObject.SetActive(true);
-
-            StartCoroutine(DecalLife(decalText));
+            decalText.color = Color.white;
         }
+        else if (zoneType == HitZone.ZoneType.Critical)
+        {
+            decalText.color = Color.red;
+        }
+        decalText.gameObject.SetActive(true);
+
+        StartCoroutine(DecalLife(decalText));
     }
 
     private IEnumerator DecalLife(TextMeshPro decalText)
