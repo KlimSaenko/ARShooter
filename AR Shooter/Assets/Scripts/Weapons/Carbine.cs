@@ -12,20 +12,16 @@ namespace Weapons
 
         protected override void RunWeaponLogic()
         {
-            var startBulletPos = virtualAim.position;
-            
-            var currentAimSpreadDiameter = UI.Aim_.StartAnim();
-            
-            
+            var currentRay = UI.Aim_.StartAnim();
             
             // var startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
             // var startBulletPos = virtualAim.position;
 
-            // if (Physics.Raycast(startBulletPos, (startBulletPos - _mainCam.transform.position).normalized, out var hitInfo) 
-            //     && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
-            // {
-            //     hitZone.ApplyDamage(Damage, hitInfo.point);
-            // }
+            if (Physics.Raycast(currentRay, out var hitInfo) && 
+                hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+            {
+                hitZone.ApplyDamage(Damage, hitInfo.point);
+            }
             // return shootAnimation.isPlaying;
         }
         

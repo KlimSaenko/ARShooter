@@ -533,7 +533,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 3120, y: 1440}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -11133,7 +11133,7 @@ GameObject:
   - component: {fileID: 1668744689}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12103,6 +12103,7 @@ GameObject:
   - component: {fileID: 1957160184}
   - component: {fileID: 1957160183}
   - component: {fileID: 1957160182}
+  - component: {fileID: 1957160186}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -12118,10 +12119,10 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1957160181}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1957160183
@@ -12189,6 +12190,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!114 &1957160186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1957160181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19a3dfaba8714114887858388a689bfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformWithController: {fileID: 0}
+  zoneType: 0
 --- !u!1 &1979634890
 GameObject:
   m_ObjectHideFlags: 0
@@ -41703,7 +41718,6 @@ GameObject:
   - component: {fileID: 7757767978917481723}
   - component: {fileID: 7757767978917481724}
   - component: {fileID: 7757767978917481725}
-  - component: {fileID: 7757767978917481726}
   m_Layer: 0
   m_Name: carbine
   m_TagString: Untagged
@@ -45932,26 +45946,6 @@ MonoBehaviour:
   shootAnimation: {fileID: 7757767978917481724}
   audioSource: {fileID: 0}
   shootAudio: {fileID: 0}
---- !u!114 &7757767978917481726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3595518562994326180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 120459ac0af9e384aa63632d3060905e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalMarker: {fileID: 0}
-  critMarker: {fileID: 0}
-  mapLookImage: {fileID: 0}
-  mapCircle: {fileID: 0}
-  pauseMenu: {fileID: 0}
-  killsText: {fileID: 0}
-  aimAnimation: {fileID: 0}
-  aimTransform: {fileID: 0}
 --- !u!4 &7761772029334302218
 Transform:
   m_ObjectHideFlags: 0

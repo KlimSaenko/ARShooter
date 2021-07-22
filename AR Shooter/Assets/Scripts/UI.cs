@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Weapons;
+using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
 
 public class UI : MonoBehaviour
@@ -174,7 +175,7 @@ public class UI : MonoBehaviour
         internal Ray StartAnim()
         {
             _aimAnimation.Play();
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _aimTransform.rect.width + 100);
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _aimTransform.rect.width + 90);
 
             return Camera.main.ScreenPointToRay(_aimTransform.rect.width * Random.insideUnitCircle);
         }
@@ -184,7 +185,7 @@ public class UI : MonoBehaviour
             if (_aimTransform.rect.width <= StartAimSpreadRadius) return;
             
             var rect = _aimTransform.rect;
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.width - Time.deltaTime * rect.width);
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.width - 1.5f * Time.deltaTime * rect.width);
         }
     }
 }
