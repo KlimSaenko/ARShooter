@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Common;
 using Mobs;
 using Player;
 using UnityEngine;
@@ -29,16 +30,11 @@ public class HitZone : MonoBehaviour
 
     public void ApplyDamage(int damage, Vector3 hitPos)
     {
-        if (Damageable == null) return;
-        
         damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
-        UI.ActivateMarker((int)zoneType, hitPos);
-        HitDecal.instance.NewDecal(hitPos, damage, zoneType);
-        Damageable.ApplyDamage(damage);
+        // UI.ActivateHitMarker((int)zoneType, hitPos);
+        // HitDecal_Prev.instance.NewDecal(hitPos, damage, zoneType);
+        Pool.Decals.ActivateHitMarker(hitPos, damage, zoneType);
+
+        Damageable?.ApplyDamage(damage);
     }
-    
-    //public IEnumerator Death()
-    //{
-    //    return ((IDamageable)mainMob).Death();
-    //}
 }

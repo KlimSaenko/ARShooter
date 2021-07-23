@@ -1,62 +1,65 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using Common;
 using UnityEngine;
-using TMPro;
+using UnityEngine.Pool;
+using UnityEngine.UI;
 
-public class HitDecal : MonoBehaviour
+namespace Weapons
 {
-    [SerializeField] private GameObject decalPrefab;
-    [SerializeField] private AnimationCurve fadeCurve;
-    private Transform poolFolder;
-
-    private static Camera MainCam { get { return Camera.main; } }
-
-    private static LinkedList<TextMeshPro> decals = new ();
-    public static HitDecal instance;
-
-    private void Start()
+    public class HitDecal : MonoBehaviour
     {
-        poolFolder = transform;
-        instance = this;
-        for (var i = 0; i < 3; i++)
-        {
-            decals.AddLast(Instantiate(decalPrefab, poolFolder).GetComponent<TextMeshPro>());
-        }
-    }
+        [Range(0.0f, 5.0f)]
+        [SerializeField] private float power;
+    
+        [Range(0.0f, 1.0f)]
+        [SerializeField] private float time;
+    
+        [SerializeField] private RectTransform hitMarker;
+        [SerializeField] private Animation[] animations;
 
-    internal void NewDecal(Vector3 pos, int damage, HitZone.ZoneType zoneType)
-    {
-        if (decals.Count <= 0) return;
-        
-        var decalText = decals.First.Value;
-        decals.RemoveFirst();
+        // private Transform _thisTransform;
+    
+        private static Camera MainCam => Camera.main;
 
-        decalText.transform.position = pos + new Vector3(Random.Range(-0.1f, 0.1f), 0, Random.Range(-0.1f, 0.1f));
-        decalText.transform.rotation = MainCam.transform.rotation;
-        decalText.text = damage.ToString();
-        if (zoneType == HitZone.ZoneType.Standard)
+        private void Start()
         {
-            decalText.color = Color.white;
+            // _thisTransform = transform;
+            // _currentVelocity = power;
+            // normalMarker.gameObject.
+            
+            // var hitMarker = this.hitMarker;
+            // if (hitMarker.gameObject.TryGetComponent(out Image image))
+            //     image.color = Color.red;
+            // _currentMarker = 
         }
-        else if (zoneType == HitZone.ZoneType.Critical)
-        {
-            decalText.color = Color.red;
-        }
-        decalText.gameObject.SetActive(true);
 
-        StartCoroutine(DecalLife(decalText));
-    }
-
-    private IEnumerator DecalLife(TextMeshPro decalText)
-    {
-        float time = 0f;
-        while (time < 1f) 
+        // private float _currentVelocity;
+        // private float _currentTime;
+        //
+        // private void Update()
+        // {
+        //     var newPosition = _thisTransform.position;
+        //     newPosition += new Vector3(0, newPosition.y + _currentVelocity);
+        //     _thisTransform.position = newPosition;
+        //
+        //     _currentVelocity -= 0.1f;
+        //     _currentTime += Time.deltaTime;
+        //     
+        //     if (_currentTime >= time)
+        //         EndDecal();
+        // }
+    
+        internal void ActivateHitMarker(int damage, HitZone.ZoneType type)
         {
-            time += 3.5f * Time.deltaTime;
-            decalText.alpha = fadeCurve.Evaluate(time);
-            yield return new WaitForEndOfFrame();
+            hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+
+            foreach (var animation in animations) animation.Play();
         }
-        decalText.gameObject.SetActive(false);
-        decals.AddLast(decalText);
+
+        public void DisableDecal()
+        {
+            Pool.Decals.DeactivateHitMarker(this);
+            gameObject.SetActive(false);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace Weapons
 
         protected override void RunWeaponLogic()
         {
-            var currentRay = UI.Aim_.StartAnim();
+            var currentRay = UI.AimInstance.StartAnim();
             
             // var startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
             // var startBulletPos = virtualAim.position;

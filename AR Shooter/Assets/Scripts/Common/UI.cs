@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.Pool;
 using Weapons;
-using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
 
 public class UI : MonoBehaviour
@@ -22,73 +22,82 @@ public class UI : MonoBehaviour
 
     internal static Transform MapCircle { get; set; }
 
-    private static RectTransform[] hitMarkers;
+    private static LinkedPool<RectTransform> _hitMarkers;
     private static Camera MainCam => Camera.main;
     private static TextMeshProUGUI KillsText { get; set; }
 
-    public static WeaponHolderAndSwitcher weaponHolderScript;
-    private Transform player;
+    public static WeaponHolderAndSwitcher WeaponHolderScript;
+    private Transform _player;
 
     private void Start()
     {
         MapCircle = mapCircle;
 
-        hitMarkers = new[] { normalMarker, critMarker };
+        _hitMarkers = new LinkedPool<RectTransform>(() => normalMarker,
+            rt => rt.gameObject.SetActive(true),
+            rt => rt.gameObject.SetActive(false),
+            null, false,10);
+        
         KillsText = killsText;
         Config.MobsKills = 0;
 
         AliveStateUI = transform.GetChild(0).gameObject;
         DeadStateUI = transform.GetChild(1).gameObject;
 
-        Aim_ = new Aim(aimAnimation, aimTransform);
+        AimInstance = new Aim(aimAnimation, aimTransform);
     }
 
     public void Aiming(bool toAim)
     {
-        weaponHolderScript.Aiming(toAim);
+        WeaponHolderScript.Aiming(toAim);
     }
 
     public void Shoot(bool start) =>
-        weaponHolderScript.Shoot(start);
+        WeaponHolderScript.Shoot(start);
 
     public void SwitchWeapon(int toWeaponIndex)
     {
-        weaponHolderScript.SwitchWeapon(toWeaponIndex);
+        WeaponHolderScript.SwitchWeapon(toWeaponIndex);
     }
 
-    private static float hitTimeThreshold;
+    private static float _hitTimeThreshold;
+
+    public void DisableMarker()
+    {
+        
+    }
 
     private void Update()
     {
-        if (hitTimeThreshold > 0 && hitMarkers.Length > 0)
-        {
-            hitTimeThreshold -= Time.deltaTime;
-            if (hitTimeThreshold <= 0) foreach (var marker in hitMarkers) marker.gameObject.SetActive(false);
-        }
+        // if (_hitTimeThreshold > 0 && _hitMarkers.CountInactive > 0)
+        // {
+        //     _hitTimeThreshold -= Time.deltaTime;
+        //     if (_hitTimeThreshold <= 0) foreach (var marker in _hitMarkers.) marker.gameObject.SetActive(false);
+        // }
 
-        if (player != null)
+        if (_player != null)
         {
             //mapLookImage.transform.rotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180 - player.rotation.eulerAngles.y);
-            mapCircle.localRotation = Quaternion.Euler(0, 0, player.rotation.eulerAngles.y);
+            mapCircle.localRotation = Quaternion.Euler(0, 0, _player.rotation.eulerAngles.y);
         }
         else if (MainCam != null)
         {
-            player = MainCam.transform;
+            _player = MainCam.transform;
             mapLookImage.fillAmount = Screen.width / Screen.height * MainCam.fieldOfView / 360f;
-            mapLookImage.transform.rotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180 - player.rotation.eulerAngles.y);
+            mapLookImage.transform.rotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180 - _player.rotation.eulerAngles.y);
         }
 
         if (IsTranslating()) Translation();
         
-        Aim_.Update();
+        AimInstance.Update();
     }
 
-    public static void ActivateMarker(int type, Vector3 pos)
+    public static void ActivateHitMarker(int type, Vector3 pos)
     {
-        hitMarkers[type].position = MainCam.WorldToScreenPoint(pos);
-        hitMarkers[type].gameObject.SetActive(true);
+        _hitMarkers.Get().position = MainCam.WorldToScreenPoint(pos);
+        // _hitMarkers[type].position = MainCam.WorldToScreenPoint(pos);
 
-        hitTimeThreshold = 0.11f;
+        _hitTimeThreshold = 0.1f;
     }
 
     public void Quit()
@@ -107,8 +116,8 @@ public class UI : MonoBehaviour
     {
         if (pause)
         {
-            weaponHolderScript.Shoot(false);
-            weaponHolderScript.Aiming(false);
+            WeaponHolderScript.Shoot(false);
+            WeaponHolderScript.Aiming(false);
 
             pauseMenu.gameObject.SetActive(true);
         }
@@ -156,7 +165,7 @@ public class UI : MonoBehaviour
     [SerializeField] private Animation aimAnimation;
     [SerializeField] private RectTransform aimTransform;
 
-    internal static Aim Aim_;
+    internal static Aim AimInstance;
     
     public class Aim
     {
@@ -174,18 +183,24 @@ public class UI : MonoBehaviour
     
         internal Ray StartAnim()
         {
+            var aimWidth = _aimTransform.rect.width;
             _aimAnimation.Play();
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _aimTransform.rect.width + 90);
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, aimWidth + 90);
 
-            return Camera.main.ScreenPointToRay(_aimTransform.rect.width * Random.insideUnitCircle);
+            var aimPos = _aimTransform.position;
+            
+            return Camera.main.ScreenPointToRay(aimWidth * Random.insideUnitCircle / 4f + new Vector2(aimPos.x, aimPos.y));
         }
     
         internal void Update()
         {
-            if (_aimTransform.rect.width <= StartAimSpreadRadius) return;
-            
             var rect = _aimTransform.rect;
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.width - 1.5f * Time.deltaTime * rect.width);
+            if (rect.width <= StartAimSpreadRadius) return;
+            
+            var newWidth = rect.width - 1.5f * Time.deltaTime * rect.width;
+            if (newWidth < StartAimSpreadRadius) newWidth = StartAimSpreadRadius;
+            
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, newWidth);
         }
     }
 }

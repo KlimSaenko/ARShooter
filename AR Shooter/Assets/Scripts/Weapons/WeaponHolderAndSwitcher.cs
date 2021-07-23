@@ -20,7 +20,7 @@ namespace Weapons
 
         protected virtual void Awake()
         {
-            UI.weaponHolderScript = this;
+            UI.WeaponHolderScript = this;
         }
 
         private void Start()

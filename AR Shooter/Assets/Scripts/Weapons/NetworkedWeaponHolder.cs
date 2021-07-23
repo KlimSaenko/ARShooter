@@ -8,7 +8,7 @@ public class NetworkedWeaponHolder : WeaponHolderAndSwitcher
 {
     protected override void Awake()
     {
-        if (photonView.IsMine) UI.weaponHolderScript = this;
+        if (photonView.IsMine) UI.WeaponHolderScript = this;
     }
 
     public override void Shoot(bool start)
