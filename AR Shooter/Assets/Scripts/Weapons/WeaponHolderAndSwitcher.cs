@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using DG.Tweening.Plugins.Core.PathCore;
 using Photon.Pun;
 using UnityEngine;
 using static Config;
@@ -88,6 +90,7 @@ namespace Weapons
 
             if (newWeaponScript != CurrentWeaponScript)
             {
+                //virtualHands.DOMoveX()
                 TranslateWeapon(StandardBackwardPos, Quaternion.Euler(-60, 0, 0), 0.32f);
             }
 
@@ -111,15 +114,22 @@ namespace Weapons
 
         #region Weapon Aiming
 
+        [SerializeField] private Vector3[] path;
+        [SerializeField] private PathType pathType;
+        [SerializeField] private PathMode pathMode;
+        
         public void Aiming(bool toAim)
         {
-            isAimed = toAim;
-            if (!SwitchAnimation)
-            {
-                TranslateWeapon(
-                    toAim ? GetStats((MainWeapon.WeaponType) CurrentWeaponIndex).Value.AimingPos : StandardFreePos,
-                    0.16f);
-            }
+            // print("ok");
+            transform.DOLocalPath(path, 0.8f, pathType, pathMode);
+            
+            // isAimed = toAim;
+            // if (!SwitchAnimation)
+            // {
+            //     TranslateWeapon(
+            //         toAim ? GetStats((MainWeapon.WeaponType) CurrentWeaponIndex).Value.AimingPos : StandardFreePos,
+            //         0.16f);
+            // }
         }
 
         #endregion
