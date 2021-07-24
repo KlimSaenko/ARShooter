@@ -7,7 +7,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.DD2EEDCB" = "External"
+	"last_search.DD2EEDCB" = "import "
 	"OpenInspectorPreview.DD2EEDCB" = "0"
 	"currentGroup.DD2EEDCB" = "all"
 }

@@ -53,7 +53,7 @@ namespace Weapons
         public void Shoot(bool start, bool isMine = true)
         {
             _isShoot = start;
-            if (start && !IsRunning())
+            if (start && !LogicIsRunning())
             {
                 StartCoroutine(Shooting(isMine));
             }
@@ -68,17 +68,8 @@ namespace Weapons
                     VisualizeFiring();
 
                     RunWeaponLogic();
-
-                    // var startPos = UI.weaponHolderScript.isAimed ? aim.position : virtualAim.position + new Vector3(Random.Range(-0.003f, 0.003f), Random.Range(-0.003f, 0.003f));
-                    // var startBulletPos = virtualAim.position;
-
-                    // if (Physics.Raycast(startPos, (startPos - _mainCam.transform.position).normalized, out var hitInfo) && hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
-                    // {
-                    //     hitZone.ApplyDamage(_damage, hitInfo.point);
-                    // }
                     
-                    yield return new WaitWhile(IsRunning);
-                    // yield return StartCoroutine(RunGunLogic());
+                    yield return new WaitWhile(LogicIsRunning);
                 }
             }
             else
@@ -87,15 +78,14 @@ namespace Weapons
                 {
                     VisualizeFiring();
 
-                    yield return new WaitWhile(IsRunning);
+                    yield return new WaitWhile(LogicIsRunning);
                 }
             }
         }
 
-        private bool IsRunning() =>
-            shootAnimation.isPlaying;
+        protected virtual bool LogicIsRunning() => false;
 
-        protected virtual void VisualizeFiring()
+        private void VisualizeFiring()
         {
             shellsParticle.Play();
             shootAnimation.Play();
