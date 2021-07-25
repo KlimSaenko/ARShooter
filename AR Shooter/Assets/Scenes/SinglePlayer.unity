@@ -499,6 +499,11 @@ MonoBehaviour:
   killsText: {fileID: 766538769}
   aimAnimation: {fileID: 291123495}
   aimTransform: {fileID: 939356077}
+  images:
+  - {fileID: 1291170465}
+  - {fileID: 1392606324}
+  - {fileID: 970695917}
+  - {fileID: 617052441}
 --- !u!114 &46689888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5680,7 +5685,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1416683922}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.147, y: -0.152, z: 0.215}
+  m_LocalPosition: {x: 0.1942, y: -0.164, z: 0.2604}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5702,12 +5707,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   virtualHands: {fileID: 0}
   isAimed: 0
-  path:
-  - {x: 0, y: -0.152, z: 0.175}
-  - {x: 0.0496, y: -0.152, z: 0.1748}
-  - {x: 0.147, y: -0.152, z: 0.215}
   pathType: 0
   pathMode: 3
+  ease: 9
 --- !u!1 &1434378789
 GameObject:
   m_ObjectHideFlags: 0
@@ -34957,9 +34959,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   virtualHands: {fileID: 1000165911109507932}
   isAimed: 0
-  path: []
   pathType: 0
   pathMode: 0
+  ease: 0
 --- !u!33 &1791949501971163236
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -35789,6 +35791,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   virtualAim: {fileID: 7761772029334302218}
+  posToAim: {x: 0, y: 0, z: 0}
+  posFromAim: {x: 0, y: 0, z: 0}
+  weaponStats:
+    Damage: 0
+    SpreadRadius: 0
   weaponType: 0
   shellsParticle: {fileID: 1791949501109057661}
   flashParticle: {fileID: 1791949500241448740}
@@ -41011,7 +41018,7 @@ Transform:
   - {fileID: 7289754156310095809}
   m_Father: {fileID: 1416683923}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -0.0049362183, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.0015594219, y: -0.020101868, z: -0.061108943}
 --- !u!111 &7757767978917481724
 Animation:
   m_ObjectHideFlags: 0
@@ -41041,6 +41048,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   virtualAim: {fileID: 7761772029334302218}
+  posToAim: {x: 0, y: -0.152, z: 0.175}
+  posFromAim: {x: 0.1942, y: -0.164, z: 0.2604}
+  weaponStats:
+    Damage: 0
+    SpreadRadius: 0
   weaponType: 0
   shellsParticle: {fileID: 576889723}
   flashParticle: {fileID: 2076635433}
@@ -42110,6 +42122,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   virtualAim: {fileID: 7761772029334302218}
+  posToAim: {x: 0, y: 0, z: 0}
+  posFromAim: {x: 0, y: 0, z: 0}
+  weaponStats:
+    Damage: 0
+    SpreadRadius: 0
   weaponType: 1
   shellsParticle: {fileID: 1791949501723396984}
   flashParticle: {fileID: 1791949500397693331}

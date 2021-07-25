@@ -34,10 +34,10 @@ namespace Weapons
                 switch (mainWeapon.weaponType)
                 {
                     case MainWeapon.WeaponType.AKM:
-                        AKM = new WeaponStats(1, 1 / 6f, new Vector3(0, -0.117f, 0.178f), mainWeapon);
+                        AKM = new WeaponStatsTemp(1, 1 / 6f, new Vector3(0, -0.117f, 0.178f), mainWeapon);
                         break;
                     case MainWeapon.WeaponType.Sniper:
-                        Sniper = new WeaponStats(10, 1.82f, new Vector3(0, -0.1335f, 0.26f), mainWeapon);
+                        Sniper = new WeaponStatsTemp(10, 1.82f, new Vector3(0, -0.1335f, 0.26f), mainWeapon);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -112,17 +112,42 @@ namespace Weapons
 
         #endregion
 
+        private IWeaponConfig WeaponConfig
+        {
+            get
+            {
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.activeSelf && child.TryGetComponent(out MainWeapon mainWeapon))
+                        return mainWeapon;
+                }
+
+                return null;
+            }
+        }
+        
         #region Weapon Aiming
 
-        [SerializeField] private Vector3[] path;
         [SerializeField] private PathType pathType;
         [SerializeField] private PathMode pathMode;
+        [SerializeField] private Ease ease;
         
         public void Aiming(bool toAim)
         {
             // print("ok");
-            transform.DOLocalPath(path, 0.8f, pathType, pathMode);
-            
+            // if (toAim) transform.DOLocalPath(path, 0.8f, pathType, pathMode);
+            // else
+            // {
+            //     transform.DOLocalPath(path, 0.8f, pathType, pathMode).PlayBackwards();
+            // }
+            // transform.DOLocalPath(path, 0.8f, pathType, pathMode).isBackwards = false;
+            // ex.DOJump(ex.position, 2, 1, 2).OnComplete(() => ex.DOJump(ex.position, 2, 1, 2).PlayBackwards());
+            // var path = toAim ? WeaponConfig?.PathToAim : WeaponConfig?.PathFromAim;
+            // transform.DOLocalPath(path, 0.5f, pathType, pathMode);
+            var dest = toAim ? WeaponConfig.PosToAim : WeaponConfig.PosFromAim;
+            transform.DOMove(dest, 0.4f).SetEase(Ease.InOutBack, 0.7f);
+            UI.AimInstance.SetActive(!toAim);
+
             // isAimed = toAim;
             // if (!SwitchAnimation)
             // {

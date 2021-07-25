@@ -6,8 +6,8 @@ using Weapons;
 
 public static class Config
 {
-    public static WeaponStats AKM;
-    public static WeaponStats Sniper;
+    public static WeaponStatsTemp AKM;
+    public static WeaponStatsTemp Sniper;
 
     public static Vector3 StandardFreePos = new Vector3(0.122f, -0.122f, 0.25f);
     public static Vector3 StandardBackwardPos = new Vector3(0.167f, -0.167f, -0.1f);
@@ -15,14 +15,14 @@ public static class Config
     public static Vector3 AKMAimingPos = new Vector3(0, -0.115f, 0.178f);
     public static Vector3 SniperAimingPos = new Vector3(0, -0.1335f, 0.26f);
 
-    public struct WeaponStats
+    public struct WeaponStatsTemp
     {
         public readonly int Damage;
         public float TimeDelay;
         public Vector3 AimingPos;
         public MainWeapon WeaponScript;
 
-        public WeaponStats(int damage, float timeDelay, Vector3 aimingPos, MainWeapon weaponScript)
+        public WeaponStatsTemp(int damage, float timeDelay, Vector3 aimingPos, MainWeapon weaponScript)
         {
             Damage = damage;
             TimeDelay = timeDelay;
@@ -31,7 +31,7 @@ public static class Config
         }
     }
 
-    internal static WeaponStats? GetStats(MainWeapon.WeaponType weaponType)
+    internal static WeaponStatsTemp? GetStats(MainWeapon.WeaponType weaponType)
     {
         return weaponType switch
         {

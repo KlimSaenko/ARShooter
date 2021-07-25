@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -44,7 +45,7 @@ public class UI : MonoBehaviour
         AliveStateUI = transform.GetChild(0).gameObject;
         DeadStateUI = transform.GetChild(1).gameObject;
 
-        AimInstance = new Aim(aimAnimation, aimTransform);
+        AimInstance = new Aim(aimAnimation, aimTransform, images);
     }
 
     public void Aiming(bool toAim)
@@ -164,19 +165,22 @@ public class UI : MonoBehaviour
     [Header("Aim")]
     [SerializeField] private Animation aimAnimation;
     [SerializeField] private RectTransform aimTransform;
+    [SerializeField] private Image[] images;
 
     internal static Aim AimInstance;
     
     public class Aim
     {
-        public Aim(Animation aimAnimation, RectTransform aimTransform)
+        public Aim(Animation aimAnimation, RectTransform aimTransform, Image[] images)
         {
             _aimAnimation = aimAnimation;
             _aimTransform = aimTransform;
+            _images = images;
         }
 
         private readonly RectTransform _aimTransform;
         private readonly Animation _aimAnimation;
+        private readonly Image[] _images;
 
         private int StartAimSpreadRadius = 110;
         internal float TransformTime = 1.5f;
@@ -201,6 +205,15 @@ public class UI : MonoBehaviour
             if (newWidth < StartAimSpreadRadius) newWidth = StartAimSpreadRadius;
             
             _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, newWidth);
+        }
+
+        internal void SetActive(bool value)
+        {
+            foreach (var image in _images)
+            {
+                var fadeTo = value ? 1 : 0;
+                image.DOFade(fadeTo, 0.4f);
+            }
         }
     }
 }

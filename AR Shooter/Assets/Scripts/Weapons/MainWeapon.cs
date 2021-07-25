@@ -1,13 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using static Config;
 
 namespace Weapons
 {
-    public class MainWeapon : MonoBehaviour
+    public class MainWeapon : MonoBehaviour, IWeaponConfig
     {   
         private Camera _mainCam;
         [SerializeField] protected Transform virtualAim;
+        
+        [Header("Weapon config")]
+        [SerializeField] private Vector3 posToAim;
+        [SerializeField] private Vector3 posFromAim;
+        [SerializeField] private WeaponStats weaponStats;
+
+        public Vector3 PosToAim => posToAim;
+        public Vector3 PosFromAim => posFromAim;
 
         internal enum WeaponType
         {
@@ -92,11 +101,37 @@ namespace Weapons
             flashParticle.Play(true);
             // audioSource.pitch = Random.Range(0.94f, 1.06f);
             // audioSource.PlayOneShot(shootAudio);
+            WeaponStats = new WeaponStats(3, 0.3f);
         }
 
         protected virtual void RunWeaponLogic()
         {
             
         }
+
+        public WeaponStats WeaponStats { get; set; }
+    }
+
+    internal interface IWeaponConfig
+    {
+        WeaponStats WeaponStats { get; set; }
+        
+        Vector3 PosToAim { get; }
+        
+        Vector3 PosFromAim { get; }
+    }
+
+    [Serializable]
+    public struct WeaponStats
+    {
+        public WeaponStats(int damage, float spreadRadius)
+        {
+            Damage = damage;
+            SpreadRadius = spreadRadius;
+        }
+
+        public int Damage;
+
+        public float SpreadRadius;
     }
 }
