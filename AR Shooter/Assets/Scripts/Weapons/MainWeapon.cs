@@ -77,7 +77,7 @@ namespace Weapons
                     VisualizeFiring();
 
                     RunWeaponLogic();
-                    
+
                     yield return new WaitWhile(LogicIsRunning);
                 }
             }
@@ -101,7 +101,6 @@ namespace Weapons
             flashParticle.Play(true);
             // audioSource.pitch = Random.Range(0.94f, 1.06f);
             // audioSource.PlayOneShot(shootAudio);
-            WeaponStats = new WeaponStats(3, 0.3f);
         }
 
         protected virtual void RunWeaponLogic()

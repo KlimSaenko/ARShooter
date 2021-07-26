@@ -1,40 +1,40 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Common;
-using Mobs;
+﻿using Common;
 using Player;
 using UnityEngine;
 
-public class HitZone : MonoBehaviour
+namespace Mobs
 {
-    [SerializeField] private Transform transformWithController;
-    //[SerializeField] private MainMob mainMob;
-    //[SerializeField] private PlayerStatus playerStatus;
-
-    private IDamageable Damageable
+    public class HitZone : MonoBehaviour
     {
-        get
+        [SerializeField] private Transform transformWithController;
+        //[SerializeField] private MainMob mainMob;
+        //[SerializeField] private PlayerStatus playerStatus;
+
+        private IDamageable Damageable
         {
-            if (transformWithController.TryGetComponent(out MainMob mainMob)) return mainMob;
-            return transformWithController.TryGetComponent(out PlayerStatus playerStatus) ? playerStatus : null;
+            get
+            {
+                if (transformWithController.TryGetComponent(out MainMob mainMob)) return mainMob;
+                return transformWithController.TryGetComponent(out PlayerStatus playerStatus) ? playerStatus : null;
+            }
         }
-    }
 
-    internal enum ZoneType
-    {
-        Standard = 0,
-        Critical
-    }
+        internal enum ZoneType
+        {
+            Standard = 0,
+            Critical
+        }
 
-    [SerializeField] internal ZoneType zoneType;
+        [SerializeField] internal ZoneType zoneType;
 
-    public void ApplyDamage(int damage, Vector3 hitPos)
-    {
-        damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
-        // UI.ActivateHitMarker((int)zoneType, hitPos);
-        // HitDecal_Prev.instance.NewDecal(hitPos, damage, zoneType);
-        Pool.Decals.ActivateHitMarker(hitPos, damage, zoneType);
+        public void ApplyDamage(int damage, Vector3 hitPos)
+        {
+            damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
+            // UI.ActivateHitMarker((int)zoneType, hitPos);
+            // HitDecal_Prev.instance.NewDecal(hitPos, damage, zoneType);
+            Pool.Decals.ActivateHitMarker(hitPos, damage, zoneType);
 
-        Damageable?.ApplyDamage(damage);
+            Damageable?.ApplyDamage(damage);
+        }
     }
 }

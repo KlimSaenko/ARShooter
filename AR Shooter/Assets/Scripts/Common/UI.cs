@@ -48,10 +48,10 @@ public class UI : MonoBehaviour
         AimInstance = new Aim(aimAnimation, aimTransform, images);
     }
 
-    public void Aiming(bool toAim)
-    {
-        WeaponHolderScript.Aiming(toAim);
-    }
+    // public void Aiming(bool toAim)
+    // {
+    //     WeaponHolderScript.Aiming(toAim);
+    // }
 
     public void Shoot(bool start) =>
         WeaponHolderScript.Shoot(start);
@@ -118,7 +118,7 @@ public class UI : MonoBehaviour
         if (pause)
         {
             WeaponHolderScript.Shoot(false);
-            WeaponHolderScript.Aiming(false);
+            // WeaponHolderScript.Aiming(false);
 
             pauseMenu.gameObject.SetActive(true);
         }
@@ -176,44 +176,59 @@ public class UI : MonoBehaviour
             _aimAnimation = aimAnimation;
             _aimTransform = aimTransform;
             _images = images;
+            _currentAimSpreadRadius = _startAimSpreadRadius;
         }
 
         private readonly RectTransform _aimTransform;
         private readonly Animation _aimAnimation;
         private readonly Image[] _images;
 
-        private int StartAimSpreadRadius = 110;
+        private int _aimedAimSpreadRadius = 30;
+        private int _startAimSpreadRadius = 110;
+        private float _currentAimSpreadRadius;
+        
         internal float TransformTime = 1.5f;
-    
-        internal Ray StartAnim()
-        {
-            var aimWidth = _aimTransform.rect.width;
-            _aimAnimation.Play();
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, aimWidth + 90);
 
+        private bool _isVisible = true;
+    
+        internal Ray GetRay()
+        {
             var aimPos = _aimTransform.position;
             
-            return Camera.main.ScreenPointToRay(aimWidth * Random.insideUnitCircle / 4f + new Vector2(aimPos.x, aimPos.y));
+            return Camera.main.ScreenPointToRay(_currentAimSpreadRadius * Random.insideUnitCircle / 4f + new Vector2(aimPos.x, aimPos.y));
+        }
+
+        internal void AimAnimation()
+        {
+            if (!_isVisible) return;
+            
+            _currentAimSpreadRadius += 90;
+            _aimAnimation.Play();
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _currentAimSpreadRadius);
         }
     
         internal void Update()
         {
+            if (_currentAimSpreadRadius <= _startAimSpreadRadius) return;
+            
             var rect = _aimTransform.rect;
-            if (rect.width <= StartAimSpreadRadius) return;
+            _currentAimSpreadRadius = rect.width - 1.5f * Time.deltaTime * rect.width;
+            if (_currentAimSpreadRadius < _startAimSpreadRadius) _currentAimSpreadRadius = _startAimSpreadRadius;
             
-            var newWidth = rect.width - 1.5f * Time.deltaTime * rect.width;
-            if (newWidth < StartAimSpreadRadius) newWidth = StartAimSpreadRadius;
-            
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, newWidth);
+            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _currentAimSpreadRadius);
         }
-
+        
         internal void SetActive(bool value)
         {
+            var fadeTo = value ? 1 : 0;
+            
             foreach (var image in _images)
             {
-                var fadeTo = value ? 1 : 0;
-                image.DOFade(fadeTo, 0.4f);
+                image.DOFade(fadeTo, 0.3f).OnComplete(() => _isVisible = value);
             }
+
+            DOTween.To(() => _currentAimSpreadRadius, x => _currentAimSpreadRadius = x, 
+                fadeTo * _startAimSpreadRadius + _aimedAimSpreadRadius, 0.3f);
         }
     }
 }

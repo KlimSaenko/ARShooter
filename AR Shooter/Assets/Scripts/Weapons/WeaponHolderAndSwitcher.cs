@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using DG.Tweening.Plugins.Core.PathCore;
 using Photon.Pun;
 using UnityEngine;
 using static Config;
@@ -23,6 +22,8 @@ namespace Weapons
         protected virtual void Awake()
         {
             UI.WeaponHolderScript = this;
+            
+            PlayerBehaviour.AimingAction += Aiming;
         }
 
         private void Start()
@@ -57,6 +58,9 @@ namespace Weapons
         private void Update()
         {
             if (IsTranslating()) Translation();
+            
+            if (Input.GetKeyDown(KeyCode.E)) Aiming(true);
+            else if (Input.GetKeyUp(KeyCode.E)) Aiming(false);
         }
 
         public virtual void Shoot(bool start)
@@ -90,7 +94,6 @@ namespace Weapons
 
             if (newWeaponScript != CurrentWeaponScript)
             {
-                //virtualHands.DOMoveX()
                 TranslateWeapon(StandardBackwardPos, Quaternion.Euler(-60, 0, 0), 0.32f);
             }
 
@@ -127,34 +130,13 @@ namespace Weapons
         }
         
         #region Weapon Aiming
-
-        [SerializeField] private PathType pathType;
-        [SerializeField] private PathMode pathMode;
-        [SerializeField] private Ease ease;
         
-        public void Aiming(bool toAim)
+        private void Aiming(bool toAim)
         {
-            // print("ok");
-            // if (toAim) transform.DOLocalPath(path, 0.8f, pathType, pathMode);
-            // else
-            // {
-            //     transform.DOLocalPath(path, 0.8f, pathType, pathMode).PlayBackwards();
-            // }
-            // transform.DOLocalPath(path, 0.8f, pathType, pathMode).isBackwards = false;
-            // ex.DOJump(ex.position, 2, 1, 2).OnComplete(() => ex.DOJump(ex.position, 2, 1, 2).PlayBackwards());
-            // var path = toAim ? WeaponConfig?.PathToAim : WeaponConfig?.PathFromAim;
-            // transform.DOLocalPath(path, 0.5f, pathType, pathMode);
             var dest = toAim ? WeaponConfig.PosToAim : WeaponConfig.PosFromAim;
-            transform.DOMove(dest, 0.4f).SetEase(Ease.InOutBack, 0.7f);
+            transform.DOMove(dest, 0.3f).SetEase(Ease.InOutCubic);
+                // .OnComplete(() => transform.DOShakeRotation(0.15f, 1, 2, 0))
             UI.AimInstance.SetActive(!toAim);
-
-            // isAimed = toAim;
-            // if (!SwitchAnimation)
-            // {
-            //     TranslateWeapon(
-            //         toAim ? GetStats((MainWeapon.WeaponType) CurrentWeaponIndex).Value.AimingPos : StandardFreePos,
-            //         0.16f);
-            // }
         }
 
         #endregion

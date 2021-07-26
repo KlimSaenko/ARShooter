@@ -18,4 +18,12 @@ public class PlayerBehaviour : MonoBehaviour
 
     private static void OnHitAction(Vector3 pos) =>
         HitAction?.Invoke(pos);
+    
+    /// <summary>
+    /// Invokes when player aims weapon (or goes to free position)
+    /// </summary>
+    internal static event Action<bool> AimingAction;
+    
+    public virtual void OnAimingAction(bool toAim) =>
+        AimingAction?.Invoke(toAim);
 }

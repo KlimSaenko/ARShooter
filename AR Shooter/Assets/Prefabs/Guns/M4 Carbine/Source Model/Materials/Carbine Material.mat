@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shotgun Material
+  m_Name: Carbine Material
   m_Shader: {fileID: 47, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _METALLICGLOSSMAP _NORMALMAP _SPECGLOSSMAP
+  m_ShaderKeywords: _GLOSSYREFLECTIONS_OFF _METALLICGLOSSMAP _NORMALMAP _SPECGLOSSMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: cf8db96b5a1b44f3fa258a98d7bd6ca7, type: 3}
+        m_Texture: {fileID: 2800000, guid: abcbf926da9ca2a4cb03cda9af32ccff, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -40,15 +40,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 53297ec8336b8469796062730a8bd5b1, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9cb7b51e627cc0040b3d54a440e4cd39, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 3b63b9404aa344871af0f09da40f225d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 8e13f7f911ddf1f449523f54ba9411c7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: 898662188034d4c378a16ec012ec8155, type: 3}
+        m_Texture: {fileID: 2800000, guid: 341e74b392c0d6a45bf3440c1c7b6a69, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
-        m_Texture: {fileID: 2800000, guid: bf5d05d045b7846fcbb6266d81241fa3, type: 3}
+        m_Texture: {fileID: 2800000, guid: c0f6403abc5aa4a4dbfa418c50acfe5b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -67,7 +67,7 @@ Material:
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
-    - _GlossyReflections: 1
+    - _GlossyReflections: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
