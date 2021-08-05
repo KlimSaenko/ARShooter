@@ -1,136 +1,111 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using static Config;
+using UnityEngine.Serialization;
 
 namespace Weapons
 {
     public class MainWeapon : MonoBehaviour, IWeaponConfig
-    {   
-        private Camera _mainCam;
-        [SerializeField] protected Transform virtualAim;
-        
+    {
         [Header("Weapon config")]
         [SerializeField] private Vector3 posToAim;
         [SerializeField] private Vector3 posFromAim;
-        [SerializeField] private WeaponStats weaponStats;
+        [SerializeField] protected WeaponStats weaponStats;
 
+        public static WeaponStats ActiveWeaponStats;
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
-
-        internal enum WeaponType
-        {
-            AKM = 0,
-            Sniper
-        }
-
-        [SerializeField] internal WeaponType weaponType;
-
+        public virtual WeaponType WeaponType => WeaponType.Unsigned;
+        
         [Header("Weapon Attachments")]
         [SerializeField] protected ParticleSystem shellsParticle;
         [SerializeField] protected ParticleSystem flashParticle;
         [SerializeField] protected Animation shootAnimation;
-        [SerializeField] protected AudioSource audioSource;
         [SerializeField] protected AudioClip shootAudio;
-
+        
+        protected AudioSource AudioSource;
         private bool _isShoot;
-
-        protected int Damage;
-        private Vector3 _standardWeaponPos;
-        private Quaternion _standardWeaponRot;
-
-        private void Awake()
+        
+        public bool IsActive => gameObject.activeSelf;
+        
+        public void SetActive(bool value)
         {
-            var thisTransform = transform;
-            _standardWeaponPos = thisTransform.localPosition;
-            _standardWeaponRot = thisTransform.localRotation;
+            if (value) ActiveWeaponStats = weaponStats;
+            gameObject.SetActive(value);
         }
 
-        private void Start()
+        protected void Shoot(bool start)
         {
-            Damage = GetStats(weaponType).Value.Damage;
-            _mainCam = Camera.main;
-        }
-
-        private void OnEnable()
-        {
-            var thisTransform = transform;
-            thisTransform.localPosition = _standardWeaponPos;
-            thisTransform.localRotation = _standardWeaponRot;
-        }
-
-        public void Shoot(bool start, bool isMine = true)
-        {
+            if (!IsActive) return;
+            
             _isShoot = start;
             if (start && !LogicIsRunning())
             {
-                StartCoroutine(Shooting(isMine));
+                StartCoroutine(Shooting());
             }
         }
 
-        private IEnumerator Shooting(bool isMine)
+        private IEnumerator Shooting()
         {
-            if (isMine)
+            while (_isShoot)
             {
-                while (_isShoot)
-                {
-                    VisualizeFiring();
+                VisualizeFiring();
 
-                    RunWeaponLogic();
+                RunWeaponLogic();
 
-                    yield return new WaitWhile(LogicIsRunning);
-                }
-            }
-            else
-            {
-                while (_isShoot)
-                {
-                    VisualizeFiring();
-
-                    yield return new WaitWhile(LogicIsRunning);
-                }
+                yield return new WaitWhile(LogicIsRunning);
             }
         }
 
         protected virtual bool LogicIsRunning() => false;
 
-        private void VisualizeFiring()
+        protected virtual void VisualizeFiring()
         {
-            shellsParticle.Play();
             shootAnimation.Play();
-            flashParticle.Play(true);
-            // audioSource.pitch = Random.Range(0.94f, 1.06f);
-            // audioSource.PlayOneShot(shootAudio);
         }
 
         protected virtual void RunWeaponLogic()
         {
             
         }
-
-        public WeaponStats WeaponStats { get; set; }
+    }
+    
+    public enum WeaponType
+    {
+        Unsigned = 0,
+        M4_Carabine,
+        Shotgun
     }
 
-    internal interface IWeaponConfig
+    public interface IWeaponConfig
     {
-        WeaponStats WeaponStats { get; set; }
-        
         Vector3 PosToAim { get; }
         
         Vector3 PosFromAim { get; }
+        
+        WeaponType WeaponType { get; }
+
+        bool IsActive { get; }
+
+        void SetActive(bool value);
     }
 
     [Serializable]
     public struct WeaponStats
     {
-        public WeaponStats(int damage, float spreadRadius)
+        public WeaponStats(int damage, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime)
         {
             Damage = damage;
-            SpreadRadius = spreadRadius;
+            AimedAimSpreadDiameter = aimedAimSpreadDiameter;
+            FreeAimSpreadDiameter = freeAimSpreadDiameter;
+            AimSpreadIncrement = aimSpreadIncrement;
+            AimRecoveryTime = aimRecoveryTime;
         }
 
         public int Damage;
 
-        public float SpreadRadius;
+        public int AimedAimSpreadDiameter, FreeAimSpreadDiameter, AimSpreadIncrement;
+
+        public float AimRecoveryTime;
     }
 }

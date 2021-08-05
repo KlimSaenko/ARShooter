@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using DG.Tweening;
+using UnityEngine;
 
 namespace Weapons
 {
@@ -12,14 +14,15 @@ namespace Weapons
 
         private void Update()
         {
-            if (joint == null) return;
-
+            if (!joint) return;
+        
             var thisPosition = _thisTransform.position;
             var jointPosition = joint.position;
-        
-            thisPosition = Vector3.Lerp(thisPosition, jointPosition, 
-                Mathf.Lerp(15, 29, 29 * Vector3.Distance(thisPosition, jointPosition)) * Time.deltaTime);
-        
+            
+            // thisPosition = Vector3.Lerp(thisPosition, jointPosition, 
+            //     Mathf.Lerp(15, 29, 29 * Vector3.Distance(thisPosition, jointPosition)) * Time.deltaTime);
+            thisPosition = Vector3.Lerp(thisPosition, jointPosition, 30 * Time.deltaTime);
+            
             _thisTransform.position = thisPosition;
             _thisTransform.rotation = Quaternion.Lerp(_thisTransform.rotation, joint.rotation, 25 * Time.deltaTime);
         }

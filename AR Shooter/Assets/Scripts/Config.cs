@@ -31,15 +31,15 @@ public static class Config
         }
     }
 
-    internal static WeaponStatsTemp? GetStats(MainWeapon.WeaponType weaponType)
-    {
-        return weaponType switch
-        {
-            MainWeapon.WeaponType.AKM => AKM,
-            MainWeapon.WeaponType.Sniper => Sniper,
-            _ => null
-        };
-    }
+    // internal static WeaponStatsTemp? GetStats(MainWeapon.WeaponType weaponType)
+    // {
+    //     return weaponType switch
+    //     {
+    //         MainWeapon.WeaponType.AKM => AKM,
+    //         MainWeapon.WeaponType.Sniper => Sniper,
+    //         _ => null
+    //     };
+    // }
 
     #region SingleplayerStats
 

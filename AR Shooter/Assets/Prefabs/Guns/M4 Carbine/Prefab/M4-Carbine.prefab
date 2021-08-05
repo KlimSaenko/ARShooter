@@ -191,8 +191,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683209416243742514}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.000000008381903}
-  m_LocalScale: {x: 0.002, y: 0.002, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.003, y: 0.003, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3504523172327835269}
@@ -521,18 +521,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 220b7bada93a34c78b71e5f178ecfb32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  virtualAim: {fileID: 0}
-  posToAim: {x: 0, y: -0.152, z: 0.158}
-  posFromAim: {x: 0.1942, y: -0.164, z: 0.2604}
+  posToAim: {x: 0, y: -0.152, z: 0.161}
+  posFromAim: {x: 0.1289, y: -0.1689, z: 0.2497}
   weaponStats:
-    Damage: 0
-    SpreadRadius: 0
-  weaponType: 0
+    Damage: 3
+    AimedAimSpreadDiameter: 30
+    FreeAimSpreadDiameter: 100
+    AimSpreadIncrement: 65
+    AimRecoveryTime: 0.48
   shellsParticle: {fileID: 1683209415577659467}
   flashParticle: {fileID: 8217287938710465464}
   shootAnimation: {fileID: 9003494812585625548}
-  audioSource: {fileID: 0}
-  shootAudio: {fileID: 0}
+  shootAudio: {fileID: 8300000, guid: 9ec85db3e692bbd4ab1a35087963ecb9, type: 3}
 --- !u!1 &3493928172703092699
 GameObject:
   m_ObjectHideFlags: 0
@@ -643,7 +643,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4496039020730792866}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.032184005, z: -0.014886954}
+  m_LocalPosition: {x: -0, y: 0.0325, z: -0.014886954}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -5,9 +5,19 @@ namespace Weapons
 {
     public class Shotgun : MainWeapon
     {
+        private const WeaponType CurrentWeaponType = WeaponType.Shotgun;
+
+        public override WeaponType WeaponType => CurrentWeaponType;
+
         private void Awake()
         {
-            PlayerBehaviour.FiringAction += delegate(bool start) { Shoot(start); };
+            PlayerBehaviour.FiringAction += Shoot;
+            
+            if (shootAudio is null) return;
+            
+            AudioSource = gameObject.AddComponent<AudioSource>();
+            AudioSource.playOnAwake = false;
+            AudioSource.maxDistance = 20;
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
@@ -20,7 +30,7 @@ namespace Weapons
                 if (Physics.Raycast(currentRay, out var hitInfo) && 
                     hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
                 {
-                    hitZone.ApplyDamage(Damage, hitInfo.point);
+                    hitZone.ApplyDamage(4, hitInfo.point);
                 }
             }
             
@@ -29,5 +39,19 @@ namespace Weapons
         
         protected override bool LogicIsRunning() =>
             shootAnimation.isPlaying;
+
+        private void OnShellAnimation() =>
+            shellsParticle.Play();
+        
+        protected override void VisualizeFiring()
+        {
+            shootAnimation.Play();
+            // flashParticle.Play(true);
+            
+            if (AudioSource is null) return;
+            
+            AudioSource.pitch = Random.Range(0.94f, 1.06f);
+            AudioSource.PlayOneShot(shootAudio);
+        }
     }
 }

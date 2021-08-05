@@ -1,12 +1,12 @@
-using System;
-using System.Collections;
 using DG.Tweening;
+using DG.Tweening.Core;
+using DG.Tweening.Plugins.Options;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.Pool;
-using Weapons;
+using static Weapons.MainWeapon;
 using Random = UnityEngine.Random;
 
 public class UI : MonoBehaviour
@@ -27,7 +27,6 @@ public class UI : MonoBehaviour
     private static Camera MainCam => Camera.main;
     private static TextMeshProUGUI KillsText { get; set; }
 
-    public static WeaponHolderAndSwitcher WeaponHolderScript;
     private Transform _player;
 
     private void Start()
@@ -45,20 +44,7 @@ public class UI : MonoBehaviour
         AliveStateUI = transform.GetChild(0).gameObject;
         DeadStateUI = transform.GetChild(1).gameObject;
 
-        AimInstance = new Aim(aimAnimation, aimTransform, images);
-    }
-
-    // public void Aiming(bool toAim)
-    // {
-    //     WeaponHolderScript.Aiming(toAim);
-    // }
-
-    public void Shoot(bool start) =>
-        WeaponHolderScript.Shoot(start);
-
-    public void SwitchWeapon(int toWeaponIndex)
-    {
-        WeaponHolderScript.SwitchWeapon(toWeaponIndex);
+        AimInstance = new Aim(aimTransform, images);
     }
 
     private static float _hitTimeThreshold;
@@ -70,12 +56,6 @@ public class UI : MonoBehaviour
 
     private void Update()
     {
-        // if (_hitTimeThreshold > 0 && _hitMarkers.CountInactive > 0)
-        // {
-        //     _hitTimeThreshold -= Time.deltaTime;
-        //     if (_hitTimeThreshold <= 0) foreach (var marker in _hitMarkers.) marker.gameObject.SetActive(false);
-        // }
-
         if (_player != null)
         {
             //mapLookImage.transform.rotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180 - player.rotation.eulerAngles.y);
@@ -90,7 +70,7 @@ public class UI : MonoBehaviour
 
         if (IsTranslating()) Translation();
         
-        AimInstance.Update();
+        // AimInstance.Update();
     }
 
     public static void ActivateHitMarker(int type, Vector3 pos)
@@ -117,7 +97,6 @@ public class UI : MonoBehaviour
     {
         if (pause)
         {
-            WeaponHolderScript.Shoot(false);
             // WeaponHolderScript.Aiming(false);
 
             pauseMenu.gameObject.SetActive(true);
@@ -161,33 +140,30 @@ public class UI : MonoBehaviour
         if (pause) Config.SaveGame();
         else Config.LoadGame();
     }
-    
+
+#region Aim
+
     [Header("Aim")]
-    [SerializeField] private Animation aimAnimation;
     [SerializeField] private RectTransform aimTransform;
     [SerializeField] private Image[] images;
 
     internal static Aim AimInstance;
-    
+
     public class Aim
     {
-        public Aim(Animation aimAnimation, RectTransform aimTransform, Image[] images)
+        public Aim(RectTransform aimTransform, Image[] images)
         {
-            _aimAnimation = aimAnimation;
             _aimTransform = aimTransform;
             _images = images;
-            _currentAimSpreadRadius = _startAimSpreadRadius;
+
+            _currentAimSpreadDiameter = CurrentAimSpreadDiameter;
         }
 
         private readonly RectTransform _aimTransform;
-        private readonly Animation _aimAnimation;
         private readonly Image[] _images;
 
-        private int _aimedAimSpreadRadius = 30;
-        private int _startAimSpreadRadius = 110;
-        private float _currentAimSpreadRadius;
-        
-        internal float TransformTime = 1.5f;
+        private float _currentAimSpreadDiameter;
+        private float CurrentAimSpreadDiameter => _isVisible? _aimTransform.rect.width : _currentAimSpreadDiameter;
 
         private bool _isVisible = true;
     
@@ -195,40 +171,35 @@ public class UI : MonoBehaviour
         {
             var aimPos = _aimTransform.position;
             
-            return Camera.main.ScreenPointToRay(_currentAimSpreadRadius * Random.insideUnitCircle / 4f + new Vector2(aimPos.x, aimPos.y));
+            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2f + new Vector2(aimPos.x, aimPos.y));
         }
+
+        private const int TweenId = 100;
 
         internal void AimAnimation()
         {
-            if (!_isVisible) return;
+            // if (!_isVisible) return;
+
+            DOTween.Kill(TweenId);
             
-            _currentAimSpreadRadius += 90;
-            _aimAnimation.Play();
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _currentAimSpreadRadius);
+            _aimTransform.DOSizeDelta(_aimTransform.rect.size + new Vector2(ActiveWeaponStats.AimSpreadIncrement, 0), ActiveWeaponStats.AimSpreadIncrement / 900f).SetEase(Ease.OutBack)
+                .OnComplete(() => _aimTransform.DOSizeDelta(new Vector2(ActiveWeaponStats.FreeAimSpreadDiameter, 100), ActiveWeaponStats.AimRecoveryTime / 2f * Mathf.Pow(_aimTransform.rect.width / 200f, 0.75f))
+                    .SetEase(Ease.OutSine).SetId(TweenId));
         }
-    
-        internal void Update()
-        {
-            if (_currentAimSpreadRadius <= _startAimSpreadRadius) return;
-            
-            var rect = _aimTransform.rect;
-            _currentAimSpreadRadius = rect.width - 1.5f * Time.deltaTime * rect.width;
-            if (_currentAimSpreadRadius < _startAimSpreadRadius) _currentAimSpreadRadius = _startAimSpreadRadius;
-            
-            _aimTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _currentAimSpreadRadius);
-        }
-        
+
         internal void SetActive(bool value)
         {
             var fadeTo = value ? 1 : 0;
             
             foreach (var image in _images)
             {
-                image.DOFade(fadeTo, 0.3f).OnComplete(() => _isVisible = value);
+                image.DOFade(fadeTo, 0.25f).SetDelay(fadeTo * 0.1f);
             }
 
-            DOTween.To(() => _currentAimSpreadRadius, x => _currentAimSpreadRadius = x, 
-                fadeTo * _startAimSpreadRadius + _aimedAimSpreadRadius, 0.3f);
+            DOTween.To(() => CurrentAimSpreadDiameter, newValue => _currentAimSpreadDiameter = newValue,
+                value ? _aimTransform.rect.width : ActiveWeaponStats.AimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = value);
         }
     }
+    
+#endregion
 }
