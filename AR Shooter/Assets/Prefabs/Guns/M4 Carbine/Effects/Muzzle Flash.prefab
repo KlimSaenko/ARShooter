@@ -116,7 +116,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.11
+      scalar: 0.1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4938,7 +4938,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.7
+      scalar: 1.5
       minScalar: 0.9
       maxCurve:
         serializedVersion: 2
@@ -9723,7 +9723,7 @@ GameObject:
   - component: {fileID: 1274186730172505061}
   - component: {fileID: 1274186730172097093}
   m_Layer: 0
-  m_Name: MuzzleFlash
+  m_Name: Muzzle Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9831,8 +9831,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.11
-      minScalar: 0.09
+      scalar: 0.1
+      minScalar: 0.08
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9884,7 +9884,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.1
+      scalar: -0.1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -9982,7 +9982,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.1
+      scalar: 0.11
       minScalar: 0.08
       maxCurve:
         serializedVersion: 2
@@ -10016,7 +10016,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -10069,7 +10069,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeZ:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -10409,7 +10409,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0.02
     radius:
-      value: 0.1
+      value: 0.2
       mode: 0
       spread: 0
       speed:
@@ -11096,7 +11096,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.058624778
+          value: 0
           inSlope: 2.491151
           outSlope: 2.491151
           tangentMode: 0
@@ -11104,8 +11104,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33707
         - serializedVersion: 3
-          time: 0.20787753
-          value: 0.465279
+          time: 0.41187227
+          value: 0.6479343
           inSlope: 0.85840183
           outSlope: 0.85840183
           tangentMode: 0
@@ -11115,11 +11115,11 @@ ParticleSystem:
         - serializedVersion: 3
           time: 1
           value: 0.9661017
-          inSlope: 0.43545336
-          outSlope: 0.43545336
+          inSlope: 0.24623485
+          outSlope: 0.24623485
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0.1912057
+          inWeight: 0.22066587
           outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -14523,7 +14523,7 @@ ParticleSystemRenderer:
   m_MaxParticleSize: 1
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
-  m_LengthScale: 3
+  m_LengthScale: 2
   m_SortingFudge: 1
   m_NormalDirection: 1
   m_ShadowBias: 0

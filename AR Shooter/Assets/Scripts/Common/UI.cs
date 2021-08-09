@@ -182,8 +182,8 @@ public class UI : MonoBehaviour
 
             DOTween.Kill(TweenId);
             
-            _aimTransform.DOSizeDelta(_aimTransform.rect.size + new Vector2(ActiveWeaponStats.AimSpreadIncrement, 0), ActiveWeaponStats.AimSpreadIncrement / 900f).SetEase(Ease.OutBack)
-                .OnComplete(() => _aimTransform.DOSizeDelta(new Vector2(ActiveWeaponStats.FreeAimSpreadDiameter, 100), ActiveWeaponStats.AimRecoveryTime / 2f * Mathf.Pow(_aimTransform.rect.width / 200f, 0.75f))
+            _aimTransform.DOSizeDelta(_aimTransform.rect.size + new Vector2(ActiveWeaponStats.aimSpreadIncrement, 0), ActiveWeaponStats.aimSpreadIncrement / 900f).SetEase(Ease.OutBack)
+                .OnComplete(() => _aimTransform.DOSizeDelta(new Vector2(ActiveWeaponStats.freeAimSpreadDiameter, 100), ActiveWeaponStats.aimRecoveryTime / 2f * Mathf.Pow(_aimTransform.rect.width / 200f, 0.75f))
                     .SetEase(Ease.OutSine).SetId(TweenId));
         }
 
@@ -197,7 +197,7 @@ public class UI : MonoBehaviour
             }
 
             DOTween.To(() => CurrentAimSpreadDiameter, newValue => _currentAimSpreadDiameter = newValue,
-                value ? _aimTransform.rect.width : ActiveWeaponStats.AimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = value);
+                value ? _aimTransform.rect.width : ActiveWeaponStats.aimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = value);
         }
     }
     

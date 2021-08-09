@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using Mobs;
+using UnityEngine;
+using Weapons;
 
 public interface IDamageable
 {
@@ -15,4 +17,17 @@ public interface IDamageable
     bool IsAlive { get; }
     
     IEnumerator Death(int deathType);
+}
+
+public interface IWeaponConfig
+{
+    Vector3 PosToAim { get; }
+        
+    Vector3 PosFromAim { get; }
+        
+    WeaponType WeaponType { get; }
+
+    bool IsActive { get; }
+
+    void SetActive(bool value);
 }

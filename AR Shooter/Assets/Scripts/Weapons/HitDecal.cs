@@ -1,65 +1,43 @@
-using System;
-using Common;
+using DG.Tweening;
+using static Common.Pool;
 using Mobs;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace Weapons
 {
     public class HitDecal : MonoBehaviour
     {
-        [Range(0.0f, 5.0f)]
-        [SerializeField] private float power;
-    
-        [Range(0.0f, 1.0f)]
-        [SerializeField] private float time;
-    
+        [SerializeField] private Animation markerAnimation;
         [SerializeField] private RectTransform hitMarker;
-        [SerializeField] private Animation[] animations;
-
-        // private Transform _thisTransform;
+        [SerializeField] private TextMeshPro decalText;
     
         private static Camera MainCam => Camera.main;
-
-        private void Start()
-        {
-            // _thisTransform = transform;
-            // _currentVelocity = power;
-            // normalMarker.gameObject.
-            
-            // var hitMarker = this.hitMarker;
-            // if (hitMarker.gameObject.TryGetComponent(out Image image))
-            //     image.color = Color.red;
-            // _currentMarker = 
-        }
-
-        // private float _currentVelocity;
-        // private float _currentTime;
-        //
-        // private void Update()
-        // {
-        //     var newPosition = _thisTransform.position;
-        //     newPosition += new Vector3(0, newPosition.y + _currentVelocity);
-        //     _thisTransform.position = newPosition;
-        //
-        //     _currentVelocity -= 0.1f;
-        //     _currentTime += Time.deltaTime;
-        //     
-        //     if (_currentTime >= time)
-        //         EndDecal();
-        // }
     
         internal void ActivateHitMarker(int damage, HitZone.ZoneType type)
         {
-            hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+            if (MainCam is null) return;
 
-            foreach (var animation in animations) animation.Play();
+            hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+            markerAnimation.Play();
+
+            decalText.text = damage.ToString();
+
+            decalText.alpha = 1;
+            decalText.DOFade(0, 0.3f).SetDelay(0.2f).SetEase(Ease.InOutQuad);
+            
+            var decalTransform = decalText.transform;
+            decalTransform.localPosition = Vector3.zero;
+            decalTransform.LookAt(MainCam.transform);
+            var random = Random.Range(-0.11f, 0.11f);
+            decalTransform.DOLocalJump(decalTransform.right * (random + Mathf.Sign(random) * 0.06f), 0.2f, 1, 0.5f)
+                .SetEase(Ease.OutSine).OnComplete(DisableDecal);
         }
 
-        public void DisableDecal()
+        private void DisableDecal()
         {
-            Pool.Decals.DeactivateHitMarker(this);
+            Decals.DeactivateHitMarker(this);
             gameObject.SetActive(false);
         }
     }

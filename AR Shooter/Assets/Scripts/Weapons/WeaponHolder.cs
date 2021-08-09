@@ -56,7 +56,7 @@ namespace Weapons
                     config.SetActive(true);
             }
             
-            UI.AimInstance.SetActive(true);
+            UI.AimInstance.SetActive(!_isAimed);
             
             var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             

@@ -490,6 +490,7 @@ Transform:
   - {fileID: 8217287938692116070}
   - {fileID: 1683209415577659465}
   - {fileID: 1489836043328200436}
+  - {fileID: 6037270322699195254}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0.0023422241, y: 0, z: 0}
@@ -524,15 +525,49 @@ MonoBehaviour:
   posToAim: {x: 0, y: -0.152, z: 0.161}
   posFromAim: {x: 0.1289, y: -0.1689, z: 0.2497}
   weaponStats:
-    Damage: 3
-    AimedAimSpreadDiameter: 30
-    FreeAimSpreadDiameter: 100
-    AimSpreadIncrement: 65
-    AimRecoveryTime: 0.48
+    damageMin: 3
+    damageMax: 4
+    aimedAimSpreadDiameter: 30
+    freeAimSpreadDiameter: 90
+    aimSpreadIncrement: 65
+    aimRecoveryTime: 0.48
+    bulletCount: 30
+    bulletUI: {fileID: 6037270322699195254}
   shellsParticle: {fileID: 1683209415577659467}
   flashParticle: {fileID: 8217287938710465464}
   shootAnimation: {fileID: 9003494812585625548}
   shootAudio: {fileID: 8300000, guid: 9ec85db3e692bbd4ab1a35087963ecb9, type: 3}
+--- !u!1 &2896385856672508235
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6037270322699195254}
+  m_Layer: 0
+  m_Name: Bullet UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6037270322699195254
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2896385856672508235}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.0283, y: 0.1003, z: 0.12179999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9003494812585625547}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3493928172703092699
 GameObject:
   m_ObjectHideFlags: 0

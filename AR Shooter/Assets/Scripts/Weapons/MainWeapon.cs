@@ -16,6 +16,17 @@ namespace Weapons
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
+
+        internal int BulletCount
+        {
+            get => weaponStats.bulletCount;
+            private set
+            {
+                BulletUI.UpdateCount(value);
+                
+                weaponStats.bulletCount = value;
+            }
+        }
         
         [Header("Weapon Attachments")]
         [SerializeField] protected ParticleSystem shellsParticle;
@@ -53,6 +64,8 @@ namespace Weapons
 
                 RunWeaponLogic();
 
+                BulletCount--;
+
                 yield return new WaitWhile(LogicIsRunning);
             }
         }
@@ -77,35 +90,28 @@ namespace Weapons
         Shotgun
     }
 
-    public interface IWeaponConfig
-    {
-        Vector3 PosToAim { get; }
-        
-        Vector3 PosFromAim { get; }
-        
-        WeaponType WeaponType { get; }
-
-        bool IsActive { get; }
-
-        void SetActive(bool value);
-    }
-
     [Serializable]
     public struct WeaponStats
     {
-        public WeaponStats(int damage, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime)
+        public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime, 
+            int bulletCount, Transform bulletUI)
         {
-            Damage = damage;
-            AimedAimSpreadDiameter = aimedAimSpreadDiameter;
-            FreeAimSpreadDiameter = freeAimSpreadDiameter;
-            AimSpreadIncrement = aimSpreadIncrement;
-            AimRecoveryTime = aimRecoveryTime;
+            this.damageMin = damageMin;
+            this.damageMax = damageMax;
+            this.aimedAimSpreadDiameter = aimedAimSpreadDiameter;
+            this.freeAimSpreadDiameter = freeAimSpreadDiameter;
+            this.aimSpreadIncrement = aimSpreadIncrement;
+            this.aimRecoveryTime = aimRecoveryTime;
+            this.bulletCount = bulletCount;
+            this.bulletUI = bulletUI;
         }
 
-        public int Damage;
+        public int damageMin, damageMax;
 
-        public int AimedAimSpreadDiameter, FreeAimSpreadDiameter, AimSpreadIncrement;
+        public int aimedAimSpreadDiameter, freeAimSpreadDiameter, aimSpreadIncrement;
+        public float aimRecoveryTime;
 
-        public float AimRecoveryTime;
+        public int bulletCount;
+        public Transform bulletUI;
     }
 }

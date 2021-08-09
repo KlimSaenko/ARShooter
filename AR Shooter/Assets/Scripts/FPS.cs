@@ -1,5 +1,7 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.XR.ARCore;
+using UnityEngine.XR.ARFoundation;
 
 public class FPS : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class FPS : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        // var arCameraConfig = new ArCameraConfigFilter();
+        // arCameraConfig.SetTargetFps(new ArSession(), ArCameraConfigTargetFps.Fps60);
     }
 
     private int _accumulator = 0;

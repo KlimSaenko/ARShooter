@@ -30,7 +30,9 @@ namespace Weapons
                 if (Physics.Raycast(currentRay, out var hitInfo) && 
                     hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
                 {
-                    hitZone.ApplyDamage(4, hitInfo.point);
+                    var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                    
+                    hitZone.ApplyDamage(damage, hitInfo.point);
                 }
             }
             
@@ -46,7 +48,7 @@ namespace Weapons
         protected override void VisualizeFiring()
         {
             shootAnimation.Play();
-            // flashParticle.Play(true);
+            flashParticle.Play(true);
             
             if (AudioSource is null) return;
             

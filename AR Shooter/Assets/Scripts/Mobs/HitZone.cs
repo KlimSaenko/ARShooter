@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using static Common.Pool;
 using Player;
 using UnityEngine;
 
@@ -30,9 +30,8 @@ namespace Mobs
         public void ApplyDamage(int damage, Vector3 hitPos)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
-            // UI.ActivateHitMarker((int)zoneType, hitPos);
-            // HitDecal_Prev.instance.NewDecal(hitPos, damage, zoneType);
-            Pool.Decals.ActivateHitMarker(hitPos, damage, zoneType);
+            
+            Decals.ActivateHitMarker(hitPos, damage, zoneType);
 
             Damageable?.ApplyDamage(damage);
         }
