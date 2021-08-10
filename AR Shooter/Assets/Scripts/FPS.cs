@@ -1,15 +1,14 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.XR.ARCore;
-using UnityEngine.XR.ARFoundation;
 
 public class FPS : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI fpsText;
+    [SerializeField] private int fps = 60;
 
     private void Awake()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = fps;
         // var arCameraConfig = new ArCameraConfigFilter();
         // arCameraConfig.SetTargetFps(new ArSession(), ArCameraConfigTargetFps.Fps60);
     }

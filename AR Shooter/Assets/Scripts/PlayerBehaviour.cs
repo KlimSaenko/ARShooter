@@ -33,11 +33,11 @@ public class PlayerBehaviour : MonoBehaviour
     /// <summary>
     /// Invokes when player switches weapon
     /// </summary>
-    internal static event Action<WeaponType> SwitchingAction;
+    internal static event Action<WeaponType> WeaponSwitchAction;
     
-    public void OnSwitchingAction(int toWeapon)
+    public void OnWeaponSwitchAction(int toWeapon)
     {
-        SwitchingAction?.Invoke((WeaponType)toWeapon);
+        WeaponSwitchAction?.Invoke((WeaponType)toWeapon);
     }
     
 #if UNITY_EDITOR

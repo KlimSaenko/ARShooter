@@ -16,7 +16,7 @@ namespace Weapons
             _hideWeaponRef = hideWeaponRef;
             
             PlayerBehaviour.AimingAction += Aiming;
-            PlayerBehaviour.SwitchingAction += SwitchWeapon;
+            PlayerBehaviour.WeaponSwitchAction += SwitchWeapon;
         }
 
         private float _translationTime;

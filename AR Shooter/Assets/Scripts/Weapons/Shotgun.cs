@@ -9,16 +9,8 @@ namespace Weapons
 
         public override WeaponType WeaponType => CurrentWeaponType;
 
-        private void Awake()
-        {
-            PlayerBehaviour.FiringAction += Shoot;
-            
-            if (shootAudio is null) return;
-            
-            AudioSource = gameObject.AddComponent<AudioSource>();
-            AudioSource.playOnAwake = false;
-            AudioSource.maxDistance = 20;
-        }
+        private void Start() =>
+            SetWeaponBehaviour();
 
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()

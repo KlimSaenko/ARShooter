@@ -1,10 +1,12 @@
+using System;
+using System.Collections;
 using DG.Tweening;
-using DG.Tweening.Core;
-using DG.Tweening.Plugins.Options;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.Pool;
 using static Weapons.MainWeapon;
 using Random = UnityEngine.Random;
@@ -47,8 +49,6 @@ public class UI : MonoBehaviour
         AimInstance = new Aim(aimTransform, images);
     }
 
-    private static float _hitTimeThreshold;
-
     public void DisableMarker()
     {
         
@@ -71,14 +71,6 @@ public class UI : MonoBehaviour
         if (IsTranslating()) Translation();
         
         // AimInstance.Update();
-    }
-
-    public static void ActivateHitMarker(int type, Vector3 pos)
-    {
-        _hitMarkers.Get().position = MainCam.WorldToScreenPoint(pos);
-        // _hitMarkers[type].position = MainCam.WorldToScreenPoint(pos);
-
-        _hitTimeThreshold = 0.1f;
     }
 
     public void Quit()
@@ -125,10 +117,7 @@ public class UI : MonoBehaviour
         if (!IsPaused) pauseMenu.gameObject.SetActive(false);
     }
 
-    private bool IsTranslating()
-    {
-        return _translationTime > 0;
-    }
+    private bool IsTranslating() => _translationTime > 0;
 
     internal static void KillsUI(int kills)
     {
@@ -171,15 +160,13 @@ public class UI : MonoBehaviour
         {
             var aimPos = _aimTransform.position;
             
-            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2f + new Vector2(aimPos.x, aimPos.y));
+            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2.2f + new Vector2(aimPos.x, aimPos.y));
         }
 
         private const int TweenId = 100;
 
         internal void AimAnimation()
         {
-            // if (!_isVisible) return;
-
             DOTween.Kill(TweenId);
             
             _aimTransform.DOSizeDelta(_aimTransform.rect.size + new Vector2(ActiveWeaponStats.aimSpreadIncrement, 0), ActiveWeaponStats.aimSpreadIncrement / 900f).SetEase(Ease.OutBack)
@@ -201,5 +188,55 @@ public class UI : MonoBehaviour
         }
     }
     
+#endregion
+
+#region Reload
+
+    private static event Action<bool> ReloadCompleteAction;
+
+    public void ReloadSlider(float value)
+    {
+        if (value > 0.99f) ReloadCompleteAction?.Invoke(true);
+    }
+    
+    public void SliderUp()
+    {
+        ReloadCompleteAction?.Invoke(false);
+    }
+    
+    internal class Reload
+    {
+        private readonly Slider _reloadSlider;
+        private readonly Action _reloadActionCallback;
+        internal bool IsReloading;
+        
+        internal Reload(Action reloadActionCallback, Slider reloadSlider)
+        {
+            _reloadActionCallback += reloadActionCallback;
+            _reloadSlider = reloadSlider;
+            ReloadCompleteAction += StopReload;
+        }
+
+        internal void StartReload()
+        {
+            IsReloading = true;
+            _reloadSlider.gameObject.SetActive(true);
+        }
+        
+        internal void StopReload(bool complete)
+        {
+            IsReloading = !complete;
+
+            if (complete)
+            {
+                _reloadSlider.value = 0;
+                _reloadActionCallback?.Invoke();
+            }
+            else _reloadSlider.DOValue(0, _reloadSlider.value * 0.7f).SetEase(Ease.OutQuad);
+            
+            _reloadSlider.gameObject.SetActive(!complete);
+        }
+    }
+
 #endregion
 }

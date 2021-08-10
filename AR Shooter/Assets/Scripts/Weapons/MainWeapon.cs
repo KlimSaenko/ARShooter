@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Weapons
 {
@@ -13,44 +14,85 @@ namespace Weapons
         [SerializeField] protected WeaponStats weaponStats;
 
         public static WeaponStats ActiveWeaponStats;
+        
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
+        
+        private UI.Reload _reloadState;
 
-        internal int BulletCount
+        private int _bulletCount;
+
+        private int BulletCount
         {
-            get => weaponStats.bulletCount;
-            private set
+            get => _bulletCount;
+            set
             {
                 BulletUI.UpdateCount(value);
                 
-                weaponStats.bulletCount = value;
+                _bulletCount = value;
+                
+                if (value <= 0)
+                {
+                    StartReload();
+                }
             }
         }
+
+        private protected void SetWeaponBehaviour()
+        {
+            PlayerBehaviour.FiringAction += Shoot;
+            // PlayerBehaviour.WeaponSwitchAction += weaponType => StartReload();
+            // _reloadState = new UI.Reload(CompleteReload, reloadSlider);
+            
+            SetActive(true);
+            BulletCount = weaponStats.bulletCount;
+            
+            if (shootAudio is null) return;
+
+            AudioSource = gameObject.AddComponent<AudioSource>();
+            AudioSource.playOnAwake = false;
+            AudioSource.maxDistance = 20;
+        }
+
+        private bool _isFiring;
         
+        private bool CanShoot => IsActive && !_reloadState.IsReloading && !LogicIsRunning();
+        
+        [Space]
         [Header("Weapon Attachments")]
         [SerializeField] protected ParticleSystem shellsParticle;
         [SerializeField] protected ParticleSystem flashParticle;
         [SerializeField] protected Animation shootAnimation;
         [SerializeField] protected AudioClip shootAudio;
         
+        [Header("UI")]
+        [SerializeField] private Slider reloadSlider;
+        
         protected AudioSource AudioSource;
-        private bool _isShoot;
         
         public bool IsActive => gameObject.activeSelf;
         
         public void SetActive(bool value)
         {
-            if (value) ActiveWeaponStats = weaponStats;
+            if (value)
+            {
+                ActiveWeaponStats = weaponStats;
+                BulletUI.UpdateCount(BulletCount);
+
+                _reloadState ??= new UI.Reload(CompleteReload, reloadSlider);
+                
+                if (_reloadState.IsReloading) StartReload();
+            }
+            else if (_reloadState.IsReloading) StartReload();
+            
             gameObject.SetActive(value);
         }
 
-        protected void Shoot(bool start)
+        private void Shoot(bool start)
         {
-            if (!IsActive) return;
-            
-            _isShoot = start;
-            if (start && !LogicIsRunning())
+            _isFiring = start;
+            if (start && CanShoot)
             {
                 StartCoroutine(Shooting());
             }
@@ -58,7 +100,7 @@ namespace Weapons
 
         private IEnumerator Shooting()
         {
-            while (_isShoot)
+            while (_isFiring && CanShoot)
             {
                 VisualizeFiring();
 
@@ -77,9 +119,17 @@ namespace Weapons
             shootAnimation.Play();
         }
 
-        protected virtual void RunWeaponLogic()
+        protected virtual void RunWeaponLogic() { }
+
+        private void StartReload()
         {
-            
+            _reloadState.StartReload();
+        }
+
+        private void CompleteReload()
+        {
+            if (_reloadState.IsReloading) _reloadState.StopReload(false);
+            BulletCount = weaponStats.bulletCount;
         }
     }
     
