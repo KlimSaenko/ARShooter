@@ -8,6 +8,7 @@ namespace Weapons
         [SerializeField] private TextMeshPro bulletText;
 
         private static TextMeshPro BulletText { get; set; }
+        private static WeaponType _currentWeapon = WeaponType.Unsigned;
 
         private void Awake() =>
             BulletText = bulletText;
@@ -17,9 +18,15 @@ namespace Weapons
             transform.position = Vector3.Lerp(transform.position, MainWeapon.ActiveWeaponStats.bulletUI.position, 0.5f);
         }
 
-        internal static void UpdateCount(int to)
+        internal static void UpdateCount(IWeaponConfig weapon)
         {
-            BulletText.text = to.ToString();
+            if (_currentWeapon != weapon.WeaponType)
+            {
+                _currentWeapon = weapon.WeaponType;
+                
+            }
+            
+            BulletText.text = weapon.BulletCount.ToString();
         }
     }
 }

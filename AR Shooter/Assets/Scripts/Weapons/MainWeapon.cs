@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -19,16 +21,16 @@ namespace Weapons
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
         
-        private UI.Reload _reloadState;
+        private Reload _reloadState;
 
         private int _bulletCount;
 
-        private int BulletCount
+        public int BulletCount
         {
             get => _bulletCount;
             set
             {
-                BulletUI.UpdateCount(value);
+                BulletUI.UpdateCount(this);
                 
                 _bulletCount = value;
                 
@@ -42,8 +44,6 @@ namespace Weapons
         private protected void SetWeaponBehaviour()
         {
             PlayerBehaviour.FiringAction += Shoot;
-            // PlayerBehaviour.WeaponSwitchAction += weaponType => StartReload();
-            // _reloadState = new UI.Reload(CompleteReload, reloadSlider);
             
             SetActive(true);
             BulletCount = weaponStats.bulletCount;
@@ -55,7 +55,7 @@ namespace Weapons
             AudioSource.maxDistance = 20;
         }
 
-        private bool _isFiring;
+        private static bool _isFiring;
         
         private bool CanShoot => IsActive && !_reloadState.IsReloading && !LogicIsRunning();
         
@@ -78,13 +78,14 @@ namespace Weapons
             if (value)
             {
                 ActiveWeaponStats = weaponStats;
-                BulletUI.UpdateCount(BulletCount);
+                BulletUI.UpdateCount(this);
 
-                _reloadState ??= new UI.Reload(CompleteReload, reloadSlider);
-                
+                _reloadState ??= new Reload(CompleteReload, reloadSlider);
+
                 if (_reloadState.IsReloading) StartReload();
+                else Shoot(_isFiring);
             }
-            else if (_reloadState.IsReloading) StartReload();
+            else if (_reloadState.IsReloading) _reloadState.SkipReload();
             
             gameObject.SetActive(value);
         }
@@ -121,16 +122,73 @@ namespace Weapons
 
         protected virtual void RunWeaponLogic() { }
 
-        private void StartReload()
-        {
+        private void StartReload() =>
             _reloadState.StartReload();
-        }
 
         private void CompleteReload()
         {
-            if (_reloadState.IsReloading) _reloadState.StopReload(false);
             BulletCount = weaponStats.bulletCount;
         }
+        
+        #region Reload
+
+        private class Reload
+        {
+            private readonly Slider _reloadSlider;
+            private readonly Action _reloadActionCallback;
+            internal bool IsReloading;
+
+            private readonly EventTrigger _eventTrigger;
+            private readonly EventTrigger.Entry _entry;
+        
+            internal Reload(Action reloadActionCallback, Slider reloadSlider)
+            {
+                _reloadActionCallback += reloadActionCallback;
+                _reloadSlider = reloadSlider;
+            
+                _eventTrigger = _reloadSlider.gameObject.TryGetComponent(out EventTrigger eventTrigger) 
+                    ? eventTrigger : _reloadSlider.gameObject.AddComponent<EventTrigger>();
+                _entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+                _entry.callback.AddListener( _ => { StopReload(false); } );
+            }
+        
+            private void ReloadValueChange(float value)
+            {
+                if (value > 0.99f) StopReload(true);
+            }
+
+            internal void StartReload()
+            {
+                IsReloading = true;
+                _reloadSlider.gameObject.SetActive(true);
+                
+                _reloadSlider.onValueChanged.AddListener(ReloadValueChange);
+                _eventTrigger.triggers.Add(_entry);
+            }
+
+            private void StopReload(bool complete)
+            {
+                IsReloading = !complete;
+
+                if (complete)
+                {
+                    SkipReload();
+                    _reloadActionCallback?.Invoke();
+                }
+                else _reloadSlider.DOValue(0, _reloadSlider.value * 0.7f).SetEase(Ease.OutQuad);
+            }
+
+            internal void SkipReload()
+            {
+                _reloadSlider.onValueChanged.RemoveAllListeners();
+                _eventTrigger.triggers.Clear();
+                
+                _reloadSlider.value = 0;
+                _reloadSlider.gameObject.SetActive(false);
+            }
+        }
+        
+        #endregion
     }
     
     public enum WeaponType

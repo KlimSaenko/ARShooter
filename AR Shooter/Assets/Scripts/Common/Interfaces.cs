@@ -28,6 +28,8 @@ public interface IWeaponConfig
     WeaponType WeaponType { get; }
 
     bool IsActive { get; }
+    
+    int BulletCount { get; set; }
 
     void SetActive(bool value);
 }

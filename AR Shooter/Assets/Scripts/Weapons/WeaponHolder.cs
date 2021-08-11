@@ -36,8 +36,8 @@ namespace Weapons
 
         private static void HideWeapon(TweenCallback onCompleteAction = null)
         {
-            _thisTransform.DOMove(_hideWeaponRef.position, 0.35f).SetEase(Ease.InOutCubic);
-            _thisTransform.DOLocalRotate(_hideWeaponRef.rotation.eulerAngles, 0.35f).SetEase(Ease.InOutCubic)
+            _thisTransform.DOLocalMove(_hideWeaponRef.localPosition, 0.35f).SetEase(Ease.InOutCubic);
+            _thisTransform.DOLocalRotate(_hideWeaponRef.localRotation.eulerAngles, 0.35f).SetEase(Ease.InOutCubic)
                 .OnComplete(onCompleteAction);
             
             UI.AimInstance.SetActive(false);
@@ -60,7 +60,7 @@ namespace Weapons
             
             var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             
-            _thisTransform.DOMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => UI.AimInstance.AimAnimation());
+            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => UI.AimInstance.AimAnimation());
             _thisTransform.DOLocalRotate(Vector3.zero, 0.35f).SetEase(Ease.InOutCubic);
         }
 
@@ -106,14 +106,12 @@ namespace Weapons
             if (CurrentWeaponConfig is null) return;
             
             var dest = toAim ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
-            _thisTransform.DOMove(dest, 0.3f).SetEase(Ease.InOutCubic);
+            _thisTransform.DOLocalMove(dest, 0.3f).SetEase(Ease.InOutCubic);
             UI.AimInstance.SetActive(!toAim);
 
             _isAimed = toAim;
         }
 
         #endregion
-
-        private bool IsTranslating() => _translationTime > 0;
     }
 }

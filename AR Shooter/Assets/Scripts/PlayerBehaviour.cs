@@ -35,6 +35,9 @@ public class PlayerBehaviour : MonoBehaviour
     /// </summary>
     internal static event Action<WeaponType> WeaponSwitchAction;
     
+    /// <summary>
+    /// 0 - None; 1 - M4; 2 - Shotgun
+    /// </summary>
     public void OnWeaponSwitchAction(int toWeapon)
     {
         WeaponSwitchAction?.Invoke((WeaponType)toWeapon);
@@ -46,6 +49,9 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E)) OnAimingAction(true);
         else if (Input.GetKeyUp(KeyCode.E)) OnAimingAction(false);
+
+        if (Input.GetKeyDown(KeyCode.Alpha1)) OnWeaponSwitchAction(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) OnWeaponSwitchAction(2);
     }
         
 #endif    

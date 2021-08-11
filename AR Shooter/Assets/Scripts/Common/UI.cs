@@ -160,7 +160,7 @@ public class UI : MonoBehaviour
         {
             var aimPos = _aimTransform.position;
             
-            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2.2f + new Vector2(aimPos.x, aimPos.y));
+            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2f + new Vector2(aimPos.x, aimPos.y));
         }
 
         private const int TweenId = 100;
@@ -188,55 +188,5 @@ public class UI : MonoBehaviour
         }
     }
     
-#endregion
-
-#region Reload
-
-    private static event Action<bool> ReloadCompleteAction;
-
-    public void ReloadSlider(float value)
-    {
-        if (value > 0.99f) ReloadCompleteAction?.Invoke(true);
-    }
-    
-    public void SliderUp()
-    {
-        ReloadCompleteAction?.Invoke(false);
-    }
-    
-    internal class Reload
-    {
-        private readonly Slider _reloadSlider;
-        private readonly Action _reloadActionCallback;
-        internal bool IsReloading;
-        
-        internal Reload(Action reloadActionCallback, Slider reloadSlider)
-        {
-            _reloadActionCallback += reloadActionCallback;
-            _reloadSlider = reloadSlider;
-            ReloadCompleteAction += StopReload;
-        }
-
-        internal void StartReload()
-        {
-            IsReloading = true;
-            _reloadSlider.gameObject.SetActive(true);
-        }
-        
-        internal void StopReload(bool complete)
-        {
-            IsReloading = !complete;
-
-            if (complete)
-            {
-                _reloadSlider.value = 0;
-                _reloadActionCallback?.Invoke();
-            }
-            else _reloadSlider.DOValue(0, _reloadSlider.value * 0.7f).SetEase(Ease.OutQuad);
-            
-            _reloadSlider.gameObject.SetActive(!complete);
-        }
-    }
-
 #endregion
 }
