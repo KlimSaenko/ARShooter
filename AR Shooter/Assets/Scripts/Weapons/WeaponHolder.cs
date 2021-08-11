@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,6 +10,11 @@ namespace Weapons
         [SerializeField] private Transform hideWeaponRef;
 
         private static Transform _thisTransform;
+
+        internal static event Action<bool> WeaponReadyAction;
+        
+        private static void OnWeaponReadyAction(bool ready) =>
+            WeaponReadyAction?.Invoke(ready);
 
         private void Awake()
         {
@@ -36,7 +42,7 @@ namespace Weapons
 
         private static void HideWeapon(TweenCallback onCompleteAction = null)
         {
-            _thisTransform.DOLocalMove(_hideWeaponRef.localPosition, 0.35f).SetEase(Ease.InOutCubic);
+            _thisTransform.DOLocalMove(_hideWeaponRef.localPosition, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => OnWeaponReadyAction(false));
             _thisTransform.DOLocalRotate(_hideWeaponRef.localRotation.eulerAngles, 0.35f).SetEase(Ease.InOutCubic)
                 .OnComplete(onCompleteAction);
             
@@ -60,7 +66,7 @@ namespace Weapons
             
             var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             
-            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => UI.AimInstance.AimAnimation());
+            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => UI.AimInstance.AimAnimation()).OnComplete(() => OnWeaponReadyAction(true));
             _thisTransform.DOLocalRotate(Vector3.zero, 0.35f).SetEase(Ease.InOutCubic);
         }
 

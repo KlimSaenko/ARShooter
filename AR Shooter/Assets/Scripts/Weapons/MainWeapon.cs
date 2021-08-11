@@ -3,7 +3,6 @@ using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Weapons
@@ -30,9 +29,9 @@ namespace Weapons
             get => _bulletCount;
             set
             {
-                BulletUI.UpdateCount(this);
-                
                 _bulletCount = value;
+                
+                BulletUI.UpdateCount(this);
                 
                 if (value <= 0)
                 {
@@ -44,8 +43,10 @@ namespace Weapons
         private protected void SetWeaponBehaviour()
         {
             PlayerBehaviour.FiringAction += Shoot;
+            WeaponHolder.WeaponReadyAction += SetReady;
             
             SetActive(true);
+            SetReady(true);
             BulletCount = weaponStats.bulletCount;
             
             if (shootAudio is null) return;
@@ -56,8 +57,9 @@ namespace Weapons
         }
 
         private static bool _isFiring;
+        private bool _isReady;
         
-        private bool CanShoot => IsActive && !_reloadState.IsReloading && !LogicIsRunning();
+        private bool CanShoot => IsActive && _isReady && !_reloadState.IsReloading && !LogicIsRunning();
         
         [Space]
         [Header("Weapon Attachments")]
@@ -77,17 +79,25 @@ namespace Weapons
         {
             if (value)
             {
+                _reloadState ??= new Reload(CompleteReload, reloadSlider);
+                
                 ActiveWeaponStats = weaponStats;
                 BulletUI.UpdateCount(this);
+            }
+            
+            gameObject.SetActive(value);
+        }
 
-                _reloadState ??= new Reload(CompleteReload, reloadSlider);
+        private void SetReady(bool ready)
+        {
+            _isReady = ready;
 
+            if (ready)
+            {
                 if (_reloadState.IsReloading) StartReload();
                 else Shoot(_isFiring);
             }
             else if (_reloadState.IsReloading) _reloadState.SkipReload();
-            
-            gameObject.SetActive(value);
         }
 
         private void Shoot(bool start)
