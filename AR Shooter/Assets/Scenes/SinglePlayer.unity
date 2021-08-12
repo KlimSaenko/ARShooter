@@ -846,6 +846,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 152999573}
   m_CullTransparentMesh: 0
+--- !u!4 &189633427 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6037270322699195254, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
+  m_PrefabInstance: {fileID: 1683209415013681968}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &193536369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1031,7 +1036,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 75a321eef2903413dba2b97b03c860ff, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2567,7 +2572,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 75a321eef2903413dba2b97b03c860ff, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3537,7 +3542,6 @@ GameObject:
   - component: {fileID: 867063767}
   - component: {fileID: 867063770}
   - component: {fileID: 867063769}
-  - component: {fileID: 867063768}
   m_Layer: 0
   m_Name: Bullet Count
   m_TagString: Untagged
@@ -3567,19 +3571,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0.10060001, y: -0.06860001}
   m_SizeDelta: {x: 1, y: 0}
   m_Pivot: {x: 1, y: 0}
---- !u!114 &867063768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867063766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36f3b81adbe80bc43becc3d60d43417e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletText: {fileID: 867063769}
 --- !u!114 &867063769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4166,6 +4157,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 943167763}
   m_CullTransparentMesh: 0
+--- !u!4 &970678982 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2691788904751303813, guid: 00d00c45e4144c04ca6336dad8870159, type: 3}
+  m_PrefabInstance: {fileID: 1161899704946044144}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &970695915
 GameObject:
   m_ObjectHideFlags: 0
@@ -9777,6 +9773,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2080254499105582001, guid: 00d00c45e4144c04ca6336dad8870159, type: 3}
+      propertyPath: bulletText
+      value: 
+      objectReference: {fileID: 867063769}
+    - target: {fileID: 2080254499105582001, guid: 00d00c45e4144c04ca6336dad8870159, type: 3}
+      propertyPath: bulletUIRef
+      value: 
+      objectReference: {fileID: 970678982}
+    - target: {fileID: 2080254499105582001, guid: 00d00c45e4144c04ca6336dad8870159, type: 3}
       propertyPath: reloadSlider
       value: 
       objectReference: {fileID: 1526356133}
@@ -10629,9 +10633,17 @@ PrefabInstance:
       value: 0.071685605
       objectReference: {fileID: 0}
     - target: {fileID: 9003494812585625549, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
+      propertyPath: bulletText
+      value: 
+      objectReference: {fileID: 867063769}
+    - target: {fileID: 9003494812585625549, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
       propertyPath: virtualAim
       value: 
       objectReference: {fileID: 7761772029334302218}
+    - target: {fileID: 9003494812585625549, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
+      propertyPath: bulletUIRef
+      value: 
+      objectReference: {fileID: 189633427}
     - target: {fileID: 9003494812585625549, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
       propertyPath: reloadSlider
       value: 
@@ -36394,12 +36406,13 @@ MonoBehaviour:
     aimSpreadIncrement: 0
     aimRecoveryTime: 0
     bulletCount: 0
-    bulletUI: {fileID: 0}
   shellsParticle: {fileID: 1791949501109057661}
   flashParticle: {fileID: 1791949500241448740}
   shootAnimation: {fileID: 7782120675077652937}
   shootAudio: {fileID: 8300000, guid: 3b7b869aec8d6fe4996902d873a80d8e, type: 3}
   reloadSlider: {fileID: 0}
+  bulletText: {fileID: 0}
+  bulletUIRef: {fileID: 0}
 --- !u!23 &2579176818316364650
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -41949,12 +41962,13 @@ MonoBehaviour:
     aimSpreadIncrement: 0
     aimRecoveryTime: 0
     bulletCount: 0
-    bulletUI: {fileID: 0}
   shellsParticle: {fileID: 1791949501723396984}
   flashParticle: {fileID: 1791949500397693331}
   shootAnimation: {fileID: 3592682084585230489}
   shootAudio: {fileID: 8300000, guid: 95b074f3f21f92d479c9ccbc810842c8, type: 3}
   reloadSlider: {fileID: 0}
+  bulletText: {fileID: 0}
+  bulletUIRef: {fileID: 0}
 --- !u!4 &8905493414836859389
 Transform:
   m_ObjectHideFlags: 0

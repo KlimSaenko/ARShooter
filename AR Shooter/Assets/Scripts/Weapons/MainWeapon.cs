@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -20,7 +21,7 @@ namespace Weapons
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
         
-        private Reload _reloadState;
+        private ReloadState _reloadState;
 
         private int _bulletCount;
 
@@ -31,7 +32,7 @@ namespace Weapons
             {
                 _bulletCount = value;
                 
-                BulletUI.UpdateCount(this);
+                _bulletUI.UpdateCount(value);
                 
                 if (value <= 0)
                 {
@@ -39,23 +40,7 @@ namespace Weapons
                 }
             }
         }
-
-        private protected void SetWeaponBehaviour()
-        {
-            PlayerBehaviour.FiringAction += Shoot;
-            WeaponHolder.WeaponReadyAction += SetReady;
-            
-            SetActive(true);
-            SetReady(true);
-            BulletCount = weaponStats.bulletCount;
-            
-            if (shootAudio is null) return;
-
-            AudioSource = gameObject.AddComponent<AudioSource>();
-            AudioSource.playOnAwake = false;
-            AudioSource.maxDistance = 20;
-        }
-
+        
         private static bool _isFiring;
         private bool _isReady;
         
@@ -75,34 +60,56 @@ namespace Weapons
         
         public bool IsActive => gameObject.activeSelf;
         
+        private protected void SetWeaponBehaviour()
+        {
+            PlayerBehaviour.FiringAction += Fire;
+            WeaponHolder.WeaponReadyAction += SetReady;
+            
+            SetActive(true);
+            _isReady = true;
+            BulletCount = weaponStats.bulletCount;
+            
+            if (shootAudio is null) return;
+
+            AudioSource = gameObject.AddComponent<AudioSource>();
+            AudioSource.playOnAwake = false;
+            AudioSource.maxDistance = 20;
+        }
+        
         public void SetActive(bool value)
         {
             if (value)
             {
-                _reloadState ??= new Reload(CompleteReload, reloadSlider);
+                _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
+                _bulletUI ??= new BulletUI(bulletText, bulletUIRef);
                 
                 ActiveWeaponStats = weaponStats;
-                BulletUI.UpdateCount(this);
+                _bulletUI.UpdateCount(BulletCount);
             }
-            
+
             gameObject.SetActive(value);
         }
 
         private void SetReady(bool ready)
         {
+            if (!IsActive) return;
+            
             _isReady = ready;
 
             if (ready)
             {
                 if (_reloadState.IsReloading) StartReload();
-                else Shoot(_isFiring);
+                else Fire(_isFiring);
             }
             else if (_reloadState.IsReloading) _reloadState.SkipReload();
         }
 
-        private void Shoot(bool start)
+        #region Fire
+
+        private void Fire(bool start)
         {
             _isFiring = start;
+            
             if (start && CanShoot)
             {
                 StartCoroutine(Shooting());
@@ -123,6 +130,8 @@ namespace Weapons
             }
         }
 
+        #endregion
+
         protected virtual bool LogicIsRunning() => false;
 
         protected virtual void VisualizeFiring()
@@ -131,6 +140,8 @@ namespace Weapons
         }
 
         protected virtual void RunWeaponLogic() { }
+        
+        #region Reload
 
         private void StartReload() =>
             _reloadState.StartReload();
@@ -140,9 +151,7 @@ namespace Weapons
             BulletCount = weaponStats.bulletCount;
         }
         
-        #region Reload
-
-        private class Reload
+        private class ReloadState
         {
             private readonly Slider _reloadSlider;
             private readonly Action _reloadActionCallback;
@@ -151,7 +160,7 @@ namespace Weapons
             private readonly EventTrigger _eventTrigger;
             private readonly EventTrigger.Entry _entry;
         
-            internal Reload(Action reloadActionCallback, Slider reloadSlider)
+            internal ReloadState(Action reloadActionCallback, Slider reloadSlider)
             {
                 _reloadActionCallback += reloadActionCallback;
                 _reloadSlider = reloadSlider;
@@ -198,6 +207,40 @@ namespace Weapons
             }
         }
         
+#endregion
+
+        #region Bullet Count UI
+
+        private BulletUI _bulletUI;
+
+        [Space]
+        [SerializeField] private TextMeshPro bulletText;
+        [SerializeField] private Transform bulletUIRef;
+
+        internal class BulletUI
+        {
+            private readonly TextMeshPro _bulletText;
+            private readonly Transform _bulletUIRef;
+            private readonly Transform _bulletTextTransform;
+
+            internal BulletUI(TextMeshPro bulletText, Transform bulletUIRef)
+            {
+                _bulletText = bulletText;
+                _bulletUIRef = bulletUIRef;
+                _bulletTextTransform = bulletText.transform;
+            }
+
+            private void Update()
+            {
+                _bulletTextTransform.position = Vector3.Lerp(_bulletTextTransform.position, _bulletUIRef.position, 0.5f);
+            }
+
+            internal void UpdateCount(int value)
+            {
+                _bulletText.text = value.ToString();
+            }
+        }
+
         #endregion
     }
     
@@ -212,7 +255,7 @@ namespace Weapons
     public struct WeaponStats
     {
         public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime, 
-            int bulletCount, Transform bulletUI)
+            int bulletCount)
         {
             this.damageMin = damageMin;
             this.damageMax = damageMax;
@@ -221,7 +264,6 @@ namespace Weapons
             this.aimSpreadIncrement = aimSpreadIncrement;
             this.aimRecoveryTime = aimRecoveryTime;
             this.bulletCount = bulletCount;
-            this.bulletUI = bulletUI;
         }
 
         public int damageMin, damageMax;
@@ -230,6 +272,5 @@ namespace Weapons
         public float aimRecoveryTime;
 
         public int bulletCount;
-        public Transform bulletUI;
     }
 }
