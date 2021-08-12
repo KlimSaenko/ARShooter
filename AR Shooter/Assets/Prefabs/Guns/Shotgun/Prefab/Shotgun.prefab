@@ -193,12 +193,13 @@ MonoBehaviour:
     aimSpreadIncrement: 240
     aimRecoveryTime: 1.8
     bulletCount: 5
-    bulletUI: {fileID: 2691788904751303813}
   shellsParticle: {fileID: 6403677143890619112}
   flashParticle: {fileID: 7094582488169494469}
   shootAnimation: {fileID: 2080254499105582000}
   shootAudio: {fileID: 8300000, guid: 6396767d6728443468b82f343aab8015, type: 3}
   reloadSlider: {fileID: 0}
+  bulletText: {fileID: 0}
+  bulletUIRef: {fileID: 0}
 --- !u!1 &5379284934618901246
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +224,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5379284934618901246}
   m_LocalRotation: {x: -0.000000081460335, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.029, y: 0.087, z: 0.221}
+  m_LocalPosition: {x: -0.03350001, y: 0.087, z: 0.22100002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

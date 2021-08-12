@@ -20,11 +20,8 @@ namespace Weapons
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
-        
-        private ReloadState _reloadState;
 
         private int _bulletCount;
-
         public int BulletCount
         {
             get => _bulletCount;
@@ -53,13 +50,12 @@ namespace Weapons
         [SerializeField] protected Animation shootAnimation;
         [SerializeField] protected AudioClip shootAudio;
         
-        [Header("UI")]
-        [SerializeField] private Slider reloadSlider;
-        
-        protected AudioSource AudioSource;
+        private protected AudioSource AudioSource;
         
         public bool IsActive => gameObject.activeSelf;
-        
+
+        #region Setters
+
         private protected void SetWeaponBehaviour()
         {
             PlayerBehaviour.FiringAction += Fire;
@@ -103,6 +99,8 @@ namespace Weapons
             }
             else if (_reloadState.IsReloading) _reloadState.SkipReload();
         }
+        
+        #endregion
 
         #region Fire
 
@@ -142,7 +140,12 @@ namespace Weapons
         protected virtual void RunWeaponLogic() { }
         
         #region Reload
+        
+        [Header("UI")]
+        [SerializeField] private Slider reloadSlider;
 
+        private ReloadState _reloadState;
+        
         private void StartReload() =>
             _reloadState.StartReload();
 
@@ -210,29 +213,30 @@ namespace Weapons
 #endregion
 
         #region Bullet Count UI
-
+        
+        private void Update() =>
+            BulletUI.UpdatePos(bulletUIRef.position);
+        
         private BulletUI _bulletUI;
 
         [Space]
         [SerializeField] private TextMeshPro bulletText;
         [SerializeField] private Transform bulletUIRef;
 
-        internal class BulletUI
+        private class BulletUI
         {
             private readonly TextMeshPro _bulletText;
-            private readonly Transform _bulletUIRef;
-            private readonly Transform _bulletTextTransform;
+            private static Transform _bulletTextTransform;
 
             internal BulletUI(TextMeshPro bulletText, Transform bulletUIRef)
             {
                 _bulletText = bulletText;
-                _bulletUIRef = bulletUIRef;
                 _bulletTextTransform = bulletText.transform;
             }
 
-            private void Update()
+            internal static void UpdatePos(Vector3 posTo)
             {
-                _bulletTextTransform.position = Vector3.Lerp(_bulletTextTransform.position, _bulletUIRef.position, 0.5f);
+                _bulletTextTransform.position = Vector3.Lerp(_bulletTextTransform.position, posTo, 0.5f);
             }
 
             internal void UpdateCount(int value)
