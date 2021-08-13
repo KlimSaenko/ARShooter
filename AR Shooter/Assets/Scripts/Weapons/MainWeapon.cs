@@ -20,6 +20,7 @@ namespace Weapons
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
+        private Vector3 _startLocalPos;
 
         private int _bulletCount;
         public int BulletCount
@@ -64,6 +65,7 @@ namespace Weapons
             SetActive(true);
             _isReady = true;
             BulletCount = weaponStats.bulletCount;
+            _startLocalPos = transform.localPosition;
             
             if (shootAudio is null) return;
 
@@ -77,12 +79,14 @@ namespace Weapons
             if (value)
             {
                 _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
-                _bulletUI ??= new BulletUI(bulletText, bulletUIRef);
-                
+                _bulletUI ??= new BulletUI(bulletText);
+
                 ActiveWeaponStats = weaponStats;
                 _bulletUI.UpdateCount(BulletCount);
             }
+            else transform.localPosition = _startLocalPos;
 
+            bulletText.transform.GetChild((int)WeaponType - 1).gameObject.SetActive(value);
             gameObject.SetActive(value);
         }
 
@@ -101,9 +105,18 @@ namespace Weapons
         }
         
         #endregion
+        
+        protected virtual bool LogicIsRunning() => false;
 
+        protected virtual void VisualizeFiring()
+        {
+            shootAnimation.Play();
+        }
+
+        protected virtual void RunWeaponLogic() { }
+        
         #region Fire
-
+        
         private void Fire(bool start)
         {
             _isFiring = start;
@@ -127,17 +140,8 @@ namespace Weapons
                 yield return new WaitWhile(LogicIsRunning);
             }
         }
-
+        
         #endregion
-
-        protected virtual bool LogicIsRunning() => false;
-
-        protected virtual void VisualizeFiring()
-        {
-            shootAnimation.Play();
-        }
-
-        protected virtual void RunWeaponLogic() { }
         
         #region Reload
         
@@ -182,7 +186,9 @@ namespace Weapons
             internal void StartReload()
             {
                 IsReloading = true;
+                _reloadSlider.interactable = true;
                 _reloadSlider.gameObject.SetActive(true);
+                _reloadSlider.transform.DOPunchScale(Vector3.one * 0.12f, 0.2f, 1);
                 
                 _reloadSlider.onValueChanged.AddListener(ReloadValueChange);
                 _eventTrigger.triggers.Add(_entry);
@@ -204,9 +210,13 @@ namespace Weapons
             {
                 _reloadSlider.onValueChanged.RemoveAllListeners();
                 _eventTrigger.triggers.Clear();
-                
-                _reloadSlider.value = 0;
-                _reloadSlider.gameObject.SetActive(false);
+
+                _reloadSlider.transform.DOPunchScale(Vector3.one * 0.12f, 0.2f, 1).OnComplete(() =>
+                {
+                    _reloadSlider.value = 0;
+                    _reloadSlider.gameObject.SetActive(false);
+                });
+                _reloadSlider.interactable = false;
             }
         }
         
@@ -228,7 +238,7 @@ namespace Weapons
             private readonly TextMeshPro _bulletText;
             private static Transform _bulletTextTransform;
 
-            internal BulletUI(TextMeshPro bulletText, Transform bulletUIRef)
+            internal BulletUI(TextMeshPro bulletText)
             {
                 _bulletText = bulletText;
                 _bulletTextTransform = bulletText.transform;
