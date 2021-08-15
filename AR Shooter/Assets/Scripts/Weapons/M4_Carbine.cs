@@ -8,11 +8,7 @@ namespace Weapons
     public class M4_Carbine : MainWeapon
     {
         private const WeaponType CurrentWeaponType = WeaponType.M4_Carabine;
-
         public override WeaponType WeaponType => CurrentWeaponType;
-        
-        private void Start() =>
-            SetWeaponBehaviour();
 
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()

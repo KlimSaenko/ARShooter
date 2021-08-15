@@ -199,7 +199,7 @@ MonoBehaviour:
   shootAudio: {fileID: 8300000, guid: 6396767d6728443468b82f343aab8015, type: 3}
   reloadSlider: {fileID: 0}
   bulletText: {fileID: 0}
-  bulletUIRef: {fileID: 0}
+  bulletUIRef: {fileID: 2691788904751303813}
 --- !u!1 &5379284934618901246
 GameObject:
   m_ObjectHideFlags: 0

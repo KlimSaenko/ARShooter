@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using static Common.Pool;
 using Mobs;
@@ -10,6 +11,7 @@ namespace Weapons
     public class HitDecal : MonoBehaviour
     {
         [SerializeField] private Animation markerAnimation;
+        [SerializeField] private AnimationClip[] animationClips;
         [SerializeField] private RectTransform hitMarker;
         [SerializeField] private TextMeshPro decalText;
     
@@ -20,6 +22,15 @@ namespace Weapons
             if (MainCam is null) return;
 
             hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+            switch (type)
+            {
+                case HitZone.ZoneType.Standard:
+                    markerAnimation.clip = animationClips[0];
+                    break;
+                case HitZone.ZoneType.Critical:
+                    markerAnimation.clip = animationClips[1];
+                    break;
+            }
             markerAnimation.Play();
 
             decalText.text = damage.ToString();

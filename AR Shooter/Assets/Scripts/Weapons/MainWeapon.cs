@@ -39,10 +39,10 @@ namespace Weapons
             }
         }
         
-        private static bool _isFiring;
+        private protected static bool IsFiring;
         private bool _isReady;
-        
-        private bool CanShoot => IsActive && _isReady && !_reloadState.IsReloading && !LogicIsRunning();
+
+        private protected bool CanShoot => IsActive && _isReady && !_reloadState.IsReloading && !LogicIsRunning();
         
         [Space]
         [Header("Weapon Attachments")]
@@ -54,10 +54,13 @@ namespace Weapons
         private protected AudioSource AudioSource;
         
         public bool IsActive => gameObject.activeSelf;
+        
+        private void Start() =>
+            SetWeaponBehaviour();
 
         #region Setters
 
-        private protected void SetWeaponBehaviour()
+        private void SetWeaponBehaviour()
         {
             PlayerBehaviour.FiringAction += Fire;
             WeaponHolder.WeaponReadyAction += SetReady;
@@ -99,7 +102,7 @@ namespace Weapons
             if (ready)
             {
                 if (_reloadState.IsReloading) StartReload();
-                else Fire(_isFiring);
+                else Fire(IsFiring);
             }
             else if (_reloadState.IsReloading) _reloadState.SkipReload();
         }
@@ -119,7 +122,7 @@ namespace Weapons
         
         private void Fire(bool start)
         {
-            _isFiring = start;
+            IsFiring = start;
             
             if (start && CanShoot)
             {
@@ -127,9 +130,9 @@ namespace Weapons
             }
         }
 
-        private IEnumerator Shooting()
+        private protected virtual IEnumerator Shooting()
         {
-            while (_isFiring && CanShoot)
+            while (IsFiring && CanShoot)
             {
                 VisualizeFiring();
 
@@ -262,7 +265,8 @@ namespace Weapons
     {
         Unsigned = 0,
         M4_Carabine,
-        Shotgun
+        Shotgun,
+        Flamethrower
     }
 
     [Serializable]

@@ -6,11 +6,7 @@ namespace Weapons
     public class Shotgun : MainWeapon
     {
         private const WeaponType CurrentWeaponType = WeaponType.Shotgun;
-
         public override WeaponType WeaponType => CurrentWeaponType;
-
-        private void Start() =>
-            SetWeaponBehaviour();
 
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()

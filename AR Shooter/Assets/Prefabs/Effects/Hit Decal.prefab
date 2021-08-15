@@ -103,7 +103,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7922757287108062307}
   - component: {fileID: 7922757287108062316}
-  - component: {fileID: 190652286420149616}
   m_Layer: 0
   m_Name: Hit Decal
   m_TagString: Untagged
@@ -145,27 +144,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ddcecefbd0d04445a2d869a7a1b0d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  power: 0
-  time: 0
   markerAnimation: {fileID: 5206503839970795480}
+  animationClips:
+  - {fileID: 7400000, guid: 394e18fb72c5a43e28fbeed8880b6c1d, type: 2}
+  - {fileID: 7400000, guid: 07e58fbac4f4b8c42b3d317316d85633, type: 2}
   hitMarker: {fileID: 3614408724651843415}
   decalText: {fileID: 7922757287213444259}
---- !u!111 &190652286420149616
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7922757287108062317}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 6f5710dec7f5b3c4ba332a1ecf996302, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 6f5710dec7f5b3c4ba332a1ecf996302, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!1 &7922757287213444269
 GameObject:
   m_ObjectHideFlags: 0

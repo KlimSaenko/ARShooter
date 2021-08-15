@@ -7,8 +7,6 @@ namespace Common
 {
     public class Pool : MonoBehaviour
     {
-        private static Camera MainCam => Camera.main;
-        
         private void Awake()
         {
             DecalsInstance = new Decals(hitDecalPrefab, folder);
@@ -28,8 +26,8 @@ namespace Common
 
             internal Decals(GameObject hitDecalPrefab, Transform folder)
             {
-                Decals._hitDecalPrefab = hitDecalPrefab;
-                Decals._folder = folder;
+                _hitDecalPrefab = hitDecalPrefab;
+                _folder = folder;
 
                 _hitDecals = new LinkedPool<HitDecal>(hitDecalPrefab.GetComponent<HitDecal>,
                     rt => rt.gameObject.SetActive(true),
