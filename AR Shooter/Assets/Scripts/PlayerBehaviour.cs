@@ -37,9 +37,10 @@ public class PlayerBehaviour : MonoBehaviour
     
     /// <summary>
     /// 0 - None;
-    /// 1 - M4;
-    /// 2 - Shotgun;
-    /// 3 - Flamethrower
+    /// 1 - Pistol;
+    /// 2 - M4;
+    /// 3 - Shotgun;
+    /// 4 - Flamethrower
     /// </summary>
     public void OnWeaponSwitchAction(int toWeapon)
     {
@@ -56,6 +57,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) OnWeaponSwitchAction(1);
         else if (Input.GetKeyDown(KeyCode.Alpha2)) OnWeaponSwitchAction(2);
         else if (Input.GetKeyDown(KeyCode.Alpha3)) OnWeaponSwitchAction(3);
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) OnWeaponSwitchAction(4);
     }
         
 #endif    

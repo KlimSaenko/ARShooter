@@ -17,11 +17,10 @@ namespace Weapons
     
         private static Camera MainCam => Camera.main;
     
-        internal void ActivateHitMarker(int damage, HitZone.ZoneType type)
+        internal void ActivateHitMarker(int damage, HitZone.ZoneType type, bool withMarker)
         {
             if (MainCam is null) return;
 
-            hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
             switch (type)
             {
                 case HitZone.ZoneType.Standard:
@@ -31,7 +30,12 @@ namespace Weapons
                     markerAnimation.clip = animationClips[1];
                     break;
             }
-            markerAnimation.Play();
+
+            if (withMarker)
+            {
+                hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+                markerAnimation.Play();
+            }
 
             decalText.text = damage.ToString();
 

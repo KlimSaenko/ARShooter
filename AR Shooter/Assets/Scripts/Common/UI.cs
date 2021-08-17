@@ -152,7 +152,7 @@ public class UI : MonoBehaviour
         private readonly Image[] _images;
 
         private float _currentAimSpreadDiameter;
-        private float CurrentAimSpreadDiameter => (_isVisible ? _aimTransform.rect.width : _currentAimSpreadDiameter);
+        internal float CurrentAimSpreadDiameter => (_isVisible ? _aimTransform.rect.width : _currentAimSpreadDiameter);
 
         private bool _isVisible = true;
     

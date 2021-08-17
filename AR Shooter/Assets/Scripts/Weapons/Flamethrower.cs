@@ -1,6 +1,7 @@
 using System.Collections;
 using Mobs;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Weapons
 {
@@ -8,6 +9,8 @@ namespace Weapons
     {
         private const WeaponType CurrentWeaponType = WeaponType.Flamethrower;
         public override WeaponType WeaponType => CurrentWeaponType;
+
+        private Transform MainCam => Camera.main.transform;
 
         private ParticleSystem[] _subParticles;
 
@@ -44,28 +47,35 @@ namespace Weapons
                 emission.enabled = false;
             }
         }
+        
+        private readonly RaycastHit[] _hits = new RaycastHit[16];
 
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
-            foreach (var triggeredEnemy in FlamethrowerTrigger.TriggeredEnemies)
+            var forward = MainCam.forward;
+            var camPosition = MainCam.position;
+            
+            var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * 3.5f,
+                UI.AimInstance.CurrentAimSpreadDiameter / 2200f, forward, _hits, 0);
+
+            for (var i = 0; i < hitsCount; i++)
             {
-                var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
-                
-                triggeredEnemy.ApplyDamage(damage);
+                if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+
+                StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
             }
             
-            // var currentRay = UI.AimInstance.GetRay();
-            //
-            // if (Physics.Raycast(currentRay, out var hitInfo) && 
-            //     hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
-            // {
-            //     var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
-            //     
-            //     hitZone.ApplyDamage(damage, hitInfo.point);
-            // }
-            
             UI.AimInstance.AimAnimation();
+        }
+
+        private IEnumerator ApplyDamage(float delay, HitZone enemy)
+        {
+            yield return new WaitForSeconds(delay);
+            
+            var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+            
+            enemy.ApplyDamage(damage);
         }
         
         protected override bool LogicIsRunning() =>

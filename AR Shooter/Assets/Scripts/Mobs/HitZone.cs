@@ -35,8 +35,16 @@ namespace Mobs
 
             Damageable?.ApplyDamage(damage);
         }
-        
-        public void ApplyDamage(int damage) =>
-            ApplyDamage(damage, transform.position + new Vector3(Random.Range(-0.15f, 0.15f), Random.Range(-0.15f, 0.15f), Random.Range(-0.15f, 0.15f)));
+
+        public void ApplyDamage(int damage)
+        {
+            damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
+
+            var hitPos = transform.position + new Vector3(Random.Range(-0.15f, 0.15f), Random.Range(-0.15f, 0.15f), Random.Range(-0.15f, 0.15f));
+            
+            Decals.ActivateHitMarker(hitPos, damage, zoneType, false);
+            
+            Damageable?.ApplyDamage(damage);
+        }
     }
 }

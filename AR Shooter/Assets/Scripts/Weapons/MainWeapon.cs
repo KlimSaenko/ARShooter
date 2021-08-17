@@ -264,6 +264,7 @@ namespace Weapons
     public enum WeaponType
     {
         Unsigned = 0,
+        Pistol,
         M4_Carabine,
         Shotgun,
         Flamethrower

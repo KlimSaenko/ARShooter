@@ -35,14 +35,14 @@ namespace Common
                     null, false, 10);
             }
         
-            internal static void ActivateHitMarker(Vector3 pos, int damage, HitZone.ZoneType type)
+            internal static void ActivateHitMarker(Vector3 pos, int damage, HitZone.ZoneType type, bool withMarker = true)
             {
                 if (_hitDecals.CountInactive <= 0)
                     _hitDecals.Release(Instantiate(_hitDecalPrefab, Vector3.zero, Quaternion.identity, _folder).GetComponent<HitDecal>());
             
                 var currentHitDecal = _hitDecals.Get();
                 currentHitDecal.transform.position = pos;
-                currentHitDecal.ActivateHitMarker(damage, type);
+                currentHitDecal.ActivateHitMarker(damage, type, withMarker);
             }
 
             internal static void DeactivateHitMarker(HitDecal hitDecal)
