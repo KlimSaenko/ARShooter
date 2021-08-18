@@ -183,8 +183,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa38578d368be442880a540c6e0546c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posToAim: {x: 0, y: -0.119, z: 0.09}
-  posFromAim: {x: 0.1355, y: -0.1437, z: 0.1044}
+  posToAim: {x: 0, y: -0.119, z: 0.085}
+  posFromAim: {x: 0.0916, y: -0.1437, z: 0.0985}
   weaponStats:
     damageMin: 2
     damageMax: 3
@@ -193,6 +193,7 @@ MonoBehaviour:
     aimSpreadIncrement: 240
     aimRecoveryTime: 1.8
     bulletCount: 5
+    mass: 1.5
   shellsParticle: {fileID: 6403677143890619112}
   flashParticle: {fileID: 7094582488169494469}
   shootAnimation: {fileID: 2080254499105582000}

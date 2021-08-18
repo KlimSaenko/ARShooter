@@ -218,7 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posToAim: {x: 0, y: -0.0985, z: 0.1966}
-  posFromAim: {x: 0.1006, y: -0.1292, z: 0.2485}
+  posFromAim: {x: 0.0878, y: -0.1245, z: 0.2471}
   weaponStats:
     damageMin: 2
     damageMax: 3
@@ -227,6 +227,7 @@ MonoBehaviour:
     aimSpreadIncrement: 50
     aimRecoveryTime: 0.7
     bulletCount: 20
+    mass: 0.6
   shellsParticle: {fileID: 5064119335600677354}
   flashParticle: {fileID: 8760293872177977026}
   shootAnimation: {fileID: 993437874561819208}

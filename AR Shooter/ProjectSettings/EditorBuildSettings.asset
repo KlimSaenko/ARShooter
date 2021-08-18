@@ -5,21 +5,22 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainMenu.unity
     guid: 90008d108f07c2143b7c44e57f8952f1
   - enabled: 1
     path: Assets/Scenes/SinglePlayer.unity
     guid: 3fadd845756a8c64a9d0999921597cae
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MultiPlayer.unity
     guid: e3cb9544cddb06b4fb1d22654028b8ca
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Preview.unity
     guid: edd338c3802ca0f4fb747f5df5c003fb
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 99c8c2059a46c324090c7c94479e7cc2, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 051177a785050be4698d0d1b7a5516fe, type: 2}
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 604e59750fe25764181479a76b81f678, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 58f1e5c6da177f14ea81443250c3477a, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: fad2f7712b9949947a16dd3d754d5af4, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 06ec6dcc4024745d7865e738ee989c07, type: 2}

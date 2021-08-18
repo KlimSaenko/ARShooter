@@ -274,7 +274,7 @@ namespace Weapons
     public struct WeaponStats
     {
         public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime, 
-            int bulletCount)
+            int bulletCount, float mass)
         {
             this.damageMin = damageMin;
             this.damageMax = damageMax;
@@ -283,6 +283,7 @@ namespace Weapons
             this.aimSpreadIncrement = aimSpreadIncrement;
             this.aimRecoveryTime = aimRecoveryTime;
             this.bulletCount = bulletCount;
+            this.mass = mass;
         }
 
         public int damageMin, damageMax;
@@ -291,5 +292,7 @@ namespace Weapons
         public float aimRecoveryTime;
 
         public int bulletCount;
+
+        public float mass;
     }
 }
