@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a90169a6d6d00a4d956d4c237e8d6a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posToAim: {x: 0, y: -0.0973, z: 0.1937}
+  posToAim: {x: 0, y: -0.0985, z: 0.1966}
   posFromAim: {x: 0.1006, y: -0.1292, z: 0.2485}
   weaponStats:
     damageMin: 2
@@ -284,7 +284,7 @@ MeshRenderer:
   m_GameObject: {fileID: 5264878315345914126}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 1
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -783,7 +783,7 @@ MeshRenderer:
   m_GameObject: {fileID: 8739785000470029194}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 1
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -952,11 +952,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5855284563507776995, guid: bf01b46af97e90c4e83d4a957f8e0222, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.0015
+      value: 0.0042
       objectReference: {fileID: 0}
     - target: {fileID: 5855284563507776995, guid: bf01b46af97e90c4e83d4a957f8e0222, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0769
+      value: 0.0816
       objectReference: {fileID: 0}
     - target: {fileID: 5855284563507776995, guid: bf01b46af97e90c4e83d4a957f8e0222, type: 3}
       propertyPath: m_LocalPosition.z

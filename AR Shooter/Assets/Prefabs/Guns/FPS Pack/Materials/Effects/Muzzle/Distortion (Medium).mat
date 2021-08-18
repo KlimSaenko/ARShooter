@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Distortion (Small)
+  m_Name: Distortion (Medium)
   m_Shader: {fileID: 4800000, guid: eb4f2df0f08a90d44bd8b39d9b7a09ca, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -25,7 +25,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BumpAmt: 80
+    - _BumpAmt: 150
     - _InvFade: 1
     - _InvFade2: 0
     m_Colors:

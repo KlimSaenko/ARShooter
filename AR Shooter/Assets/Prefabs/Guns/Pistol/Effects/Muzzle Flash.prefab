@@ -205,7 +205,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 0.46666667, a: 0.5882353}
+      maxColor: {r: 0.7830189, g: 0.7830189, b: 0.41736382, a: 0.39215687}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -979,9 +979,9 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.91101694
-          inSlope: 0.18146303
-          outSlope: 0.18146303
+          value: 0.812655
+          inSlope: 0.38205245
+          outSlope: 0.38205245
           tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
@@ -989,17 +989,17 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0.49036467
           value: 1
-          inSlope: -0.054769814
-          outSlope: -0.054769814
+          inSlope: -0.0992267
+          outSlope: -0.0992267
           tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
-          value: 0.85169476
-          inSlope: -0.29100266
-          outSlope: -0.29100266
+          value: 0.7041537
+          inSlope: -0.58050585
+          outSlope: -0.58050585
           tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
@@ -9651,7 +9651,7 @@ ParticleSystemRenderer:
   m_MaxParticleSize: 1
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
-  m_LengthScale: 1
+  m_LengthScale: 0.8
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -14472,7 +14472,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fe6340b58e4dde441ae5c35ea7ff93b6, type: 2}
+  - {fileID: 2100000, guid: 050e72f81603341cb86eb40d03eefd55, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
