@@ -25,6 +25,17 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.barracuda": {
+      "version": "2.1.0-preview",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.6.0-pre.2",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.imageconversion": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.burst": {
       "version": "1.6.0-pre.2",
       "depth": 0,
@@ -316,6 +327,14 @@
       "source": "git",
       "dependencies": {},
       "hash": "efac099e5a7a373b6ea961cc0b8aaebe059ab1c8"
+    },
+    "jp.keijiro.bodypix": {
+      "version": "file:/Users/hukvladimir/Downloads/BodyPixBarracuda-main/Packages/jp.keijiro.bodypix",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.barracuda": "2.1.0-preview"
+      }
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

@@ -7,15 +7,21 @@ namespace Mobs
     public class HitZone : MonoBehaviour
     {
         [SerializeField] private Transform transformWithController;
-        //[SerializeField] private MainMob mainMob;
-        //[SerializeField] private PlayerStatus playerStatus;
 
+        private IDamageable _damageable;
         private IDamageable Damageable
         {
             get
             {
-                if (transformWithController.TryGetComponent(out MainMob mainMob)) return mainMob;
-                return transformWithController.TryGetComponent(out PlayerStatus playerStatus) ? playerStatus : null;
+                if (_damageable is not null) return _damageable;
+                
+                if (transformWithController.TryGetComponent(out MainMob mainMob)) _damageable = mainMob;
+                else
+                {
+                    _damageable = transformWithController.TryGetComponent(out PlayerStatus playerStatus) ? playerStatus : null;
+                }
+
+                return _damageable;
             }
         }
 

@@ -64,8 +64,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66cca0c083a216d4f960d2c7b86ba965, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posToAim: {x: 0.014, y: -0.1402, z: 0.2654}
-  posFromAim: {x: 0.1077, y: -0.167, z: 0.3573}
+  posToAim: {x: 0.014, y: -0.1346, z: 0.2591}
+  posFromAim: {x: 0.1077, y: -0.1612, z: 0.343}
   weaponStats:
     damageMin: 3
     damageMax: 4

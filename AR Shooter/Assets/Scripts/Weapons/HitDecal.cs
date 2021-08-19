@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using DG.Tweening;
 using static Common.Pool;
 using Mobs;
@@ -33,7 +34,7 @@ namespace Weapons
 
             if (withMarker)
             {
-                hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
+                UpdateMarkerPos();
                 markerAnimation.Play();
             }
 
@@ -49,6 +50,9 @@ namespace Weapons
             decalTransform.DOLocalJump(decalTransform.right * (random + Mathf.Sign(random) * 0.06f), 0.2f, 1, 0.5f)
                 .SetEase(Ease.OutSine).OnComplete(DisableDecal);
         }
+
+        private void UpdateMarkerPos() =>
+            hitMarker.position = MainCam.WorldToScreenPoint(transform.position);
 
         private void DisableDecal()
         {
