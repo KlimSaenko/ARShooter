@@ -231,7 +231,7 @@ MonoBehaviour:
   shellsParticle: {fileID: 5064119335600677354}
   flashParticle: {fileID: 8760293872177977026}
   shootAnimation: {fileID: 993437874561819208}
-  shootAudio: {fileID: 0}
+  shootAudio: {fileID: 8300000, guid: d4f61c90a681e44448f5d3dc4752baf6, type: 3}
   reloadSlider: {fileID: 0}
   bulletText: {fileID: 0}
   bulletUIRef: {fileID: 74326616747264774}

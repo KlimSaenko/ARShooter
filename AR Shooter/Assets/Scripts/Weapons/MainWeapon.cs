@@ -51,7 +51,7 @@ namespace Weapons
         [SerializeField] protected Animation shootAnimation;
         [SerializeField] protected AudioClip shootAudio;
         
-        private protected AudioSource AudioSource;
+        private protected static AudioSource AudioSource;
         
         public bool IsActive => gameObject.activeSelf;
         
@@ -70,9 +70,9 @@ namespace Weapons
             BulletCount = weaponStats.bulletCount;
             _startLocalPos = transform.localPosition;
             
-            if (shootAudio is null) return;
+            if (shootAudio is null || AudioSource is not null) return;
 
-            AudioSource = gameObject.AddComponent<AudioSource>();
+            AudioSource = transform.parent.gameObject.AddComponent<AudioSource>();
             AudioSource.playOnAwake = false;
             AudioSource.maxDistance = 20;
         }

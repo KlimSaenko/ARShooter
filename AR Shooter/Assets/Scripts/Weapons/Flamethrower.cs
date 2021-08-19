@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using Mobs;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -27,6 +28,13 @@ namespace Weapons
                 emission.enabled = true;
             }
             
+            AudioSource.loop = true;
+            DOTween.Kill(TweenId);
+            AudioSource.volume = 1f;
+            AudioSource.pitch = Random.Range(0.94f, 1.06f);
+            AudioSource.clip = shootAudio;
+            AudioSource.Play();
+            
             while (IsFiring && CanShoot)
             {
                 VisualizeFiring();
@@ -46,7 +54,11 @@ namespace Weapons
                 emission = subParticle.emission;
                 emission.enabled = false;
             }
+            
+            AudioSource.DOFade(0, 0.2f).OnComplete(() => AudioSource.Stop()).SetId(TweenId);
         }
+
+        private const int TweenId = 101;
         
         private readonly RaycastHit[] _hits = new RaycastHit[16];
 
@@ -86,9 +98,12 @@ namespace Weapons
             shootAnimation.Play();
             
             if (AudioSource is null) return;
-            
-            AudioSource.pitch = Random.Range(0.94f, 1.06f);
-            AudioSource.PlayOneShot(shootAudio);
+
+            // AudioSource.loop = true;
+            // AudioSource.volume = 1f;
+            // AudioSource.pitch = Random.Range(0.94f, 1.06f);
+            // AudioSource.clip = shootAudio;
+            // if (!AudioSource.isPlaying) AudioSource.Play();
         }
     }
 }

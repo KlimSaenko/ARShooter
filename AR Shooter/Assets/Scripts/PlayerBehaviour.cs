@@ -6,6 +6,16 @@ using Weapons;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    private void Awake()
+    {
+        Initialization();
+    }
+
+    private static void Initialization()
+    {
+        Vibration.Init();
+    }
+
     /// <summary>
     /// Invokes when player starts or finishes firing
     /// </summary>

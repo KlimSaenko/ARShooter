@@ -32,9 +32,12 @@ namespace Weapons
             shellsParticle.Play();
             shootAnimation.Play();
             flashParticle.Play(true);
+            Vibration.VibratePeek();
             
             if (AudioSource is null) return;
-            
+
+            AudioSource.loop = false;
+            AudioSource.volume = 0.8f;
             AudioSource.pitch = Random.Range(0.94f, 1.06f);
             AudioSource.PlayOneShot(shootAudio);
         }

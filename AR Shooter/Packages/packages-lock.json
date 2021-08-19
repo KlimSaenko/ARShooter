@@ -329,12 +329,13 @@
       "hash": "efac099e5a7a373b6ea961cc0b8aaebe059ab1c8"
     },
     "jp.keijiro.bodypix": {
-      "version": "file:/Users/hukvladimir/Downloads/BodyPixBarracuda-main/Packages/jp.keijiro.bodypix",
+      "version": "2.0.0",
       "depth": 0,
-      "source": "local",
+      "source": "registry",
       "dependencies": {
         "com.unity.barracuda": "2.1.0-preview"
-      }
+      },
+      "url": "https://registry.npmjs.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

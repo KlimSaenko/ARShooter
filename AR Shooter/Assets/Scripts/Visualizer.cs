@@ -85,12 +85,12 @@ public sealed class Visualizer : MonoBehaviour
 
             _detector.ProcessImage(_sourceAR.Texture);
             
-            var keypoints = _detector.UpdatePostReadCache();
+            // var keypoints = _detector.UpdatePostReadCache();
 
-            var distance = ProcessKeypoints(keypoints, new []{ 0, 5, 6, 11, 12 }, out var validatedPoints);
+            // var distance = ProcessKeypoints(keypoints, new []{ 0, 5, 6, 11, 12 }, out var validatedPoints);
             
-            tm.color = Color.Lerp(Color.red, Color.green, validatedPoints / 5f);
-            tm.text = $"{distance:N2}m";
+            // tm.color = Color.Lerp(Color.red, Color.green, validatedPoints / 5f);
+            // tm.text = $"{distance:N2}m";
             
             Graphics.Blit(_detector.MaskTexture, _mask, _material, 0);
         }
