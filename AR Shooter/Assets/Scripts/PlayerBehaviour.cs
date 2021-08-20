@@ -68,6 +68,7 @@ public class PlayerBehaviour : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha2)) OnWeaponSwitchAction(2);
         else if (Input.GetKeyDown(KeyCode.Alpha3)) OnWeaponSwitchAction(3);
         else if (Input.GetKeyDown(KeyCode.Alpha4)) OnWeaponSwitchAction(4);
+        // else if ((Input.GetKeyDown(KeyCode.S))) OnFiringAction(true);
     }
         
 #endif    

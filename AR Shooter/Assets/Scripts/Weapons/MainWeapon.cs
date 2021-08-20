@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
+using Common;
 using DG.Tweening;
+using Mobs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace Weapons
 {
@@ -141,6 +144,32 @@ namespace Weapons
                 BulletCount--;
 
                 yield return new WaitWhile(LogicIsRunning);
+            }
+        }
+
+        private protected void RealTargetHit(Ray[] currentRays)
+        {
+            var count = currentRays.Length;
+            
+            var screenPoints = new Vector2[count];
+            for (var i = 0; i < count; i++)
+            {
+                screenPoints[i] = UI.AimInstance.RawRaycastPoint;
+            }
+            
+            var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(screenPoints, out var distance);
+            
+            if (distance < 0.05f) return;
+            
+            for (var i = 0; i < count; i++)
+            {
+                if (hitZoneTypes[i] == HitZone.ZoneType.None) continue;
+                
+                var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                                                    
+                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, hitZoneTypes[i]);
+                
+                // Debug.Log(hitZoneTypes[i]);
             }
         }
         

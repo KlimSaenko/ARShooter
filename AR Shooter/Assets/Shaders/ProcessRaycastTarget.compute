@@ -1,0 +1,41 @@
+#pragma kernel Process
+
+Texture2D<float4> InputTexture;
+uniform vector Input[16];
+// RWStructuredBuffer<vector> Input;
+// uniform int InputCount;
+
+RWStructuredBuffer<int> Result;
+
+// bool ValidatePoint(uint3 id, uint num)
+// {
+//     return abs(id.x - Input[num].x) + abs(id.y - Input[num].y) >= Input[num].z;
+// }
+
+[numthreads(8,8,1)]
+void Process (uint3 id : SV_DispatchThreadID)
+{
+    uint num = id.z;
+    
+    if (id.x == Input[num].x && id.y == Input[num].y)
+    {
+        if (InputTexture[id.xy].a > 0.9)
+        {
+            if (InputTexture[id.xy].x > 0.9) Result[num] = 2;
+            else if (InputTexture[id.xy].x > 0.4) Result[num] = 1;
+        }
+        else Result[num] = 0;
+    }
+    // if (InputTexture[id.xy].a > 0.9)
+    // {
+    //     if (InputTexture[id.xy].x > 0.9)
+    //     {
+    //         if (ValidatePoint(id, num)) Result[num] = 2;
+    //     }
+    //     else if (InputTexture[id.xy].x > 0.4)
+    //     {
+    //         if (ValidatePoint(id, num)) Result[num] = 1;
+    //     }
+    // }
+}
+

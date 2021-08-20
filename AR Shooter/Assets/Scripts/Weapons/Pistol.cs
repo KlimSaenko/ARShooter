@@ -13,12 +13,19 @@ namespace Weapons
         {
             var currentRay = UI.AimInstance.GetRay();
             
-            if (Physics.Raycast(currentRay, out var hitInfo) && 
-                hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+            if (Config.CurrentGameplayMode == Config.GameplayMode.Virtual)
             {
-                var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
-                
-                hitZone.ApplyDamage(damage, hitInfo.point);
+                if (Physics.Raycast(currentRay, out var hitInfo) &&
+                    hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+                {
+                    var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                                        
+                    hitZone.ApplyDamage(damage, hitInfo.point);
+                }
+            }
+            else
+            {
+                RealTargetHit(new []{ currentRay });
             }
             
             UI.AimInstance.AimAnimation();
@@ -32,7 +39,7 @@ namespace Weapons
             shellsParticle.Play();
             shootAnimation.Play();
             flashParticle.Play(true);
-            Vibration.VibratePeek();
+            Vibration.VibratePop();
             
             if (AudioSource is null) return;
 

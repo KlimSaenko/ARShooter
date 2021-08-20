@@ -22,15 +22,12 @@ namespace Weapons
         {
             if (MainCam is null) return;
 
-            switch (type)
+            markerAnimation.clip = type switch
             {
-                case HitZone.ZoneType.Standard:
-                    markerAnimation.clip = animationClips[0];
-                    break;
-                case HitZone.ZoneType.Critical:
-                    markerAnimation.clip = animationClips[1];
-                    break;
-            }
+                HitZone.ZoneType.Standard => animationClips[0],
+                HitZone.ZoneType.Critical => animationClips[1],
+                _ => animationClips[0]
+            };
 
             if (withMarker)
             {

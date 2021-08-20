@@ -86,6 +86,14 @@ public static class Config
 
     #endregion
 
+    internal enum GameplayMode
+    {
+        Virtual,
+        Real
+    }
+
+    internal static GameplayMode CurrentGameplayMode = GameplayMode.Virtual;
+
     internal static void SaveGame()
     {
         PlayerPrefs.SetInt(nameof(RecordKills), RecordKills);

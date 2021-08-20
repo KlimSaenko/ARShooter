@@ -118,7 +118,7 @@
     },
     "com.unity.inputsystem": {
       "version": "1.1.0-pre.5",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
@@ -263,6 +263,19 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.xr.interaction.toolkit": {
+      "version": "1.0.0-pre.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.inputsystem": "1.0.2",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.xr.legacyinputhelpers": "2.1.7"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.xr.interactionsubsystems": {
       "version": "1.0.1",
       "depth": 2,
@@ -274,7 +287,7 @@
     },
     "com.unity.xr.legacyinputhelpers": {
       "version": "2.1.7",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.vr": "1.0.0",
@@ -336,6 +349,17 @@
         "com.unity.barracuda": "2.1.0-preview"
       },
       "url": "https://registry.npmjs.com"
+    },
+    "jp.keijiro.klak.testtools": {
+      "version": "file:/Users/hukvladimir/Downloads/TestTools-main/Packages/jp.keijiro.klak.testtools",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.unitywebrequesttexture": "1.0.0",
+        "com.unity.modules.video": "1.0.0"
+      }
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

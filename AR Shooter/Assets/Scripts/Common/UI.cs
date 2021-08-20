@@ -156,11 +156,16 @@ public class UI : MonoBehaviour
 
         private bool _isVisible = true;
     
-        internal Ray GetRay()
+        internal Ray GetRay() =>
+            Camera.main.ScreenPointToRay(RawRaycastPoint);
+
+        internal Vector2 RawRaycastPoint
         {
-            var aimPos = _aimTransform.position;
-            
-            return Camera.main.ScreenPointToRay(CurrentAimSpreadDiameter * Random.insideUnitCircle / 2f + new Vector2(aimPos.x, aimPos.y));
+            get
+            {
+                var aimPos = _aimTransform.position;
+                return CurrentAimSpreadDiameter * Random.insideUnitCircle / 2f + new Vector2(aimPos.x, aimPos.y);
+            }
         }
 
         private const int TweenId = 100;

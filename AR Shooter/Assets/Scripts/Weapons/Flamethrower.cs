@@ -1,4 +1,5 @@
 using System.Collections;
+using Common;
 using DG.Tweening;
 using Mobs;
 using UnityEngine;
@@ -65,17 +66,33 @@ namespace Weapons
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
-            var forward = MainCam.forward;
-            var camPosition = MainCam.position;
-            
-            var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * 3.5f,
-                UI.AimInstance.CurrentAimSpreadDiameter / 2200f, forward, _hits, 0);
-
-            for (var i = 0; i < hitsCount; i++)
+            if (Config.CurrentGameplayMode == Config.GameplayMode.Virtual)
             {
-                if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+                var forward = MainCam.forward;
+                var camPosition = MainCam.position;
+                
+                var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * 3.5f,
+                    UI.AimInstance.CurrentAimSpreadDiameter / 2200f, forward, _hits, 0);
+    
+                for (var i = 0; i < hitsCount; i++)
+                {
+                    if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+    
+                    StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
+                }
+            }
+            else
+            {
+                var screenPoint = new Vector2(Screen.width / 2, Screen.height / 2);
+                var currentRay = Camera.main.ScreenPointToRay(screenPoint);
+            
+                var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(new []{ screenPoint }, out var distance);
+            
+                if (distance is < 0.05f or > 3.3f) return;
+            
+                if (hitZoneTypes[0] == HitZone.ZoneType.None) return;
 
-                StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
+                StartCoroutine(RealApplyDamage(distance * 0.1f, currentRay.GetPoint(distance), hitZoneTypes[0]));
             }
             
             UI.AimInstance.AimAnimation();
@@ -88,6 +105,15 @@ namespace Weapons
             var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
             
             enemy.ApplyDamage(damage);
+        }
+        
+        private IEnumerator RealApplyDamage(float delay, Vector3 pos, HitZone.ZoneType hitZoneType)
+        {
+            yield return new WaitForSeconds(delay);
+            
+            var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                                                            
+            Pool.Decals.ActivateHitMarker(pos, damage, hitZoneType, false);
         }
         
         protected override bool LogicIsRunning() =>

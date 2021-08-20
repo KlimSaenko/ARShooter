@@ -27,13 +27,14 @@ namespace Mobs
 
         internal enum ZoneType
         {
-            Standard = 0,
+            None = 0,
+            Standard,
             Critical
         }
 
         [SerializeField] internal ZoneType zoneType;
 
-        public void ApplyDamage(int damage, Vector3 hitPos)
+        internal void ApplyDamage(int damage, Vector3 hitPos)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
             
@@ -42,7 +43,7 @@ namespace Mobs
             Damageable?.ApplyDamage(damage);
         }
 
-        public void ApplyDamage(int damage)
+        internal void ApplyDamage(int damage)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
 

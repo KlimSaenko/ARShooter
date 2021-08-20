@@ -4938,7 +4938,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.5
+      scalar: 1.4
       minScalar: 0.9
       maxCurve:
         serializedVersion: 2
@@ -5867,8 +5867,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.08232692
-          value: 0.89105415
+          time: 0.10726741
+          value: 0.89707756
           inSlope: 0.320673
           outSlope: 0.320673
           tangentMode: 0
@@ -6269,8 +6269,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.10570842
-          value: 0.46739244
+          time: 0.1356309
+          value: 0.5095601
           inSlope: 1.1979043
           outSlope: 1.1979043
           tangentMode: 0
@@ -9831,8 +9831,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.1
-      minScalar: 0.08
+      scalar: 0.08
+      minScalar: 0.07
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -14812,9 +14812,9 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     startSize:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0.2
-      minScalar: 1
+      minMaxState: 3
+      scalar: 0.22
+      minScalar: 0.18
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -15856,8 +15856,8 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 0}
-        key1: {r: 1, g: 1, b: 1, a: 1}
-        key2: {r: 0, g: 0, b: 0, a: 1}
+        key1: {r: 1, g: 1, b: 1, a: 0.9019608}
+        key2: {r: 0, g: 0, b: 0, a: 0.9411765}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
         key5: {r: 0, g: 0, b: 0, a: 0}
@@ -15872,8 +15872,8 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 6939
-        atime2: 27563
+        atime1: 13300
+        atime2: 25443
         atime3: 65535
         atime4: 0
         atime5: 0

@@ -11,11 +11,11 @@ public class SourceAR : MonoBehaviour
     [SerializeField] private ARCameraManager cameraManager;
     [SerializeField] private Shader shader;
 
-    internal Texture Texture => _cameraTexture;
+    internal Texture Texture => _cameraTexture ;
     
     private void Awake()
     {
-        _textureMat = new Material(shader);
+        if (shader != null) _textureMat = new Material(shader);
     }
 
     private void OnEnable()
@@ -63,7 +63,8 @@ public class SourceAR : MonoBehaviour
         }
         
         _camTexture.Apply();
-            
-        Graphics.Blit(_camTexture, _cameraTexture, _textureMat);
+
+        if (_textureMat != null) Graphics.Blit(_camTexture, _cameraTexture, _textureMat);
+        else Graphics.Blit(_camTexture, _cameraTexture);
     }
 }

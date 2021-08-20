@@ -11,17 +11,27 @@ namespace Weapons
         // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
-            for (var i = 0; i < 4; i++)
+            var currentRays = new Ray[4];
+            for (var i = 0; i < currentRays.Length; i++)
             {
-                var currentRay = UI.AimInstance.GetRay();
-                
-                if (Physics.Raycast(currentRay, out var hitInfo) && 
-                    hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone))
+                currentRays[i] = UI.AimInstance.GetRay();
+            }
+            
+            if (Config.CurrentGameplayMode == Config.GameplayMode.Virtual)
+            {
+                foreach (var currentRay in currentRays)
                 {
-                    var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                    if (!Physics.Raycast(currentRay, out var hitInfo) ||
+                        !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) continue;
                     
+                    var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+                        
                     hitZone.ApplyDamage(damage, hitInfo.point);
                 }
+            }
+            else
+            {
+                RealTargetHit(currentRays);
             }
             
             UI.AimInstance.AimAnimation();
@@ -37,7 +47,7 @@ namespace Weapons
         {
             shootAnimation.Play();
             flashParticle.Play(true);
-            Vibration.VibratePop();
+            Vibration.VibratePeek();
             
             if (AudioSource is null) return;
             

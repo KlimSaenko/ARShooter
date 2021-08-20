@@ -3,7 +3,6 @@ Shader "Hidden/BodyPix/Visualizer"
     Properties
     {
         _MainTex("", 2D) = "black" {}
-//        _PosOfCenter ("", float) = 0
         _CenterPos("", vector) = (1, 1, 0, 0)
     }
 
@@ -28,8 +27,6 @@ Shader "Hidden/BodyPix/Visualizer"
 
     texture2D _MainTex;
     float4 _MainTex_TexelSize;
-    // float4 _centerPos = 0;
-    // int _Iteration = 0;
 
     void VertexMask(float4 position : POSITION,
                     float2 texCoord : TEXCOORD,
@@ -73,15 +70,6 @@ Shader "Hidden/BodyPix/Visualizer"
         
         float alpha = BodyPix_EvalSegmentation(mask);
         alpha = smoothstep(0.44, 0.55, alpha);
-        
-        // if (alpha > 0.7f && score > 0.9f)
-        // {
-        //     _Iteration++;
-        //     _CenterPos += texCoord / (float)_Iteration;
-        // }
-        // _Iteration++;
-        // _CenterPos += float4(texCoord / (float)_Iteration, 0, 0);
-        // _centerPos += float4(0.2, 0.2, 0, 0);
         
         return float4(acc, alpha);
     }
