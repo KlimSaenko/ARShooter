@@ -1,4 +1,5 @@
-﻿using static Common.Pool;
+﻿using System.Collections;
+using static Common.Pool;
 using Player;
 using UnityEngine;
 
@@ -34,7 +35,7 @@ namespace Mobs
 
         [SerializeField] internal ZoneType zoneType;
 
-        internal void ApplyDamage(int damage, Vector3 hitPos)
+        internal void ApplyDamage(int damage, Vector3 hitPos, float delay = 0)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
             
@@ -43,7 +44,7 @@ namespace Mobs
             Damageable?.ApplyDamage(damage);
         }
 
-        internal void ApplyDamage(int damage)
+        internal void ApplyDamage(int damage, float delay = 0)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
 
@@ -52,6 +53,13 @@ namespace Mobs
             Decals.ActivateHitMarker(hitPos, damage, zoneType, false);
             
             Damageable?.ApplyDamage(damage);
+        }
+
+        private IEnumerator DelayedApplyDamage(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            yield return null;
         }
     }
 }

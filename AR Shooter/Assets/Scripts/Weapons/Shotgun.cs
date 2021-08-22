@@ -17,22 +17,7 @@ namespace Weapons
                 currentRays[i] = UI.AimInstance.GetRay();
             }
             
-            if (Config.CurrentGameplayMode == Config.GameplayMode.Virtual)
-            {
-                foreach (var currentRay in currentRays)
-                {
-                    if (!Physics.Raycast(currentRay, out var hitInfo) ||
-                        !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) continue;
-                    
-                    var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
-                        
-                    hitZone.ApplyDamage(damage, hitInfo.point);
-                }
-            }
-            else
-            {
-                RealTargetHit(currentRays);
-            }
+            ShootingPatterns.ProcessRays(currentRays);
             
             UI.AimInstance.AimAnimation();
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Common;
 using DG.Tweening;
 using Mobs;
@@ -17,16 +18,15 @@ namespace Weapons
         [SerializeField] private Vector3 posToAim;
         [SerializeField] private Vector3 posFromAim;
         [SerializeField] protected WeaponStats weaponStats;
-
-        public static WeaponStats ActiveWeaponStats;
         
         public Vector3 PosToAim => posToAim;
         public Vector3 PosFromAim => posFromAim;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
-        private Vector3 _startLocalPos;
+        private (Vector3, Quaternion) _startLocalPos;
 
         private int _bulletCount;
-        public int BulletCount
+
+        protected int BulletCount
         {
             get => _bulletCount;
             set
@@ -35,10 +35,7 @@ namespace Weapons
                 
                 _bulletUI.UpdateCount(value);
                 
-                if (value <= 0)
-                {
-                    StartReload();
-                }
+                ValidateBullets(value);
             }
         }
         
@@ -69,9 +66,13 @@ namespace Weapons
             WeaponHolder.WeaponReadyAction += SetReady;
             
             SetActive(true);
-            _isReady = true;
             BulletCount = weaponStats.bulletCount;
-            _startLocalPos = transform.localPosition;
+            
+            SetReady(true);
+            
+            var transform1 = transform;
+            _startLocalPos.Item1 = transform1.localPosition;
+            _startLocalPos.Item2 = transform1.localRotation;
             
             if (shootAudio is null || AudioSource is not null) return;
 
@@ -87,10 +88,14 @@ namespace Weapons
                 _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
                 _bulletUI ??= new BulletUI(bulletText);
 
-                ActiveWeaponStats = weaponStats;
                 _bulletUI.UpdateCount(BulletCount);
             }
-            else transform.localPosition = _startLocalPos;
+            else
+            {
+                var transform1 = transform;
+                transform1.localPosition = _startLocalPos.Item1;
+                transform1.localRotation = _startLocalPos.Item2;
+            }
 
             bulletText.transform.GetChild((int)WeaponType - 1).gameObject.SetActive(value);
             gameObject.SetActive(value);
@@ -101,11 +106,13 @@ namespace Weapons
             if (!IsActive) return;
             
             _isReady = ready;
+            UI.AimInstance.SetActive(weaponStats, ready);
 
             if (ready)
             {
-                if (_reloadState.IsReloading) StartReload();
-                else Fire(IsFiring);
+                if (ValidateBullets(BulletCount)) Fire(IsFiring);
+                
+                DynamicHolder.Inertia = Mathf.Pow(weaponStats.mass, 0.6f);
             }
             else if (_reloadState.IsReloading) _reloadState.SkipReload();
         }
@@ -118,19 +125,30 @@ namespace Weapons
         {
             shootAnimation.Play();
         }
-
-        protected virtual void RunWeaponLogic() { }
         
         #region Fire
+
+        private Shooting _shootingPatterns;
+        private protected Shooting ShootingPatterns 
+        {
+            get
+            {
+                return _shootingPatterns ??= Config.CurrentGameplayMode switch
+                {
+                    Config.GameplayMode.Virtual => new Shooting(weaponStats),
+                    Config.GameplayMode.Real => new ShootingRealSpace(weaponStats),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+        }
         
         private void Fire(bool start)
         {
             IsFiring = start;
-            
-            if (start && CanShoot)
-            {
-                StartCoroutine(Shooting());
-            }
+
+            if (!start || !CanShoot) return;
+
+            StartCoroutine(Shooting());
         }
 
         private protected virtual IEnumerator Shooting()
@@ -146,6 +164,8 @@ namespace Weapons
                 yield return new WaitWhile(LogicIsRunning);
             }
         }
+        
+        protected virtual void RunWeaponLogic() { }
 
         private protected void RealTargetHit(Ray[] currentRays)
         {
@@ -163,11 +183,11 @@ namespace Weapons
             
             for (var i = 0; i < count; i++)
             {
-                if (hitZoneTypes[i] == HitZone.ZoneType.None) continue;
+                if ((HitZone.ZoneType)hitZoneTypes[i] == HitZone.ZoneType.None) continue;
                 
                 var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
                                                     
-                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, hitZoneTypes[i]);
+                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, (HitZone.ZoneType)hitZoneTypes[i]);
                 
                 // Debug.Log(hitZoneTypes[i]);
             }
@@ -181,6 +201,15 @@ namespace Weapons
         [SerializeField] private Slider reloadSlider;
 
         private ReloadState _reloadState;
+
+        private bool ValidateBullets(int currentCount)
+        {
+            var valid = currentCount > 0;
+            
+            if (!valid) StartReload();
+
+            return valid;
+        }
         
         private void StartReload() =>
             _reloadState.StartReload();
@@ -323,5 +352,100 @@ namespace Weapons
         public int bulletCount;
 
         public float mass;
+    }
+
+    internal class Shooting
+    {
+        private protected readonly WeaponStats WeaponStats;
+
+        internal Shooting(WeaponStats weaponStats)
+        {
+            WeaponStats = weaponStats;
+        }
+        
+        internal virtual void ProcessRays(Ray currentRay)
+        {
+            if (!Physics.Raycast(currentRay, out var hitInfo) ||
+                !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) return;
+            
+            var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+                                        
+            hitZone.ApplyDamage(damage, hitInfo.point);
+        }
+        
+        internal virtual void ProcessRays(Ray[] currentRays)
+        {
+            foreach (var currentRay in currentRays)
+            {
+                ProcessRays(currentRay);
+            }
+        }
+
+        private readonly RaycastHit[] _hits = new RaycastHit[8];
+        internal virtual void ProcessCapsuleRay(float radius, float length)
+        {
+            var mainCam = Camera.main.transform;
+            var forward = mainCam.forward;
+            var camPosition = mainCam.position;
+                
+            var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * length,
+                radius, forward, _hits, 0);
+    
+            for (var i = 0; i < hitsCount; i++)
+            {
+                if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+                
+                var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+            
+                enemy.ApplyDamage(damage);
+            }
+        }
+
+        internal IEnumerator ProcessCapsuleRay(float radius, float length, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            ProcessCapsuleRay(radius, length);
+        }
+    }
+
+    internal class ShootingRealSpace : Shooting
+    {
+        internal ShootingRealSpace(WeaponStats weaponStats) : base(weaponStats)
+        {
+            
+        }
+
+        internal override void ProcessRays(Ray currentRay) =>
+            RealTargetHit(new[] { currentRay });
+        
+        internal override void ProcessRays(Ray[] currentRays) =>
+            RealTargetHit(currentRays);
+        
+        private void RealTargetHit(Ray[] currentRays)
+        {
+            var count = currentRays.Length;
+            
+            var screenPoints = new Vector2[count];
+            for (var i = 0; i < count; i++)
+            {
+                screenPoints[i] = UI.AimInstance.RawRaycastPoint;
+            }
+            
+            var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(screenPoints, out var distance);
+            
+            if (distance < 0.05f) return;
+            
+            for (var i = 0; i < count; i++)
+            {
+                if ((HitZone.ZoneType)hitZoneTypes[i] == HitZone.ZoneType.None) continue;
+                
+                var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+                                                    
+                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, (HitZone.ZoneType)hitZoneTypes[i]);
+                
+                // Debug.Log(hitZoneTypes[i]);
+            }
+        }
     }
 }

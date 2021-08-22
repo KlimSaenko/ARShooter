@@ -12,7 +12,7 @@ namespace Weapons
         private const WeaponType CurrentWeaponType = WeaponType.Flamethrower;
         public override WeaponType WeaponType => CurrentWeaponType;
 
-        private Transform MainCam => Camera.main.transform;
+        private static Transform MainCam => Camera.main.transform;
 
         private ParticleSystem[] _subParticles;
 
@@ -68,18 +68,20 @@ namespace Weapons
         {
             if (Config.CurrentGameplayMode == Config.GameplayMode.Virtual)
             {
-                var forward = MainCam.forward;
-                var camPosition = MainCam.position;
-                
-                var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * 3.5f,
-                    UI.AimInstance.CurrentAimSpreadDiameter / 2200f, forward, _hits, 0);
-    
-                for (var i = 0; i < hitsCount; i++)
-                {
-                    if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
-    
-                    StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
-                }
+                // var forward = MainCam.forward;
+                // var camPosition = MainCam.position;
+                //
+                // var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * 3.5f,
+                //     UI.AimInstance.CurrentAimSpreadDiameter / 2200f, forward, _hits, 0);
+                //
+                // for (var i = 0; i < hitsCount; i++)
+                // {
+                //     if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+                //
+                //     StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
+                // }
+
+                StartCoroutine(ShootingPatterns.ProcessCapsuleRay(UI.AimInstance.CurrentAimSpreadDiameter / 2200f, 3.5f, 0.1f));
             }
             else
             {
@@ -90,9 +92,9 @@ namespace Weapons
             
                 if (distance is < 0.05f or > 3.3f) return;
             
-                if (hitZoneTypes[0] == HitZone.ZoneType.None) return;
+                if ((HitZone.ZoneType)hitZoneTypes[0] == HitZone.ZoneType.None) return;
 
-                StartCoroutine(RealApplyDamage(distance * 0.1f, currentRay.GetPoint(distance), hitZoneTypes[0]));
+                StartCoroutine(RealApplyDamage(distance * 0.1f, currentRay.GetPoint(distance), (HitZone.ZoneType)hitZoneTypes[0]));
             }
             
             UI.AimInstance.AimAnimation();
@@ -122,14 +124,6 @@ namespace Weapons
         protected override void VisualizeFiring()
         {
             shootAnimation.Play();
-            
-            if (AudioSource is null) return;
-
-            // AudioSource.loop = true;
-            // AudioSource.volume = 1f;
-            // AudioSource.pitch = Random.Range(0.94f, 1.06f);
-            // AudioSource.clip = shootAudio;
-            // if (!AudioSource.isPlaying) AudioSource.Play();
         }
     }
 }

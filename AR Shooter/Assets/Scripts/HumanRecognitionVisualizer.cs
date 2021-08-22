@@ -74,6 +74,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
     // [SerializeField] private TextMeshPro tm;
     [SerializeField] private Transform speechText;
+    private readonly Keypoint[] _keypoints = new Keypoint[17];
     
     private void LateUpdate()
     {
@@ -84,10 +85,10 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         // if (_sourceImage.Texture == null) return;
         //
         // _detector.ProcessImage(_sourceImage.Texture);
-            
-        var keypoints = _detector.UpdatePostReadCache();
 
-        _prevDistance = ProcessKeypoints(keypoints, new []{ 5, 6, 11, 12 }, out var validatedPoints);
+        _detector.KeypointBuffer.GetData(_keypoints);
+
+        _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var validatedPoints);
             
         // tm.color = Color.Lerp(Color.red, Color.green, validatedPoints / 5f);
         // tm.text = $"{distance:N2}m";
@@ -106,14 +107,22 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     
     private struct Data
     {
-        public int type;
+        public int Type;
     }
     
-    internal HitZone.ZoneType[] ProcessRaycast(Vector2[] raycastPoint, out float distance)
+    /// <summary>
+    /// 0 - None;
+    /// 1 - Body;
+    /// 2 - Head.
+    /// </summary>
+    /// <param name="raycastPoint">Screen points to raycast from</param>
+    /// <param name="distance">Distance to the point</param>
+    /// <returns>Array of ints witch describes segments of human body</returns>
+    internal int[] ProcessRaycast(Vector2[] raycastPoint, out float distance)
     {
         distance = 0;
 
-        if (!_sourceAR.enabled || _sourceAR.Texture == null) return new []{ HitZone.ZoneType.None };
+        if (!_sourceAR.enabled || _sourceAR.Texture == null) return new []{ 0 };
             
         var hitsCount = raycastPoint.Length; // <= 16
             
@@ -137,10 +146,10 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         
         distance = _prevDistance;
 
-        var zoneTypes = new HitZone.ZoneType[hitsCount];
+        var zoneTypes = new int[hitsCount];
         for (var i = 0; i < hitsCount; i++)
         {
-            zoneTypes[i] = (HitZone.ZoneType)_data[i].type;
+            zoneTypes[i] = _data[i].Type;
         }
 
         return zoneTypes;
@@ -150,7 +159,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     private static readonly int Input = Shader.PropertyToID("Input");
     private static readonly int Result = Shader.PropertyToID("Result");
         
-    private float ProcessKeypoints(Keypoint[] keypoints, int[] types, out int validatedPoints)
+    private float ProcessKeypoints(Keypoint[] keypoints, IEnumerable<int> types, out int validatedPoints)
     {
         var prevDistance = _prevDistance;
         var currentDistance = 0f;
@@ -206,7 +215,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         }
 
         var rayToNose = Camera.main.ScreenPointToRay(noseMarkerPos);
-        var currentMarkerPos = rayToNose.GetPoint(3) + (Vector3.Cross(rayToNose.direction.normalized, Vector3.up) + Vector3.up) * 0.25f;
+        var currentMarkerPos = rayToNose.GetPoint(currentDistance) + (Vector3.Cross(rayToNose.direction.normalized, Vector3.up) + Vector3.up) * 0.25f;
                                                               
         var prevMarkerPos = speechText.position;
         speechText.position = Vector3.Lerp(prevMarkerPos, currentMarkerPos, 

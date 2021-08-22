@@ -529,7 +529,7 @@ MonoBehaviour:
     damageMax: 4
     aimedAimSpreadDiameter: 30
     freeAimSpreadDiameter: 90
-    aimSpreadIncrement: 65
+    aimSpreadIncrement: 60
     aimRecoveryTime: 0.48
     bulletCount: 30
     mass: 1.2

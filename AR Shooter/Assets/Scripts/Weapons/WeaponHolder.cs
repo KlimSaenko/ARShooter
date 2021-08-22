@@ -45,8 +45,6 @@ namespace Weapons
             _thisTransform.DOLocalMove(_hideWeaponRef.localPosition, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => OnWeaponReadyAction(false));
             _thisTransform.DOLocalRotate(_hideWeaponRef.localRotation.eulerAngles, 0.35f).SetEase(Ease.InOutCubic)
                 .OnComplete(onCompleteAction);
-            
-            UI.AimInstance.SetActive(false);
         }
         
         private static void TakeWeapon(WeaponType toWeapon)
@@ -62,11 +60,9 @@ namespace Weapons
                     config.SetActive(true);
             }
             
-            UI.AimInstance.SetActive(!_isAimed);
-            
             var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             
-            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnStart(() => UI.AimInstance.AimAnimation()).OnComplete(() => OnWeaponReadyAction(true));
+            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnComplete(() => OnWeaponReadyAction(true));
             _thisTransform.DOLocalRotate(Vector3.zero, 0.35f).SetEase(Ease.InOutCubic);
         }
 
@@ -113,7 +109,6 @@ namespace Weapons
             
             var dest = toAim ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             _thisTransform.DOLocalMove(dest, 0.3f).SetEase(Ease.InOutCubic);
-            UI.AimInstance.SetActive(!toAim);
 
             _isAimed = toAim;
         }
