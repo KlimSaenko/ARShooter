@@ -65,6 +65,6 @@ public class SourceAR : MonoBehaviour
         _camTexture.Apply();
 
         if (_textureMat != null) Graphics.Blit(_camTexture, _cameraTexture, _textureMat);
-        else Graphics.Blit(_camTexture, _cameraTexture);
+        else Graphics.Blit(_camTexture, _cameraTexture, new Vector2(-1.0f, -1.0f), new Vector2(1.0f, 1.0f));
     }
 }

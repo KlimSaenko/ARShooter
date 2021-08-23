@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using BodyPix;
 using DG.Tweening;
 using Klak.TestTools;
-using Mobs;
+using TMPro;
 using UnityEngine.XR.ARFoundation;
 
 public sealed class HumanRecognitionVisualizer : MonoBehaviour
@@ -28,7 +28,10 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     
     private static readonly int Keypoints = Shader.PropertyToID("_Keypoints");
     private static readonly int Aspect = Shader.PropertyToID("_Aspect");
-    
+
+    private void Awake() =>
+        Instance = this;
+
     private void Start()
     {
         _detector = new BodyDetector(_resources, _resolution.x, _resolution.y);
@@ -42,10 +45,9 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         if (!_sourceAR.enabled) return;
         
-        Instance = this;
         Config.CurrentGameplayMode = Config.GameplayMode.Real;
     }
-
+    
     private void OnDestroy()
     {
         _detector?.Dispose();
@@ -88,7 +90,11 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         _detector.KeypointBuffer.GetData(_keypoints);
 
-        _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var validatedPoints);
+        _realEnemy ??= new RealEnemy(speechText);
+        
+        _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var headPos);
+
+        _realEnemy.HeadPosition = headPos;
             
         // tm.color = Color.Lerp(Color.red, Color.green, validatedPoints / 5f);
         // tm.text = $"{distance:N2}m";
@@ -146,12 +152,24 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         
         distance = _prevDistance;
 
+        var maxZone = 0;
         var zoneTypes = new int[hitsCount];
         for (var i = 0; i < hitsCount; i++)
         {
-            zoneTypes[i] = _data[i].Type;
+            if (_data[i].Type == 0) continue;
+            
+            var player = Camera.main;
+            var virtualDistance = Physics.Raycast(player.ScreenPointToRay(raycastPoint[i]), out var hitInfo) ? Vector3.Distance(player.transform.position, hitInfo.point) : 1000;
+            var realDistance = raycastManager.Raycast(raycastPoint[i], _raycastHits) ? _raycastHits[i].distance : 1111;
+
+            if (virtualDistance >= realDistance) zoneTypes[i] = _data[i].Type;
+            else zoneTypes[i] = 0;
+            
+            if (maxZone < zoneTypes[i]) maxZone = zoneTypes[i];
         }
 
+        _realEnemy.ChangeEmotion((RealEnemy.Emotions)maxZone);
+        
         return zoneTypes;
     }
     
@@ -159,11 +177,12 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     private static readonly int Input = Shader.PropertyToID("Input");
     private static readonly int Result = Shader.PropertyToID("Result");
         
-    private float ProcessKeypoints(Keypoint[] keypoints, IEnumerable<int> types, out int validatedPoints)
+    private float ProcessKeypoints(Keypoint[] keypoints, IEnumerable<int> types, out Vector3 headPos)
     {
         var prevDistance = _prevDistance;
         var currentDistance = 0f;
-        validatedPoints = 0;
+        var validatedPoints = 0;
+        headPos = Vector3.zero;
 
         var screen = new Vector2(Screen.width, Screen.height);
         
@@ -201,37 +220,90 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                 validatedPoints++;
             }
         }
-        
+
+        if (validatedPoints <= 0) return prevDistance;
         currentDistance /= validatedPoints;
 
-        if (noseMarkerPos == Vector2.zero)
-        {
-            if (!speechText.gameObject.activeSelf) return validatedPoints == 0 ? prevDistance : currentDistance;
-            
-            DOTween.Kill(TweenId);
-            speechText.DOScale(0, 0.4f).OnComplete(() => speechText.gameObject.SetActive(false)).SetId(TweenId);
-
-            return validatedPoints == 0 ? prevDistance : currentDistance;
-        }
-
-        var rayToNose = Camera.main.ScreenPointToRay(noseMarkerPos);
-        var currentMarkerPos = rayToNose.GetPoint(currentDistance) + (Vector3.Cross(rayToNose.direction.normalized, Vector3.up) + Vector3.up) * 0.25f;
-                                                              
-        var prevMarkerPos = speechText.position;
-        speechText.position = Vector3.Lerp(prevMarkerPos, currentMarkerPos, 
-            12 * Mathf.Pow(Vector2.Distance(prevMarkerPos, currentMarkerPos), 0.5f) * Time.deltaTime);
-
-        speechText.rotation = Quaternion.Lerp(speechText.rotation, Camera.main.transform.rotation, 4 * Time.deltaTime);
-
-        if (speechText.gameObject.activeSelf) return validatedPoints == 0 ? prevDistance : currentDistance;
+        if (noseMarkerPos == Vector2.zero) return currentDistance;
         
-        DOTween.Kill(TweenId);
-        speechText.DOScale(0.06f, 0.5f).SetEase(Ease.OutBack).OnStart(() => speechText.gameObject.SetActive(true)).SetId(TweenId);
-
-        return validatedPoints == 0 ? prevDistance : currentDistance;
+        var rayToNose = Camera.main.ScreenPointToRay(noseMarkerPos);
+        headPos = rayToNose.GetPoint(currentDistance) + (Vector3.Cross(rayToNose.direction.normalized, Vector3.up) + Vector3.up) * 0.25f;
+        
+        return currentDistance;
     }
 
     private const int TweenId = 102;
+
+    private RealEnemy _realEnemy;
+    private class RealEnemy
+    {
+        private static readonly string[] EmotionText = {
+            "I gonna kick your ass",
+            ";(",
+            ";((("
+        };
+
+        internal enum Emotions
+        {
+            CanAttack = 0,
+            GotHit,
+            GotCrit
+        }
+
+        private readonly Transform _speechText;
+        private readonly TextMeshPro _text;
+        private Vector3 _prevHeadPos = Vector3.zero;
+        
+        internal RealEnemy(Transform speechText)
+        {
+            _speechText = speechText;
+            _text = speechText.GetComponentInChildren<TextMeshPro>();
+        }
+
+        internal void ChangeEmotion(Emotions type)
+        {
+            _text.text = EmotionText[(int)type];
+        }
+
+        internal Vector3 HeadPosition
+        {
+            set
+            {
+                if (value == Vector3.zero)
+                {
+                    if (!_speechText.gameObject.activeSelf) return;
+                    
+                    DOTween.Kill(TweenId);
+                    _speechText.DOScale(0, 0.4f).OnComplete(() => _speechText.gameObject.SetActive(false)).SetId(TweenId);
+                }
+                else
+                {
+                    if (_speechText.gameObject.activeSelf)
+                    {
+                        var distance = Vector2.Distance(_prevHeadPos, value);
+                        
+                        if (distance > 50 * Time.deltaTime) return;
+                        
+                        _speechText.position = _prevHeadPos == Vector3.zero? value : Vector3.Lerp(_prevHeadPos, value, 
+                            14 * Mathf.Pow(distance, 0.5f) * Time.deltaTime);
+                        
+                        var targetRot = Camera.main.transform.rotation;
+                        _speechText.rotation = Quaternion.Lerp(_speechText.rotation, new Quaternion(targetRot.x, targetRot.y, 0, targetRot.w), 3 * Time.deltaTime);
+
+                        _prevHeadPos = _speechText.position;
+                    }
+                    else
+                    {
+                        _speechText.position = value;
+                        _prevHeadPos = value;
+                        
+                        DOTween.Kill(TweenId);
+                        _speechText.DOScale(0.06f, 0.5f).SetEase(Ease.OutBack).OnStart(() => _speechText.gameObject.SetActive(true)).SetId(TweenId);
+                    }
+                }
+            }
+        }
+    }
 
     private void OnRenderObject()
     {

@@ -202,9 +202,9 @@ public class UI : MonoBehaviour
             //     value ? _aimTransform.rect.width : _weaponStats.aimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = value);
         }
 
-        private void SetActive(bool value)
+        private void SetActive(bool toAim)
         {
-            var fadeTo = value ? 1 : 0;
+            var fadeTo = toAim ? 0 : 1;
             
             foreach (var image in _images)
             {
@@ -212,7 +212,7 @@ public class UI : MonoBehaviour
             }
 
             DOTween.To(() => CurrentAimSpreadDiameter, newValue => _currentAimSpreadDiameter = newValue,
-                value ? _aimTransform.rect.width : _weaponStats.aimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = value);
+                !toAim ? _aimTransform.rect.width : _weaponStats.aimedAimSpreadDiameter, 0.25f).OnStart(() => _isVisible = !toAim);
         }
     }
     

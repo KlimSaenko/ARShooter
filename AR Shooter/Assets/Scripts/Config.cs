@@ -92,7 +92,7 @@ public static class Config
         Real
     }
 
-    internal static GameplayMode CurrentGameplayMode = GameplayMode.Virtual;
+    internal static GameplayMode CurrentGameplayMode = GameplayMode.Real;
 
     internal static void SaveGame()
     {

@@ -166,32 +166,6 @@ namespace Weapons
         }
         
         protected virtual void RunWeaponLogic() { }
-
-        private protected void RealTargetHit(Ray[] currentRays)
-        {
-            var count = currentRays.Length;
-            
-            var screenPoints = new Vector2[count];
-            for (var i = 0; i < count; i++)
-            {
-                screenPoints[i] = UI.AimInstance.RawRaycastPoint;
-            }
-            
-            var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(screenPoints, out var distance);
-            
-            if (distance < 0.05f) return;
-            
-            for (var i = 0; i < count; i++)
-            {
-                if ((HitZone.ZoneType)hitZoneTypes[i] == HitZone.ZoneType.None) continue;
-                
-                var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
-                                                    
-                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, (HitZone.ZoneType)hitZoneTypes[i]);
-                
-                // Debug.Log(hitZoneTypes[i]);
-            }
-        }
         
         #endregion
         
@@ -368,9 +342,7 @@ namespace Weapons
             if (!Physics.Raycast(currentRay, out var hitInfo) ||
                 !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) return;
             
-            var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
-                                        
-            hitZone.ApplyDamage(damage, hitInfo.point);
+            ApplyDamage(hitZone);
         }
         
         internal virtual void ProcessRays(Ray[] currentRays)
@@ -393,19 +365,39 @@ namespace Weapons
     
             for (var i = 0; i < hitsCount; i++)
             {
-                if (!_hits[i].collider.TryGetComponent(out HitZone enemy)) continue;
+                if (!_hits[i].collider.TryGetComponent(out HitZone hitZone)) continue;
                 
                 var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
             
-                enemy.ApplyDamage(damage);
+                hitZone.ApplyDamage(damage);
             }
         }
 
         internal IEnumerator ProcessCapsuleRay(float radius, float length, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            var mainCam = Camera.main.transform;
+            var forward = mainCam.forward;
+            var camPosition = mainCam.position;
+                
+            var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * length,
+                radius, forward, _hits, 0);
 
-            ProcessCapsuleRay(radius, length);
+            float time = 0;
+            for (var i = 0; i < hitsCount; i++)
+            {
+                time = Vector3.Distance(camPosition, _hits[i].collider.transform.position) * delay - time;
+                
+                yield return new WaitForSeconds(time);
+
+                if (_hits[i].collider.TryGetComponent(out HitZone hitZone)) ApplyDamage(hitZone);
+            }
+        }
+
+        private void ApplyDamage(HitZone hitZone)
+        {
+            var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+            
+            hitZone.ApplyDamage(damage);
         }
     }
 
@@ -425,6 +417,8 @@ namespace Weapons
         private void RealTargetHit(Ray[] currentRays)
         {
             var count = currentRays.Length;
+            
+            if (count <= 0) return;
             
             var screenPoints = new Vector2[count];
             for (var i = 0; i < count; i++)
