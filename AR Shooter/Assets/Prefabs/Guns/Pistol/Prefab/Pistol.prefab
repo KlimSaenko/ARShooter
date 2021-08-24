@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a90169a6d6d00a4d956d4c237e8d6a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posToAim: {x: 0, y: -0.0973, z: 0.1944}
+  posToAim: {x: 0, y: -0.096, z: 0.186}
   posFromAim: {x: 0.081, y: -0.1208, z: 0.2471}
   weaponStats:
     damageMin: 2

@@ -103,7 +103,8 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     }
 
     private readonly List<ARRaycastHit> _raycastHits = new();
-    
+
+    [SerializeField] private ParticleSystem[] hitParticles; // 0 - virtual; 1 - real
     [SerializeField] private ComputeShader processShader;
     private ComputeBuffer _resultsBuffer;
     private Data[] _data;
@@ -140,7 +141,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         {
             _points[i] = new Vector4((int)raycastPoint[i].x, (int)raycastPoint[i].y, 1);
         }
-            
+        
         processShader.SetTexture(0, InputTexture, _mask);
         processShader.SetVectorArray(Input, _points);
         processShader.SetBuffer(0, Result, _resultsBuffer);
@@ -156,16 +157,41 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         var zoneTypes = new int[hitsCount];
         for (var i = 0; i < hitsCount; i++)
         {
-            if (_data[i].Type == 0) continue;
-            
             var player = Camera.main;
-            var virtualDistance = Physics.Raycast(player.ScreenPointToRay(raycastPoint[i]), out var hitInfo) ? Vector3.Distance(player.transform.position, hitInfo.point) : 1000;
-            var realDistance = raycastManager.Raycast(raycastPoint[i], _raycastHits) ? _raycastHits[i].distance : 1111;
-
-            if (virtualDistance >= realDistance) zoneTypes[i] = _data[i].Type;
-            else zoneTypes[i] = 0;
+            var findVirtual = Physics.Raycast(player.ScreenPointToRay(raycastPoint[i]), out var hitInfo);
             
-            if (maxZone < zoneTypes[i]) maxZone = zoneTypes[i];
+            if (_data[i].Type != 0)
+            {
+                var virtualDistance = findVirtual ? Vector3.Distance(player.transform.position, hitInfo.point) : 1000;
+                var realDistance = raycastManager.Raycast(raycastPoint[i], _raycastHits) ? _raycastHits[0].distance : 1111;
+    
+                if (virtualDistance >= realDistance)
+                {
+                    hitParticles[1].transform.position = _raycastHits[0].pose.position;
+                    hitParticles[1].transform.rotation = _raycastHits[0].pose.rotation;
+                    hitParticles[1].Play();
+                    
+                    zoneTypes[i] = _data[i].Type;
+                }
+                else if (findVirtual)
+                {
+                    hitParticles[0].transform.position = hitInfo.point;
+                    hitParticles[0].transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+                    hitParticles[0].Play();
+                    
+                    zoneTypes[i] = 0;
+                }
+                
+                if (maxZone < zoneTypes[i]) maxZone = zoneTypes[i];
+            }
+            else if (findVirtual)
+            {
+                hitParticles[0].transform.position = hitInfo.point;
+                hitParticles[0].transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+                hitParticles[0].Play();
+                
+                zoneTypes[i] = 0;
+            }
         }
 
         _realEnemy.ChangeEmotion((RealEnemy.Emotions)maxZone);

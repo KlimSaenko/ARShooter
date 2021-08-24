@@ -110,6 +110,8 @@ namespace Weapons
             var dest = toAim ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             _thisTransform.DOLocalMove(dest, 0.3f).SetEase(Ease.InOutCubic);
 
+            DynamicHolder.Inertia /= toAim ? 2.0f : 0.5f;
+
             _isAimed = toAim;
         }
 
