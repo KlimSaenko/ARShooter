@@ -45,7 +45,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         if (!_sourceAR.enabled) return;
         
-        Config.CurrentGameplayMode = Config.GameplayMode.Real;
+        // Config.CurrentGameplayMode = Config.GameplayMode.Real;
     }
     
     private void OnDestroy()
@@ -76,6 +76,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
     // [SerializeField] private TextMeshPro tm;
     [SerializeField] private Transform speechText;
+    [SerializeField] private Transform enemyHp;
     private readonly Keypoint[] _keypoints = new Keypoint[17];
     
     private void LateUpdate()
@@ -90,7 +91,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         _detector.KeypointBuffer.GetData(_keypoints);
 
-        _realEnemy ??= new RealEnemy(speechText);
+        _realEnemy ??= new RealEnemy(speechText, enemyHp);
         
         _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var headPos);
 
@@ -194,6 +195,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
             }
         }
 
+        _realEnemy.HP -= maxZone * 3;
         _realEnemy.ChangeEmotion((RealEnemy.Emotions)maxZone);
         
         return zoneTypes;
@@ -233,14 +235,14 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         // nose
         var noseMarkerPos = Vector2.zero;
         
-        if (keypoints[0].Score > 0.85f)
+        if (keypoints[0].Score > 0.87f)
         {
             noseMarkerPos = new Vector2(keypoints[0].Position.x * screen.x, keypoints[0].Position.y * screen.y);
 
             if (raycastManager.Raycast(noseMarkerPos, _raycastHits))
             {
                 prevDistance = prevDistance == 0 ? _raycastHits[0].distance : 
-                    Mathf.Lerp(prevDistance, _raycastHits[0].distance, 5 * Time.deltaTime);
+                    Mathf.Lerp(prevDistance, _raycastHits[0].distance, 15 * Time.deltaTime);
                 
                 currentDistance += prevDistance;
                 validatedPoints++;
@@ -253,7 +255,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         if (noseMarkerPos == Vector2.zero) return currentDistance;
         
         var rayToNose = Camera.main.ScreenPointToRay(noseMarkerPos);
-        headPos = rayToNose.GetPoint(currentDistance) + (Vector3.Cross(rayToNose.direction.normalized, Vector3.up) + Vector3.up) * 0.25f;
+        headPos = rayToNose.GetPoint(currentDistance);
         
         return currentDistance;
     }
@@ -266,29 +268,46 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         private static readonly string[] EmotionText = {
             "I gonna kick your ass",
             ";(",
-            ";((("
+            ";(((",
+            "X/"
         };
 
         internal enum Emotions
         {
             CanAttack = 0,
             GotHit,
-            GotCrit
+            GotCrit,
+            Dead
         }
 
         private readonly Transform _speechText;
+        private readonly Transform _hp;
         private readonly TextMeshPro _text;
         private Vector3 _prevHeadPos = Vector3.zero;
+
+        private int _HP = 100;
+        internal int HP
+        {
+            get => _HP;
+            set
+            {
+                _HP = value;
+                
+                if (_HP <= 0) ChangeEmotion(Emotions.Dead);
+                else _hp.localScale = new Vector3(value * 6 / 100f, 0.2f, 1);
+            }
+        }
         
-        internal RealEnemy(Transform speechText)
+        internal RealEnemy(Transform speechText, Transform hp)
         {
             _speechText = speechText;
             _text = speechText.GetComponentInChildren<TextMeshPro>();
+            _hp = hp;
         }
 
         internal void ChangeEmotion(Emotions type)
         {
-            _text.text = EmotionText[(int)type];
+            if (HP > 0) _text.text = EmotionText[(int)type];
         }
 
         internal Vector3 HeadPosition
@@ -308,15 +327,29 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                     {
                         var distance = Vector2.Distance(_prevHeadPos, value);
                         
-                        if (distance > 50 * Time.deltaTime) return;
-                        
-                        _speechText.position = _prevHeadPos == Vector3.zero? value : Vector3.Lerp(_prevHeadPos, value, 
-                            14 * Mathf.Pow(distance, 0.5f) * Time.deltaTime);
-                        
-                        var targetRot = Camera.main.transform.rotation;
-                        _speechText.rotation = Quaternion.Lerp(_speechText.rotation, new Quaternion(targetRot.x, targetRot.y, 0, targetRot.w), 3 * Time.deltaTime);
+                        if (distance < 17 * Time.deltaTime)
+                        {
+                            _speechText.position = _prevHeadPos == Vector3.zero? value : Vector3.Lerp(_prevHeadPos, value, 
+                                14 * Mathf.Pow(distance, 0.5f) * Time.deltaTime);
+                            
+                            var targetRot = Camera.main.transform.rotation;
+                            _speechText.rotation = Quaternion.Lerp(_speechText.rotation, new Quaternion(targetRot.x, targetRot.y, 0, targetRot.w), 3 * Time.deltaTime);
+                            
+                            _prevHeadPos = _speechText.position;
+                        }
+                        else
+                        {
+                            _speechText.position = _prevHeadPos == Vector3.zero? value : Vector3.Lerp(_prevHeadPos, value, 
+                                40 * Mathf.Pow(distance, 0.5f) * Time.deltaTime);
+                            
+                            var targetRot = Camera.main.transform.rotation;
+                            _speechText.rotation = Quaternion.Lerp(_speechText.rotation, new Quaternion(targetRot.x, targetRot.y, 0, targetRot.w), 4 * Time.deltaTime);
+    
+                            _prevHeadPos = _speechText.position;
 
-                        _prevHeadPos = _speechText.position;
+                            HP = 100;
+                            ChangeEmotion(Emotions.CanAttack);
+                        }
                     }
                     else
                     {

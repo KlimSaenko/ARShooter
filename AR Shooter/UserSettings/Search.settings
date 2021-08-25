@@ -7,7 +7,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.DD2EEDCB" = "import "
+	"last_search.DD2EEDCB" = "timeli"
 	"OpenInspectorPreview.DD2EEDCB" = "0"
 	"currentGroup.DD2EEDCB" = "all"
 }
@@ -89,6 +89,8 @@ providers = {
 	}
 }
 recentSearches = [
+	"timeli"
+	"timeline"
 	"External"
 ]
 searchItemFavorites = [

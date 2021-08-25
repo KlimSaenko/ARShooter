@@ -342,7 +342,7 @@ namespace Weapons
             if (!Physics.Raycast(currentRay, out var hitInfo) ||
                 !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) return;
             
-            ApplyDamage(hitZone);
+            ApplyDamage(hitZone, hitInfo.point);
         }
         
         internal virtual void ProcessRays(Ray[] currentRays)
@@ -398,6 +398,13 @@ namespace Weapons
             var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
             
             hitZone.ApplyDamage(damage);
+        }
+        
+        private void ApplyDamage(HitZone hitZone, Vector3 hitPos)
+        {
+            var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+            
+            hitZone.ApplyDamage(damage, hitPos);
         }
     }
 

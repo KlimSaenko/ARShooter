@@ -20,7 +20,7 @@ namespace Weapons
             //     Mathf.Lerp(15, 29, 29 * Vector3.Distance(thisPosition, jointPosition)) * Time.deltaTime);
 
             var position = _thisTransform.position;
-            position = Vector3.Lerp(position, joint.position, 50 / Inertia * Mathf.Pow(Vector3.Distance(position, joint.position), 0.54f) * Time.deltaTime);
+            position = Vector3.Lerp(position, joint.position, 55 / Inertia * Mathf.Pow(Vector3.Distance(position, joint.position), 0.54f) * Time.deltaTime);
             _thisTransform.position = position;
 
             var rotation = _thisTransform.rotation;
