@@ -25,7 +25,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BumpAmt: 60
+    - _BumpAmt: 80
     - _InvFade: 1
     - _InvFade2: 0
     m_Colors:

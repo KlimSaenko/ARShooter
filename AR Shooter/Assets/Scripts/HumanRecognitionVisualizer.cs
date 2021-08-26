@@ -9,43 +9,34 @@ using UnityEngine.XR.ARFoundation;
 
 public sealed class HumanRecognitionVisualizer : MonoBehaviour
 {
-    [SerializeField] SourceAR _sourceAR = null;
-    [SerializeField] ImageSource _sourceImage = null;
-    [SerializeField] ResourceSet _resources = null;
-    [SerializeField] Vector2Int _resolution = new(512, 384);
-    [SerializeField] RawImage _previewUI = null;
-    [SerializeField] RawImage _maskUI = null;
-    [SerializeField] bool _drawSkeleton = false;
-    [SerializeField] Shader _shader = null;
+    [Header("Barracuda preferences")]
+    [SerializeField] private SourceAR sourceAR;
+    [SerializeField] private ImageSource sourceImage;
+    [SerializeField] private ResourceSet resources;
+    [SerializeField] private Vector2Int resolution = new(512, 384);
     
-    [SerializeField] private ARRaycastManager raycastManager;
+    [Space]
+    [SerializeField] private RawImage maskUI;
+    [SerializeField] private Shader maskShader;
 
-    BodyDetector _detector;
-    Material _material;
-    RenderTexture _mask;
+    private BodyDetector _detector;
+    private Material _material;
+    private RenderTexture _mask;
 
     internal static HumanRecognitionVisualizer Instance;
-    
-    private static readonly int Keypoints = Shader.PropertyToID("_Keypoints");
-    private static readonly int Aspect = Shader.PropertyToID("_Aspect");
 
     private void Awake() =>
         Instance = this;
 
     private void Start()
     {
-        _detector = new BodyDetector(_resources, _resolution.x, _resolution.y);
+        _detector = new BodyDetector(resources, resolution.x, resolution.y);
 
-        _material = new Material(_shader);
+        _material = new Material(maskShader);
 
         var reso = new Vector2Int(Screen.width, Screen.height);
         _mask = new RenderTexture(reso.x, reso.y, 0);
-        _maskUI.texture = _mask;
-        // _material.SetFloat(GetPosOfCenter, 0.4f);
-
-        if (!_sourceAR.enabled) return;
-        
-        // Config.CurrentGameplayMode = Config.GameplayMode.Real;
+        maskUI.texture = _mask;
     }
     
     private void OnDestroy()
@@ -55,58 +46,67 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         Destroy(_mask);
     }
 
-// #define BODYPIX_KEYPOINT_NOSE               0 true
-// #define BODYPIX_KEYPOINT_LEFT_EYE           1
-// #define BODYPIX_KEYPOINT_RIGHT_EYE          2
-// #define BODYPIX_KEYPOINT_LEFT_EAR           3
-// #define BODYPIX_KEYPOINT_RIGHT_EAR          4
-// #define BODYPIX_KEYPOINT_LEFT_SHOULDER      5 true
-// #define BODYPIX_KEYPOINT_RIGHT_SHOULDER     6 true
-// #define BODYPIX_KEYPOINT_LEFT_ELBOW         7
-// #define BODYPIX_KEYPOINT_RIGHT_ELBOW        8
-// #define BODYPIX_KEYPOINT_LEFT_WRIST         9
-// #define BODYPIX_KEYPOINT_RIGHT_WRIST        10
-// #define BODYPIX_KEYPOINT_LEFT_HIP           11 true
-// #define BODYPIX_KEYPOINT_RIGHT_HIP          12 true
-// #define BODYPIX_KEYPOINT_LEFT_KNEE          13
-// #define BODYPIX_KEYPOINT_RIGHT_KNEE         14
-// #define BODYPIX_KEYPOINT_LEFT_ANKLE         15
-// #define BODYPIX_KEYPOINT_RIGHT_ANKLE        16
-// #define BODYPIX_KEYPOINT_COUNT              17
+    // BODYPIX_KEYPOINT_NOSE               0 true
+    // BODYPIX_KEYPOINT_LEFT_EYE           1
+    // BODYPIX_KEYPOINT_RIGHT_EYE          2
+    // BODYPIX_KEYPOINT_LEFT_EAR           3
+    // BODYPIX_KEYPOINT_RIGHT_EAR          4
+    // BODYPIX_KEYPOINT_LEFT_SHOULDER      5 true
+    // BODYPIX_KEYPOINT_RIGHT_SHOULDER     6 true
+    // BODYPIX_KEYPOINT_LEFT_ELBOW         7
+    // BODYPIX_KEYPOINT_RIGHT_ELBOW        8
+    // BODYPIX_KEYPOINT_LEFT_WRIST         9
+    // BODYPIX_KEYPOINT_RIGHT_WRIST        10
+    // BODYPIX_KEYPOINT_LEFT_HIP           11 true
+    // BODYPIX_KEYPOINT_RIGHT_HIP          12 true
+    // BODYPIX_KEYPOINT_LEFT_KNEE          13
+    // BODYPIX_KEYPOINT_RIGHT_KNEE         14
+    // BODYPIX_KEYPOINT_LEFT_ANKLE         15
+    // BODYPIX_KEYPOINT_RIGHT_ANKLE        16
+    // BODYPIX_KEYPOINT_COUNT              17
 
-    // [SerializeField] private TextMeshPro tm;
+    [Header("Real enemy preferences")]
     [SerializeField] private Transform speechText;
     [SerializeField] private Transform enemyHp;
+    [SerializeField] private Transform enemyShield;
+    [SerializeField] private RectTransform enemyMarker;
+    
     private readonly Keypoint[] _keypoints = new Keypoint[17];
     
     private void LateUpdate()
     {
-        if (!_sourceAR.enabled || _sourceAR.Texture == null) return;
-        
-        _detector.ProcessImage(_sourceAR.Texture);
+#if UNITY_IOS && !UNITY_EDITOR
 
-        // if (_sourceImage.Texture == null) return;
-        //
-        // _detector.ProcessImage(_sourceImage.Texture);
+        if (!sourceAR.enabled || sourceAR.Texture == null) return;
+                
+        _detector.ProcessImage(sourceAR.Texture);
+        
+#elif UNITY_EDITOR
+
+        if (sourceImage.Texture == null) return;
+        
+        _detector.ProcessImage(sourceImage.Texture);
+
+#endif
 
         _detector.KeypointBuffer.GetData(_keypoints);
 
-        _realEnemy ??= new RealEnemy(speechText, enemyHp);
+        _realEnemy ??= new RealEnemy(speechText, enemyHp, enemyShield, enemyMarker);
         
         _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var headPos);
 
         _realEnemy.HeadPosition = headPos;
-            
-        // tm.color = Color.Lerp(Color.red, Color.green, validatedPoints / 5f);
-        // tm.text = $"{distance:N2}m";
+        // _realEnemy.MapMarker();
             
         Graphics.Blit(_detector.MaskTexture, _mask, _material, 0);
     }
 
     private readonly List<ARRaycastHit> _raycastHits = new();
 
-    [SerializeField] private ParticleSystem[] hitParticles; // 0 - virtual; 1 - real
+    [Tooltip("[0] - virtual hit \n[1] - real shield hit \n[2] - real human hit")]
+    [SerializeField] private ParticleSystem[] hitParticles;
     [SerializeField] private ComputeShader processShader;
+    
     private ComputeBuffer _resultsBuffer;
     private Data[] _data;
     private Vector4[] _points;
@@ -118,10 +118,17 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         public int Type;
     }
     
+    [Space]
+    [SerializeField] private ARRaycastManager raycastManager;
+    
+    private static readonly int InputTexture = Shader.PropertyToID("InputTexture");
+    private static readonly int Input = Shader.PropertyToID("Input");
+    private static readonly int Result = Shader.PropertyToID("Result");
+        
     /// <summary>
-    /// 0 - None;
-    /// 1 - Body;
-    /// 2 - Head.
+    /// [0] - None;
+    /// [1] - Body;
+    /// [2] - Head.
     /// </summary>
     /// <param name="raycastPoint">Screen points to raycast from</param>
     /// <param name="distance">Distance to the point</param>
@@ -130,7 +137,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     {
         distance = 0;
 
-        if (!_sourceAR.enabled || _sourceAR.Texture == null) return new []{ 0 };
+        if (!sourceAR.enabled || sourceAR.Texture == null) return new []{ 0 };
             
         var hitsCount = raycastPoint.Length; // <= 16
             
@@ -168,9 +175,11 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     
                 if (virtualDistance >= realDistance)
                 {
-                    hitParticles[1].transform.position = _raycastHits[0].pose.position;
-                    hitParticles[1].transform.rotation = _raycastHits[0].pose.rotation;
-                    hitParticles[1].Play();
+                    var type = _realEnemy.WithShield ? 1 : 2;
+                    hitParticles[type].transform.position = _raycastHits[0].pose.position;
+                    // hitParticles[type].transform.rotation = _raycastHits[0].pose.rotation;
+                    hitParticles[type].transform.LookAt(Camera.main.transform);
+                    hitParticles[type].Play();
                     
                     zoneTypes[i] = _data[i].Type;
                 }
@@ -194,16 +203,12 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                 zoneTypes[i] = 0;
             }
         }
-
+        
         _realEnemy.HP -= maxZone * 3;
         _realEnemy.ChangeEmotion((RealEnemy.Emotions)maxZone);
         
         return zoneTypes;
     }
-    
-    private static readonly int InputTexture = Shader.PropertyToID("InputTexture");
-    private static readonly int Input = Shader.PropertyToID("Input");
-    private static readonly int Result = Shader.PropertyToID("Result");
         
     private float ProcessKeypoints(Keypoint[] keypoints, IEnumerable<int> types, out Vector3 headPos)
     {
@@ -214,7 +219,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         var screen = new Vector2(Screen.width, Screen.height);
         
-        // other
+        // other points
         foreach (var type in types)
         {
             if (keypoints[type].Score < 0.9f) continue;
@@ -232,10 +237,10 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
             validatedPoints++;
         }
         
-        // nose
+        // nose point
         var noseMarkerPos = Vector2.zero;
         
-        if (keypoints[0].Score > 0.87f)
+        if (keypoints[0].Score > 0.88f)
         {
             noseMarkerPos = new Vector2(keypoints[0].Position.x * screen.x, keypoints[0].Position.y * screen.y);
 
@@ -263,6 +268,9 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     private const int TweenId = 102;
 
     private RealEnemy _realEnemy;
+    /// <summary>
+    /// Real enemy functionality class
+    /// </summary>
     private class RealEnemy
     {
         private static readonly string[] EmotionText = {
@@ -281,28 +289,65 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         }
 
         private readonly Transform _speechText;
-        private readonly Transform _hp;
         private readonly TextMeshPro _text;
+        
+        private readonly Transform _hpTransform;
+        private readonly Transform _shieldTransform;
+
+        private readonly RectTransform _mapMarker;
+        private readonly RectTransform _map;
+        
         private Vector3 _prevHeadPos = Vector3.zero;
 
-        private int _HP = 100;
+        private int _shield = 100;
+        private int _hp = 100;
         internal int HP
         {
-            get => _HP;
+            get => WithShield ? _shield : _hp;
             set
             {
-                _HP = value;
+                if (value > _hp)
+                {
+                    _shieldTransform.localScale = new Vector3(value * 6 / 100f, 0.2f, 1);
+                    _shield = value;
+                    
+                    _hpTransform.localScale = new Vector3(value * 6 / 100f, 0.2f, 1);
+                    _hp = value;
+
+                    return;
+                }
                 
-                if (_HP <= 0) ChangeEmotion(Emotions.Dead);
-                else _hp.localScale = new Vector3(value * 6 / 100f, 0.2f, 1);
+                if (_hp <= 0) return;
+                
+                var newValue = value > 0 ? value : 0;
+                
+                if (WithShield)
+                {
+                    _shieldTransform.localScale = new Vector3(newValue * 6 / 100f, 0.2f, 1);
+                    
+                    _shield = newValue;
+                }
+                else
+                {
+                    _hpTransform.localScale = new Vector3(newValue * 6 / 100f, 0.2f, 1);
+                            
+                    if (newValue <= 0) ChangeEmotion(Emotions.Dead);
+                    
+                    _hp = newValue;
+                }
             }
         }
+
+        internal bool WithShield => _shield > 0;
         
-        internal RealEnemy(Transform speechText, Transform hp)
+        internal RealEnemy(Transform speechText, Transform hpTransform, Transform shieldTransform, RectTransform mapMarker)
         {
             _speechText = speechText;
             _text = speechText.GetComponentInChildren<TextMeshPro>();
-            _hp = hp;
+            _hpTransform = hpTransform;
+            _shieldTransform = shieldTransform;
+            _mapMarker = mapMarker;
+            _map = mapMarker.parent.TryGetComponent(out RectTransform rectTransform) ? rectTransform : null;
         }
 
         internal void ChangeEmotion(Emotions type)
@@ -319,7 +364,11 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                     if (!_speechText.gameObject.activeSelf) return;
                     
                     DOTween.Kill(TweenId);
-                    _speechText.DOScale(0, 0.4f).OnComplete(() => _speechText.gameObject.SetActive(false)).SetId(TweenId);
+                    _speechText.DOScale(0, 0.4f).OnComplete(() =>
+                    {
+                        _speechText.gameObject.SetActive(false);
+                        _mapMarker.gameObject.SetActive(false);
+                    }).SetId(TweenId);
                 }
                 else
                 {
@@ -327,7 +376,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                     {
                         var distance = Vector2.Distance(_prevHeadPos, value);
                         
-                        if (distance < 17 * Time.deltaTime)
+                        if (distance < 16 * Time.deltaTime)
                         {
                             _speechText.position = _prevHeadPos == Vector3.zero? value : Vector3.Lerp(_prevHeadPos, value, 
                                 14 * Mathf.Pow(distance, 0.5f) * Time.deltaTime);
@@ -357,19 +406,43 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
                         _prevHeadPos = value;
                         
                         DOTween.Kill(TweenId);
-                        _speechText.DOScale(0.06f, 0.5f).SetEase(Ease.OutBack).OnStart(() => _speechText.gameObject.SetActive(true)).SetId(TweenId);
+                        _speechText.DOScale(0.06f, 0.5f).SetEase(Ease.OutBack).OnStart(() =>
+                        {
+                            _speechText.gameObject.SetActive(true);
+                            _mapMarker.gameObject.SetActive(true);
+                        }).SetId(TweenId);
                     }
+
+                    MapMarker(_prevHeadPos);
                 }
             }
         }
-    }
 
+        internal void MapMarker(Vector3 pos)
+        {
+            var player = Camera.main.transform;
+            var distance = Vector3.Distance(pos, player.position);
+            
+            var rotation = Quaternion.LookRotation(pos - player.position).eulerAngles + player.rotation.eulerAngles;
+
+            _map.localRotation = Quaternion.Euler(0, 0, rotation.y);
+
+            _mapMarker.localPosition = new Vector2(0, distance * 48);
+        }
+    }
+    
+    private bool _drawSkeleton;
+    public void VisualizeSkeleton(bool value) => _drawSkeleton = value;
+    
+    private static readonly int Keypoints = Shader.PropertyToID("_Keypoints");
+    private static readonly int Aspect = Shader.PropertyToID("_Aspect");
+    
     private void OnRenderObject()
     {
         if (!_drawSkeleton) return;
 
         _material.SetBuffer(Keypoints, _detector.KeypointBuffer);
-        _material.SetFloat(Aspect, (float)_resolution.x / _resolution.y);
+        _material.SetFloat(Aspect, (float)resolution.x / resolution.y);
 
         _material.SetPass(1);
         Graphics.DrawProceduralNow
