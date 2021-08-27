@@ -83,7 +83,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         
 #elif UNITY_EDITOR
 
-        if (sourceImage.Texture == null) return;
+        if (!sourceImage.enabled || sourceImage.Texture == null) return;
         
         _detector.ProcessImage(sourceImage.Texture);
 
@@ -96,7 +96,6 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         _prevDistance = ProcessKeypoints(_keypoints, new []{ 5, 6, 11, 12 }, out var headPos);
 
         _realEnemy.HeadPosition = headPos;
-        // _realEnemy.MapMarker();
             
         Graphics.Blit(_detector.MaskTexture, _mask, _material, 0);
     }
@@ -111,6 +110,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     private Data[] _data;
     private Vector4[] _points;
     
+    // Distance to the real enemy at the last frame
     private float _prevDistance = 0;
     
     private struct Data
@@ -130,16 +130,16 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
     /// [1] - Body;
     /// [2] - Head.
     /// </summary>
-    /// <param name="raycastPoint">Screen points to raycast from</param>
+    /// <param name="screenPoints">Screen points to raycast from</param>
     /// <param name="distance">Distance to the point</param>
     /// <returns>Array of ints witch describes segments of human body</returns>
-    internal int[] ProcessRaycast(Vector2[] raycastPoint, out float distance)
+    internal int[] ProcessRaycast(Vector2[] screenPoints, out float distance)
     {
         distance = 0;
-
+        
         if (!sourceAR.enabled || sourceAR.Texture == null) return new []{ 0 };
             
-        var hitsCount = raycastPoint.Length; // <= 16
+        var hitsCount = screenPoints.Length; // <= 16
             
         _resultsBuffer = new ComputeBuffer(hitsCount, sizeof(int));
         _data = new Data[hitsCount];
@@ -147,7 +147,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         _points = new Vector4[hitsCount];
         for (var i = 0; i < hitsCount; i++)
         {
-            _points[i] = new Vector4((int)raycastPoint[i].x, (int)raycastPoint[i].y, 1);
+            _points[i] = new Vector4((int)screenPoints[i].x, (int)screenPoints[i].y, 1);
         }
         
         processShader.SetTexture(0, InputTexture, _mask);
@@ -166,12 +166,12 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         for (var i = 0; i < hitsCount; i++)
         {
             var player = Camera.main;
-            var findVirtual = Physics.Raycast(player.ScreenPointToRay(raycastPoint[i]), out var hitInfo);
+            var findVirtual = Physics.Raycast(player.ScreenPointToRay(screenPoints[i]), out var hitInfo);
             
             if (_data[i].Type != 0)
             {
                 var virtualDistance = findVirtual ? Vector3.Distance(player.transform.position, hitInfo.point) : 1000;
-                var realDistance = raycastManager.Raycast(raycastPoint[i], _raycastHits) ? _raycastHits[0].distance : 1111;
+                var realDistance = raycastManager.Raycast(screenPoints[i], _raycastHits) ? _raycastHits[0].distance : 1111;
     
                 if (virtualDistance >= realDistance)
                 {
@@ -209,7 +209,14 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         
         return zoneTypes;
     }
-        
+    
+    /// <summary>
+    /// Handle data about the real enemy
+    /// </summary>
+    /// <param name="keypoints">Keypoints data handled from process shader</param>
+    /// <param name="types">Keypoints types to process (0 - 16)</param>
+    /// <param name="headPos">Returns world position of the enemy head</param>
+    /// <returns>Current average distance to the enemy</returns>
     private float ProcessKeypoints(Keypoint[] keypoints, IEnumerable<int> types, out Vector3 headPos)
     {
         var prevDistance = _prevDistance;
@@ -240,7 +247,7 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         // nose point
         var noseMarkerPos = Vector2.zero;
         
-        if (keypoints[0].Score > 0.88f)
+        if (keypoints[0].Score > 0.9f)
         {
             noseMarkerPos = new Vector2(keypoints[0].Position.x * screen.x, keypoints[0].Position.y * screen.y);
 
@@ -295,7 +302,6 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
         private readonly Transform _shieldTransform;
 
         private readonly RectTransform _mapMarker;
-        private readonly RectTransform _map;
         
         private Vector3 _prevHeadPos = Vector3.zero;
 
@@ -347,7 +353,6 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
             _hpTransform = hpTransform;
             _shieldTransform = shieldTransform;
             _mapMarker = mapMarker;
-            _map = mapMarker.parent.TryGetComponent(out RectTransform rectTransform) ? rectTransform : null;
         }
 
         internal void ChangeEmotion(Emotions type)
@@ -418,16 +423,11 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
             }
         }
 
-        internal void MapMarker(Vector3 pos)
+        private void MapMarker(Vector3 pos)
         {
-            var player = Camera.main.transform;
-            var distance = Vector3.Distance(pos, player.position);
-            
-            var rotation = Quaternion.LookRotation(pos - player.position).eulerAngles + player.rotation.eulerAngles;
+            var deltaPos = pos - Camera.main.transform.position;
 
-            _map.localRotation = Quaternion.Euler(0, 0, rotation.y);
-
-            _mapMarker.localPosition = new Vector2(0, distance * 48);
+            _mapMarker.anchoredPosition = new Vector2(deltaPos.x * 48, deltaPos.z * 48);
         }
     }
     
@@ -443,10 +443,10 @@ public sealed class HumanRecognitionVisualizer : MonoBehaviour
 
         _material.SetBuffer(Keypoints, _detector.KeypointBuffer);
         _material.SetFloat(Aspect, (float)resolution.x / resolution.y);
+        // _material.SetFloat(Aspect, (float)Screen.width / Screen.height);
 
         _material.SetPass(1);
-        Graphics.DrawProceduralNow
-          (MeshTopology.Triangles, 6, Body.KeypointCount);
+        Graphics.DrawProceduralNow(MeshTopology.Triangles, 6, Body.KeypointCount);
 
         _material.SetPass(2);
         Graphics.DrawProceduralNow(MeshTopology.Lines, 2, 12);

@@ -60,11 +60,29 @@ namespace Weapons
 
         #region Setters
 
-        private void SetWeaponBehaviour()
+        private void OnEnable()
         {
+            _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
+            _bulletUI ??= new BulletUI(bulletText);
+
+            _bulletUI.UpdateCount(BulletCount);
+            
             PlayerBehaviour.FiringAction += Fire;
             WeaponHolder.WeaponReadyAction += SetReady;
+        }
+
+        private void OnDisable()
+        {
+            PlayerBehaviour.FiringAction -= Fire;
+            WeaponHolder.WeaponReadyAction -= SetReady;
             
+            var transform1 = transform;
+            transform1.localPosition = _startLocalPos.Item1;
+            transform1.localRotation = _startLocalPos.Item2;
+        }
+
+        private void SetWeaponBehaviour()
+        {
             SetActive(true);
             BulletCount = weaponStats.bulletCount;
             
@@ -83,20 +101,6 @@ namespace Weapons
         
         public void SetActive(bool value)
         {
-            if (value)
-            {
-                _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
-                _bulletUI ??= new BulletUI(bulletText);
-
-                _bulletUI.UpdateCount(BulletCount);
-            }
-            else
-            {
-                var transform1 = transform;
-                transform1.localPosition = _startLocalPos.Item1;
-                transform1.localRotation = _startLocalPos.Item2;
-            }
-
             bulletText.transform.GetChild((int)WeaponType - 1).gameObject.SetActive(value);
             gameObject.SetActive(value);
         }
@@ -331,18 +335,20 @@ namespace Weapons
     internal class Shooting
     {
         private protected readonly WeaponStats WeaponStats;
+        private readonly RaycastHit[] _hitsBuffer;
 
         internal Shooting(WeaponStats weaponStats)
         {
             WeaponStats = weaponStats;
+            _hitsBuffer = new RaycastHit[8];
         }
         
         internal virtual void ProcessRays(Ray currentRay)
         {
-            if (!Physics.Raycast(currentRay, out var hitInfo) ||
-                !hitInfo.transform.gameObject.TryGetComponent(out HitZone hitZone)) return;
+            var hitsCount = Physics.RaycastNonAlloc(currentRay, _hitsBuffer);
+            if (hitsCount < 1 || !_hitsBuffer[0].transform.TryGetComponent(out HitZone hitZone)) return;
             
-            ApplyDamage(hitZone, hitInfo.point);
+            ApplyDamage(hitZone, _hitsBuffer[0].point);
         }
         
         internal virtual void ProcessRays(Ray[] currentRays)
@@ -353,7 +359,6 @@ namespace Weapons
             }
         }
 
-        private readonly RaycastHit[] _hits = new RaycastHit[8];
         internal virtual void ProcessCapsuleRay(float radius, float length)
         {
             var mainCam = Camera.main.transform;
@@ -361,11 +366,11 @@ namespace Weapons
             var camPosition = mainCam.position;
                 
             var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * length,
-                radius, forward, _hits, 0);
+                radius, forward, _hitsBuffer, 0);
     
             for (var i = 0; i < hitsCount; i++)
             {
-                if (!_hits[i].collider.TryGetComponent(out HitZone hitZone)) continue;
+                if (!_hitsBuffer[i].collider.TryGetComponent(out HitZone hitZone)) continue;
                 
                 var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
             
@@ -380,16 +385,16 @@ namespace Weapons
             var camPosition = mainCam.position;
                 
             var hitsCount = Physics.CapsuleCastNonAlloc(camPosition + forward * 0.5f, camPosition + forward * length,
-                radius, forward, _hits, 0);
+                radius, forward, _hitsBuffer, 0);
 
             float time = 0;
             for (var i = 0; i < hitsCount; i++)
             {
-                time = Vector3.Distance(camPosition, _hits[i].collider.transform.position) * delay - time;
+                time = Vector3.Distance(camPosition, _hitsBuffer[i].collider.transform.position) * delay - time;
                 
                 yield return new WaitForSeconds(time);
 
-                if (_hits[i].collider.TryGetComponent(out HitZone hitZone)) ApplyDamage(hitZone);
+                if (_hitsBuffer[i].collider.TryGetComponent(out HitZone hitZone)) ApplyDamage(hitZone);
             }
         }
 

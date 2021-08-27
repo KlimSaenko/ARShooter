@@ -11,7 +11,6 @@ using Random = UnityEngine.Random;
 public class UI : MonoBehaviour
 {
     [SerializeField] private RectTransform normalMarker;
-    [SerializeField] private RectTransform critMarker;
     [SerializeField] private Image mapLookImage;
     [SerializeField] private Transform mapCircle;
     [SerializeField] private RectTransform pauseMenu;
@@ -49,11 +48,6 @@ public class UI : MonoBehaviour
         DeadStateUI = transform.GetChild(1).gameObject;
     }
 
-    public void DisableMarker()
-    {
-        
-    }
-
     private void Update()
     {
         if (_player != null)
@@ -65,12 +59,10 @@ public class UI : MonoBehaviour
         {
             _player = MainCam.transform;
             mapLookImage.fillAmount = Screen.width / Screen.height * MainCam.fieldOfView / 360f;
-            mapLookImage.transform.rotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180 - _player.rotation.eulerAngles.y);
+            mapLookImage.rectTransform.localRotation = Quaternion.Euler(0, 0, mapLookImage.fillAmount * 180);
         }
-
-        if (IsTranslating()) Translation();
-        
-        // AimInstance.Update();
+    
+        // if (IsTranslating()) Translation();
     }
 
     public void Quit()

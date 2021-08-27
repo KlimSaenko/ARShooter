@@ -7,13 +7,13 @@ using UnityEngine.XR.ARFoundation;
 public class SourceAR : MonoBehaviour
 {
     [SerializeField] private ARCameraManager cameraManager;
-    [SerializeField] private Shader shader;
+    [SerializeField] private Shader rotationShader;
 
     internal Texture Texture => _cameraTexture ;
     
     private void Awake()
     {
-        if (shader != null) _textureMat = new Material(shader);
+        if (rotationShader != null) _textureMat = new Material(rotationShader);
     }
 
     private void OnEnable()
