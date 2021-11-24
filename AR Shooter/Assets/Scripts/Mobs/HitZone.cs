@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using static Common.Pool;
+using static Game.Managers.Pool;
 using Player;
 using UnityEngine;
 
-namespace Mobs
+namespace Game.Mobs
 {
     public class HitZone : MonoBehaviour
     {

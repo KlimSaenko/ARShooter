@@ -1,32 +1,34 @@
-﻿using Mobs;
-using UnityEngine;
+﻿using Game.UI;
 
-public class SimpleMob : MainMob
+namespace Game.Mobs
 {
-    private void Awake()
+    public class SimpleMob : MainMob
     {
-        MobAppeared();
-    }
-
-    private void Update()
-    {
-        if (UI.IsPaused || !PlayerStatusScript.IsAlive) return;
-        
-        var moveDir = TargetPos - MobTransform.position;
-
-        MobMove(moveDir, 0.33f);
-    }
-
-    protected override void Attack(bool start)
-    {
-        IsAttacking = start;
-        mobAnimator.SetBool("Attack", start);
-
-        if (start)
+        private void Awake()
         {
-            PlayerStatusScript.ApplyDamage(mobDamage);
-            DamageTimeDelay = 0.7f;
+            MobAppeared();
         }
-        else MobSpeed = 0.35f;
+
+        private void Update()
+        {
+            if (CommonUI.IsPaused || !PlayerStatusScript.IsAlive) return;
+
+            var moveDir = TargetPos - MobTransform.position;
+
+            MobMove(moveDir, 0.33f);
+        }
+
+        protected override void Attack(bool start)
+        {
+            IsAttacking = start;
+            mobAnimator.SetBool("Attack", start);
+
+            if (start)
+            {
+                PlayerStatusScript.ApplyDamage(mobDamage);
+                DamageTimeDelay = 0.7f;
+            }
+            else MobSpeed = 0.35f;
+        }
     }
 }

@@ -1,38 +1,38 @@
-using Mobs;
 using UnityEngine;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public class Shotgun : MainWeapon
     {
-        private const WeaponType CurrentWeaponType = WeaponType.Shotgun;
+        private const WeaponName CurrentWeaponName = WeaponName.Shotgun;
+        public override WeaponName WeaponName => CurrentWeaponName;
+
+        private const WeaponType CurrentWeaponType = WeaponType.Heavy;
         public override WeaponType WeaponType => CurrentWeaponType;
 
-        // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
             var currentRays = new Ray[4];
             for (var i = 0; i < currentRays.Length; i++)
             {
-                currentRays[i] = UI.AimInstance.GetRay();
+                currentRays[i] = Aim.GetRay();
             }
             
             ShootingPatterns.ProcessRays(currentRays);
             
-            UI.AimInstance.AimAnimation();
+            Aim.AimAnimation();
         }
         
-        protected override bool LogicIsRunning() =>
-            shootAnimation.isPlaying;
+        //protected override bool LogicIsRunning() =>
+        //    shootAnimator.isPlaying;
 
         private void OnShellAnimation() =>
             shellsParticle.Play();
         
         protected override void VisualizeFiring()
         {
-            shootAnimation.Play();
+            //shootAnimator.Play();
             flashParticle.Play(true);
-            Vibration.VibratePeek();
             
             if (AudioSource is null) return;
             

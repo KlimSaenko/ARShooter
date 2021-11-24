@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dd7ebc13479cac47b31562754f851f3, type: 3}
+  m_Name: Json Saver
+  m_EditorClassIdentifier: 
+  weaponsConfigsJson: {fileID: 4900000, guid: 466bde3c86d48e947b346f78399ae5cc, type: 3}
+  setWeaponConfigsEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 993437874561819215, guid: 1b18e76ac2001d4469484ccd6fa14045, type: 3}
+        m_TargetAssemblyTypeName: Weapons.MainWeapon, Assembly-CSharp
+        m_MethodName: SetConfig
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 9003494812585625549, guid: 47d9cf20cd02b4bacb9ed4d1563aada2, type: 3}
+        m_TargetAssemblyTypeName: Weapons.MainWeapon, Assembly-CSharp
+        m_MethodName: SetConfig
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 11400000, guid: cf91459e66eb7f249b81b1144554cb96, type: 2}
+        m_TargetAssemblyTypeName: Weapons.WeaponsListAccess, Assembly-CSharp
+        m_MethodName: SetListReady
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2

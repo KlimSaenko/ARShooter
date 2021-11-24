@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Michsky.UI.FieldCompleteMainMenu
+namespace Game.UI
 {
     public class TopPanelButton : MonoBehaviour
     {

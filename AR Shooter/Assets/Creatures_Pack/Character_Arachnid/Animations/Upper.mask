@@ -1,0 +1,194 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Upper
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: CATRigHub001
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigHub001Bone001
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigHub001Bone002
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigHub001Bone002/CATRigHub001Bone002Bone001
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigHub001Bone002/CATRigHub001Bone002Bone001/CATRigHub001Bone002Bone001Bone001
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigHub001Bone003
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigHub001Bone003/CATRigHub001Bone002Bone001 1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigHub001Bone003/CATRigHub001Bone002Bone001 1/CATRigHub001Bone002Bone001Bone001
+      1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigHub001Bone004
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigHub001Bone005
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigLLeg1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg1/CATRigLLeg2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg1/CATRigLLeg2/CATRigLLegAnkle
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg003
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg003/CATRigLLeg004
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg003/CATRigLLeg004/CATRigLLegAnkle001
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg005
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg005/CATRigLLeg006
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigLLeg005/CATRigLLeg006/CATRigLLegAnkle002
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg1/CATRigRLeg2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg1/CATRigRLeg2/CATRigRLegAnkle
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg003
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg003/CATRigRLeg004
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg003/CATRigRLeg004/CATRigRLegAnkle001
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg005
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg005/CATRigRLeg006
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigRLeg005/CATRigRLeg006/CATRigRLegAnkle002
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigTail1/CATRigTail2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1/CATRigTail2/CATRigTail3
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1/CATRigTail2/CATRigTail3/CATRigTail4
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1/CATRigTail2/CATRigTail3/CATRigTail4/CATRigTail5
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 1
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigTail1 1/CATRigTail2 1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 1/CATRigTail2 1/CATRigTail3 1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 1/CATRigTail2 1/CATRigTail3 1/CATRigTail4 1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 1/CATRigTail2 1/CATRigTail3 1/CATRigTail4 1/CATRigTail5
+      1
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 2
+    m_Weight: 1
+  - m_Path: CATRigHub001/CATRigTail1 2/CATRigTail2 2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 2/CATRigTail2 2/CATRigTail3 2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 2/CATRigTail2 2/CATRigTail3 2/CATRigTail4 2
+    m_Weight: 0
+  - m_Path: CATRigHub001/CATRigTail1 2/CATRigTail2 2/CATRigTail3 2/CATRigTail4 2/CATRigTail5
+      2
+    m_Weight: 0
+  - m_Path: CATRigHub001Bone004Bone001
+    m_Weight: 1
+  - m_Path: CATRigLLegPlatform
+    m_Weight: 0
+  - m_Path: CATRigLLegPlatform001
+    m_Weight: 0
+  - m_Path: CATRigLLegPlatform002
+    m_Weight: 0
+  - m_Path: CATRigRLegPlatform
+    m_Weight: 0
+  - m_Path: CATRigRLegPlatform001
+    m_Weight: 0
+  - m_Path: CATRigRLegPlatform002
+    m_Weight: 0
+  - m_Path: Character001
+    m_Weight: 0
+  - m_Path: Low_mesh
+    m_Weight: 0
+  - m_Path: Spider001
+    m_Weight: 0
+  - m_Path: Spider001Hub
+    m_Weight: 1
+  - m_Path: Spider001Hub/Spider001 1
+    m_Weight: 1
+  - m_Path: Spider001Hub/Spider001 2
+    m_Weight: 1
+  - m_Path: Spider001Hub/Spider001 3
+    m_Weight: 1
+  - m_Path: Spider001Hub/Spider001LLeg11
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg11/Spider001LLeg12
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg11/Spider001LLeg12/Spider001LLeg13
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg21
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg21/Spider001LLeg22
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg21/Spider001LLeg22/Spider001LLeg23
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg31
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg31/Spider001LLeg32
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg31/Spider001LLeg32/Spider001LLeg33
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg41
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg41/Spider001LLeg42
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001LLeg41/Spider001LLeg42/Spider001LLeg43
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg11
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg11/Spider001RLeg12
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg11/Spider001RLeg12/Spider001RLeg13
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg21
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg21/Spider001RLeg22
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg21/Spider001RLeg22/Spider001RLeg23
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg31
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg31/Spider001RLeg32
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg31/Spider001RLeg32/Spider001RLeg33
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg41
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg41/Spider001RLeg42
+    m_Weight: 0
+  - m_Path: Spider001Hub/Spider001RLeg41/Spider001RLeg42/Spider001RLeg43
+    m_Weight: 0
+  - m_Path: Spider001LLeg1Platform
+    m_Weight: 0
+  - m_Path: Spider001LLeg2Platform
+    m_Weight: 0
+  - m_Path: Spider001LLeg3Platform
+    m_Weight: 0
+  - m_Path: Spider001LLeg4Platform
+    m_Weight: 0
+  - m_Path: Spider001RLeg1Platform
+    m_Weight: 0
+  - m_Path: Spider001RLeg2Platform
+    m_Weight: 0
+  - m_Path: Spider001RLeg3Platform
+    m_Weight: 0
+  - m_Path: Spider001RLeg4Platform
+    m_Weight: 0

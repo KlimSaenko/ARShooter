@@ -1,136 +1,160 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using Common;
 using DG.Tweening;
-using Mobs;
+using Game.Mobs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using MoreMountains.NiceVibrations;
+using Game.UI;
 
-namespace Weapons
+namespace Game.Weapons
 {
-    public class MainWeapon : MonoBehaviour, IWeaponConfig
+    public class MainWeapon : MonoBehaviour, IWeapon
     {
+        [SerializeField] private protected Animator stateMachine;
+        private protected static readonly int blendId = Animator.StringToHash("Blend");
+        private protected static readonly int noizeId = Animator.StringToHash("Noize");
+
+        private protected float prevNoize = 0.5f;
+
         [Header("Weapon config")]
-        [SerializeField] private Vector3 posToAim;
-        [SerializeField] private Vector3 posFromAim;
-        [SerializeField] protected WeaponStats weaponStats;
-        
-        public Vector3 PosToAim => posToAim;
-        public Vector3 PosFromAim => posFromAim;
+        [SerializeField] private protected WeaponStats weaponStats;
+        [SerializeField] private protected HapticTypes hapticType;
+
+        [Space]
+        [SerializeField] private Transform model;
+        [SerializeField] private Transform magazine;
+
+        public string Name { get; set; }
+
+        public virtual WeaponName WeaponName => WeaponName.Unsigned;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
-        private (Vector3, Quaternion) _startLocalPos;
 
+        public void SetConfig(SO.WeaponsList weaponsList)
+        {
+            weaponStats = weaponsList.CurrentWeaponStats(WeaponName, out var name);
+            Name = name;
+
+            WeaponsListAccess.AddWeaponPrefab(this);
+        }
+
+        public MainWeapon InstantiateWeapon(Transform saveFolder, int index, TextMeshPro bulletsText)
+        {
+            var script = Instantiate(gameObject, saveFolder).GetComponent<MainWeapon>();
+            script.bulletsText = bulletsText;
+            script.SetWeaponBehaviour(index);
+
+            return script;
+        }
+
+        internal Action<int, int> bulletsUpdateAction;
+
+        private int _totalBulletCount;
         private int _bulletCount;
-
-        protected int BulletCount
+        private protected int BulletCount
         {
             get => _bulletCount;
             set
             {
+                var delta = _bulletCount - value;
+                if (_totalBulletCount > 0 && delta > 0) _totalBulletCount -= delta;
                 _bulletCount = value;
-                
-                _bulletUI.UpdateCount(value);
-                
-                ValidateBullets(value);
+
+                bulletsUpdateAction?.Invoke(value, _totalBulletCount);
+
+                CanShoot = ValidateBullets(value);
             }
         }
-        
-        private protected static bool IsFiring;
-        private bool _isReady;
 
-        private protected bool CanShoot => IsActive && _isReady && !_reloadState.IsReloading && !LogicIsRunning();
+        private protected bool CanShoot;
+
+        private protected static bool HapticsSupported;
         
         [Space]
         [Header("Weapon Attachments")]
         [SerializeField] protected ParticleSystem shellsParticle;
         [SerializeField] protected ParticleSystem flashParticle;
-        [SerializeField] protected Animation shootAnimation;
         [SerializeField] protected AudioClip shootAudio;
         
         private protected static AudioSource AudioSource;
-        
-        public bool IsActive => gameObject.activeSelf;
-        
-        private void Start() =>
-            SetWeaponBehaviour();
+
+        private protected CommonUI.Aim Aim;
 
         #region Setters
 
         private void OnEnable()
         {
-            _reloadState ??= new ReloadState(CompleteReload, reloadSlider);
-            _bulletUI ??= new BulletUI(bulletText);
+            _reloadState ??= new ReloadState(OnChangeValue, reloadSlider);
+            _bulletUI ??= new BulletUI(bulletsText);
 
-            _bulletUI.UpdateCount(BulletCount);
+            DynamicHolder.BulletsLabelRef = bulletUIRef;
             
+            bulletsUpdateAction += _bulletUI.UpdateCount;
             PlayerBehaviour.FiringAction += Fire;
-            WeaponHolder.WeaponReadyAction += SetReady;
-        }
+            PlayerStates.WeaponReadyAction += SetReady;
 
-        private void OnDisable()
-        {
-            PlayerBehaviour.FiringAction -= Fire;
-            WeaponHolder.WeaponReadyAction -= SetReady;
-            
-            var transform1 = transform;
-            transform1.localPosition = _startLocalPos.Item1;
-            transform1.localRotation = _startLocalPos.Item2;
-        }
-
-        private void SetWeaponBehaviour()
-        {
-            SetActive(true);
-            BulletCount = weaponStats.bulletCount;
-            
-            SetReady(true);
-            
-            var transform1 = transform;
-            _startLocalPos.Item1 = transform1.localPosition;
-            _startLocalPos.Item2 = transform1.localRotation;
-            
-            if (shootAudio is null || AudioSource is not null) return;
-
-            AudioSource = transform.parent.gameObject.AddComponent<AudioSource>();
-            AudioSource.playOnAwake = false;
-            AudioSource.maxDistance = 20;
+            bulletsUpdateAction?.Invoke(BulletCount, _totalBulletCount);
         }
         
-        public void SetActive(bool value)
+        private void OnDisable()
         {
-            bulletText.transform.GetChild((int)WeaponType - 1).gameObject.SetActive(value);
-            gameObject.SetActive(value);
+            bulletsUpdateAction -= _bulletUI.UpdateCount;
+            PlayerBehaviour.FiringAction -= Fire;
+            PlayerStates.WeaponReadyAction -= SetReady;
+        }
+
+        private void SetWeaponBehaviour(int index)
+        {
+            Aim = new CommonUI.Aim(weaponStats);
+            reloadId = Animator.StringToHash("Reload " + (int)WeaponName);
+
+            weaponSwitchButton = weaponSwitchButton.SetButton(index + 1);
+            bulletsUpdateAction += weaponSwitchButton.OnUpdateBullets;
+
+            _reloadState ??= new ReloadState(OnChangeValue, reloadSlider);
+            _bulletUI ??= new BulletUI(bulletsText);
+            _totalBulletCount = weaponStats.allBullets;
+            BulletCount = weaponStats.bulletInMagazineCount;
+
+            HapticsSupported = MMVibrationManager.HapticsSupported();
+
+            if (shootAudio == null || AudioSource != null) return;
+
+            AudioSource = transform.parent.parent.gameObject.AddComponent<AudioSource>();
+            AudioSource.playOnAwake = false;
+            AudioSource.maxDistance = 20;
         }
 
         private void SetReady(bool ready)
         {
-            if (!IsActive) return;
-            
-            _isReady = ready;
-            UI.AimInstance.SetActive(weaponStats, ready);
-
-            if (ready)
-            {
-                if (ValidateBullets(BulletCount)) Fire(IsFiring);
-                
-                DynamicHolder.Inertia = Mathf.Pow(weaponStats.mass, 0.6f);
-            }
-            else if (_reloadState.IsReloading) _reloadState.SkipReload();
+            Fire(ready && PlayerBehaviour.Firing);
         }
         
         #endregion
-        
-        protected virtual bool LogicIsRunning() => false;
 
         protected virtual void VisualizeFiring()
         {
-            shootAnimation.Play();
+            
         }
         
         #region Fire
+
+        private static readonly int shootingId = Animator.StringToHash("Shooting");
+
+        private void Fire(bool fire)
+        {
+            if (fire && !CanShoot)
+            {
+                ValidateBullets(BulletCount);
+
+                return;
+            }
+
+            stateMachine.SetBool(shootingId, fire);
+        }
 
         private Shooting _shootingPatterns;
         private protected Shooting ShootingPatterns 
@@ -145,37 +169,17 @@ namespace Weapons
                 };
             }
         }
-        
-        private void Fire(bool start)
-        {
-            IsFiring = start;
 
-            if (!start || !CanShoot) return;
-
-            StartCoroutine(Shooting());
-        }
-
-        private protected virtual IEnumerator Shooting()
-        {
-            while (IsFiring && CanShoot)
-            {
-                VisualizeFiring();
-
-                RunWeaponLogic();
-
-                BulletCount--;
-
-                yield return new WaitWhile(LogicIsRunning);
-            }
-        }
-        
         protected virtual void RunWeaponLogic() { }
-        
+
         #endregion
-        
-        #region Reload
-        
+
         [Header("UI")]
+
+        [SerializeField] internal WeaponSwitchButton weaponSwitchButton;
+
+        #region Reload
+
         [SerializeField] private Slider reloadSlider;
 
         private ReloadState _reloadState;
@@ -183,79 +187,90 @@ namespace Weapons
         private bool ValidateBullets(int currentCount)
         {
             var valid = currentCount > 0;
-            
-            if (!valid) StartReload();
+
+            if (!valid)
+            {
+                Fire(false);
+
+                if (_totalBulletCount != 0) StartReload();
+                else Managers.NotificationManager.Notification(Managers.NotificationTypes.Info, "No ammo.");
+            }
 
             return valid;
         }
-        
-        private void StartReload() =>
+
+        private int reloadId;
+        private readonly static int localReloadId = Animator.StringToHash("Reload");
+
+        private void StartReload()
+        {
+            Fire(false);
+
+            PlayerBehaviour.PlayerStateMachine.SetBool(reloadId, true);
+            stateMachine.SetBool(localReloadId, true);
+
+            model.localEulerAngles = new Vector3(0, 0, 4);
+            magazine.localPosition = new Vector3(0, -0.16f);
             _reloadState.StartReload();
+        }
 
         private void CompleteReload()
         {
-            BulletCount = weaponStats.bulletCount;
+            BulletCount = weaponStats.bulletInMagazineCount;
+            model.localEulerAngles = Vector3.zero;
+            magazine.localPosition = Vector3.zero;
+
+            _reloadState.Reloading = false;
+
+            if (HapticsSupported) MMVibrationManager.Haptic(hapticType);
+
+            stateMachine.SetBool(localReloadId, false);
+            PlayerBehaviour.PlayerStateMachine.SetBool(reloadId, false);
+        }
+
+        private void OnChangeValue(float value)
+        {
+            if (!_reloadState.Reloading) return;
+
+            model.localEulerAngles = new Vector3(0, 0, 8 * (0.5f - value));
+            magazine.localPosition = Vector3.Lerp(new Vector3(0, -0.16f), Vector3.zero, value);
+
+            if (value > 0.995f) CompleteReload();
         }
         
         private class ReloadState
         {
             private readonly Slider _reloadSlider;
-            private readonly Action _reloadActionCallback;
-            internal bool IsReloading;
 
             private readonly EventTrigger _eventTrigger;
             private readonly EventTrigger.Entry _entry;
+
+            internal bool Reloading;
         
-            internal ReloadState(Action reloadActionCallback, Slider reloadSlider)
+            internal ReloadState(UnityEngine.Events.UnityAction<float> action, Slider reloadSlider)
             {
-                _reloadActionCallback += reloadActionCallback;
                 _reloadSlider = reloadSlider;
-            
+                _reloadSlider.onValueChanged.AddListener(action);
+
                 _eventTrigger = _reloadSlider.gameObject.TryGetComponent(out EventTrigger eventTrigger) 
                     ? eventTrigger : _reloadSlider.gameObject.AddComponent<EventTrigger>();
                 _entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
-                _entry.callback.AddListener( _ => { StopReload(false); } );
-            }
-        
-            private void ReloadValueChange(float value)
-            {
-                if (value > 0.99f) StopReload(true);
+                _entry.callback.AddListener( _ => { StopReload(); } );
+
+                _eventTrigger.triggers.Add(_entry);
             }
 
             internal void StartReload()
             {
-                IsReloading = true;
-                _reloadSlider.interactable = true;
-                _reloadSlider.gameObject.SetActive(true);
-                _reloadSlider.transform.DOPunchScale(Vector3.one * 0.12f, 0.2f, 1);
-                
-                _reloadSlider.onValueChanged.AddListener(ReloadValueChange);
-                _eventTrigger.triggers.Add(_entry);
+                Reloading = true;
+                _reloadSlider.value = 0;
             }
 
-            private void StopReload(bool complete)
+            private void StopReload()
             {
-                IsReloading = !complete;
+                if (!Reloading) return;
 
-                if (complete)
-                {
-                    SkipReload();
-                    _reloadActionCallback?.Invoke();
-                }
-                else _reloadSlider.DOValue(0, _reloadSlider.value * 0.7f).SetEase(Ease.OutQuad);
-            }
-
-            internal void SkipReload()
-            {
-                _reloadSlider.onValueChanged.RemoveAllListeners();
-                _eventTrigger.triggers.Clear();
-
-                _reloadSlider.transform.DOPunchScale(Vector3.one * 0.12f, 0.2f, 1).OnComplete(() =>
-                {
-                    _reloadSlider.value = 0;
-                    _reloadSlider.gameObject.SetActive(false);
-                });
-                _reloadSlider.interactable = false;
+                _reloadSlider.DOValue(0, _reloadSlider.value * 0.6f).SetEase(Ease.OutSine);
             }
         }
         
@@ -263,73 +278,73 @@ namespace Weapons
 
         #region Bullet Count UI
         
-        private void Update() =>
-            BulletUI.UpdatePos(bulletUIRef.position);
-        
         private BulletUI _bulletUI;
 
         [Space]
-        [SerializeField] private TextMeshPro bulletText;
         [SerializeField] private Transform bulletUIRef;
+        internal TextMeshPro bulletsText;
 
         private class BulletUI
         {
             private readonly TextMeshPro _bulletText;
-            private static Transform _bulletTextTransform;
 
             internal BulletUI(TextMeshPro bulletText)
             {
                 _bulletText = bulletText;
-                _bulletTextTransform = bulletText.transform;
+
+                //bulletsUpdateAction += UpdateCount;
             }
 
-            internal static void UpdatePos(Vector3 posTo)
+            internal void UpdateCount(int bullets, int totalBullets)
             {
-                _bulletTextTransform.position = Vector3.Lerp(_bulletTextTransform.position, posTo, 0.5f);
-            }
-
-            internal void UpdateCount(int value)
-            {
-                _bulletText.text = value.ToString();
+                _bulletText.text = bullets.ToString();
             }
         }
 
         #endregion
     }
     
-    public enum WeaponType
+    public enum WeaponName
     {
-        Unsigned = 0,
+        Unsigned,
         Pistol,
-        M4_Carabine,
+        M4Carabine,
         Shotgun,
         Flamethrower
+    }
+
+    public enum WeaponType
+    {
+        Unsigned,
+        Light,
+        Medium,
+        Heavy
     }
 
     [Serializable]
     public struct WeaponStats
     {
-        public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, int aimSpreadIncrement, float aimRecoveryTime, 
-            int bulletCount, float mass)
-        {
-            this.damageMin = damageMin;
-            this.damageMax = damageMax;
-            this.aimedAimSpreadDiameter = aimedAimSpreadDiameter;
-            this.freeAimSpreadDiameter = freeAimSpreadDiameter;
-            this.aimSpreadIncrement = aimSpreadIncrement;
-            this.aimRecoveryTime = aimRecoveryTime;
-            this.bulletCount = bulletCount;
-            this.mass = mass;
-        }
+        //public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, float aimSpreadIncrement, float aimRecoveryTime, 
+        //    int bulletCount)
+        //{
+        //    this.damageMin = damageMin;
+        //    this.damageMax = damageMax;
+        //    this.aimedAimSpreadDiameter = aimedAimSpreadDiameter;
+        //    this.freeAimSpreadDiameter = freeAimSpreadDiameter;
+        //    this.aimSpreadIncrement = aimSpreadIncrement;
+        //    this.aimRecoveryTime = aimRecoveryTime;
+        //    this.bulletCount = bulletCount;
+        //}
 
         public int damageMin, damageMax;
 
-        public int aimedAimSpreadDiameter, freeAimSpreadDiameter, aimSpreadIncrement;
+        [Range(0.01f, 1)]
+        public float aimSpreadIncrement;
+
+        [Range(0.01f, 5)]
         public float aimRecoveryTime;
 
-        public int bulletCount;
-
-        public float mass;
+        public int bulletInMagazineCount, allBullets;
     }
 
     internal class Shooting
@@ -428,30 +443,30 @@ namespace Weapons
         
         private void RealTargetHit(Ray[] currentRays)
         {
-            var count = currentRays.Length;
+            //var count = currentRays.Length;
             
-            if (count <= 0) return;
+            //if (count <= 0) return;
             
-            var screenPoints = new Vector2[count];
-            for (var i = 0; i < count; i++)
-            {
-                screenPoints[i] = UI.AimInstance.RawRaycastPoint;
-            }
+            //var screenPoints = new Vector2[count];
+            //for (var i = 0; i < count; i++)
+            //{
+            //    screenPoints[i] = UI.AimInstance.RawRaycastPoint;
+            //}
             
-            var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(screenPoints, out var distance);
+            //var hitZoneTypes = HumanRecognitionVisualizer.Instance.ProcessRaycast(screenPoints, out var distance);
             
-            if (distance < 0.05f) return;
+            //if (distance < 0.05f) return;
             
-            for (var i = 0; i < count; i++)
-            {
-                if ((HitZone.ZoneType)hitZoneTypes[i] == HitZone.ZoneType.None) continue;
+            //for (var i = 0; i < count; i++)
+            //{
+            //    if ((HitZone.ZoneType)hitZoneTypes[i] == HitZone.ZoneType.None) continue;
                 
-                var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
+            //    var damage = Random.Range(WeaponStats.damageMin, WeaponStats.damageMax + 1);
                                                     
-                Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, (HitZone.ZoneType)hitZoneTypes[i]);
+            //    Pool.Decals.ActivateHitMarker(currentRays[i].GetPoint(distance), damage, (HitZone.ZoneType)hitZoneTypes[i]);
                 
-                // Debug.Log(hitZoneTypes[i]);
-            }
+            //    // Debug.Log(hitZoneTypes[i]);
+            //}
         }
     }
 }

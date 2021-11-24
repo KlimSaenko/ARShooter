@@ -1,13 +1,11 @@
-using System;
-using System.Collections;
 using DG.Tweening;
-using static Common.Pool;
-using Mobs;
+using static Game.Managers.Pool;
+using Game.Mobs;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public class HitDecal : MonoBehaviour
     {
@@ -15,11 +13,13 @@ namespace Weapons
         [SerializeField] private AnimationClip[] animationClips;
         [SerializeField] private RectTransform hitMarker;
         [SerializeField] private TextMeshPro decalText;
-    
-        private static Camera MainCam => Camera.main;
+        
+        private static Camera MainCam;
     
         internal void ActivateHitMarker(int damage, HitZone.ZoneType type, bool withMarker)
         {
+            MainCam = MainCam != null ? MainCam : Camera.main;
+
             if (MainCam is null) return;
 
             markerAnimation.clip = type switch
@@ -38,13 +38,15 @@ namespace Weapons
             decalText.text = damage.ToString();
 
             decalText.alpha = 1;
-            decalText.DOFade(0, 0.3f).SetDelay(0.2f).SetEase(Ease.InOutQuad);
+            decalText.DOFade(0, 0.18f).SetDelay(0.24f).SetEase(Ease.InOutQuad);
             
             var decalTransform = decalText.transform;
+            var scale = Mathf.Pow(Vector3.Distance(decalTransform.position, MainCam.transform.position), 0.6f);
             decalTransform.localPosition = Vector3.zero;
+            decalTransform.localScale = new Vector3(-1, 1, 1) * scale;
             decalTransform.LookAt(MainCam.transform);
-            var random = Random.Range(-0.11f, 0.11f);
-            decalTransform.DOLocalJump(decalTransform.right * (random + Mathf.Sign(random) * 0.06f), 0.2f, 1, 0.5f)
+            var random = Random.Range(-1f, 1f);
+            decalTransform.DOLocalJump(0.03f * scale * ((random + Mathf.Sign(random)) * decalTransform.right - decalTransform.up), 0.08f * scale, 1, 0.42f)
                 .SetEase(Ease.OutSine).OnComplete(DisableDecal);
         }
 

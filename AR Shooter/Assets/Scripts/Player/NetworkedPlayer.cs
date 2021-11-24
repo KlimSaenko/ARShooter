@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.Animations;
+using Game.UI;
 
 public class NetworkedPlayer : MonoBehaviourPunCallbacks
 {
@@ -38,7 +38,7 @@ public class NetworkedPlayer : MonoBehaviourPunCallbacks
         {
             Destroy(thisTransform.Find("Canvas").gameObject);
 
-            mapMarker = Instantiate(mapMarkerPrefab, UI.MapCircle).GetComponent<RectTransform>();
+            mapMarker = Instantiate(mapMarkerPrefab, CommonUI.MapCircle).GetComponent<RectTransform>();
 
             yield return new WaitUntil(FindOwnerPlayer);
 

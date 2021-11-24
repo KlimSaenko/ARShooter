@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public sealed class WeaponHolder : MonoBehaviour
     {
@@ -25,17 +25,15 @@ namespace Weapons
             PlayerBehaviour.WeaponSwitchAction += SwitchWeapon;
         }
 
-        private float _translationTime;
-
         private static bool _isAimed;
 
         #region Weapon Switching
 
         private static Transform _hideWeaponRef;
         
-        private static void SwitchWeapon(WeaponType toWeapon)
+        private static void SwitchWeapon(WeaponName toWeapon)
         {
-            if (_hideWeaponRef is null || CurrentWeaponConfig.WeaponType == toWeapon) return;
+            if (_hideWeaponRef is null || CurrentWeaponConfig.WeaponName == toWeapon) return;
             
             HideWeapon(() => TakeWeapon(toWeapon));
         }
@@ -47,29 +45,29 @@ namespace Weapons
                 .OnComplete(onCompleteAction);
         }
         
-        private static void TakeWeapon(WeaponType toWeapon)
+        private static void TakeWeapon(WeaponName toWeapon)
         {
             var weaponsConfigs = WeaponsConfigs;
             if (weaponsConfigs is null) return;
 
-            CurrentWeaponConfig.SetActive(false);
+            //CurrentWeaponConfig.SetActive(false);
             
-            foreach (var config in weaponsConfigs)
-            {
-                if (config.WeaponType == toWeapon)
-                    config.SetActive(true);
-            }
+            //foreach (var config in weaponsConfigs)
+            //{
+            //    if (config.WeaponType == toWeapon)
+            //        config.SetActive(true);
+            //}
             
-            var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
+            //var dest = _isAimed ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
             
-            _thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnComplete(() => OnWeaponReadyAction(true));
+            //_thisTransform.DOLocalMove(dest, 0.35f).SetEase(Ease.InOutCubic).OnComplete(() => OnWeaponReadyAction(true));
             _thisTransform.DOLocalRotate(Vector3.zero, 0.35f).SetEase(Ease.InOutCubic);
         }
 
         #endregion
 
         private static MainWeapon[] _weaponsConfigs;
-        private static IEnumerable<IWeaponConfig> WeaponsConfigs
+        private static IEnumerable<IWeapon> WeaponsConfigs
         {
             get
             {
@@ -79,22 +77,22 @@ namespace Weapons
             }
         }
         
-        private static IWeaponConfig CurrentWeaponConfig
+        private static IWeapon CurrentWeaponConfig
         {
             get
             {
                 var weaponsConfigs = WeaponsConfigs;
                 if (weaponsConfigs is null) return null;
                 
-                IWeaponConfig config = null;
+                IWeapon config = null;
                 
                 foreach (var currentConfig in weaponsConfigs)
                 {
-                    if (!currentConfig.IsActive) continue;
+                    //if (!currentConfig.IsActive) continue;
                     
                     if (config is null)
                         config = currentConfig;
-                    else currentConfig.SetActive(false);
+                    //else currentConfig.SetActive(false);
                 }
 
                 return config;
@@ -107,10 +105,8 @@ namespace Weapons
         {
             if (CurrentWeaponConfig is null) return;
             
-            var dest = toAim ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
-            _thisTransform.DOLocalMove(dest, 0.3f).SetEase(Ease.InOutCubic);
-
-            DynamicHolder.Inertia /= toAim ? 2.0f : 0.5f;
+            //var dest = toAim ? CurrentWeaponConfig.PosToAim : CurrentWeaponConfig.PosFromAim;
+            //_thisTransform.DOLocalMove(dest, 0.25f).SetEase(Ease.InOutCubic);
 
             _isAimed = toAim;
         }

@@ -1,35 +1,39 @@
-using Common;
-using Mobs;
+using MoreMountains.NiceVibrations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public class M4_Carbine : MainWeapon
     {
-        private const WeaponType CurrentWeaponType = WeaponType.M4_Carabine;
+        private const WeaponName CurrentWeaponName = WeaponName.M4Carabine;
+        public override WeaponName WeaponName => CurrentWeaponName;
+
+        private const WeaponType CurrentWeaponType = WeaponType.Medium;
         public override WeaponType WeaponType => CurrentWeaponType;
 
-        // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
-            var currentRay = UI.AimInstance.GetRay();
+            prevNoize = Mathf.Clamp01(prevNoize + 0.4f * (Random.value - 0.5f));
+            stateMachine.SetFloat(blendId, prevNoize);
+            stateMachine.SetTrigger(noizeId);
 
+            var currentRay = Aim.GetRay();
             ShootingPatterns.ProcessRays(currentRay);
-            
-            UI.AimInstance.AimAnimation();
+
+            BulletCount--;
+
+            VisualizeFiring();
+            Aim.AimAnimation();
         }
-        
-        protected override bool LogicIsRunning() =>
-            shootAnimation.isPlaying;
         
         protected override void VisualizeFiring()
         {
             shellsParticle.Play();
-            shootAnimation.Play();
             flashParticle.Play(true);
-            Vibration.VibratePop();
-            
+
+            if (HapticsSupported) MMVibrationManager.Haptic(hapticType);
+
             if (AudioSource is null) return;
             
             AudioSource.loop = false;

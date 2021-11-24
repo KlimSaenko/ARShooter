@@ -1,33 +1,38 @@
-using Mobs;
 using UnityEngine;
+using MoreMountains.NiceVibrations;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public class Pistol : MainWeapon
     {
-        private const WeaponType CurrentWeaponType = WeaponType.Pistol;
+        private const WeaponName CurrentWeaponName = WeaponName.Pistol;
+        public override WeaponName WeaponName => CurrentWeaponName;
+
+        private const WeaponType CurrentWeaponType = WeaponType.Light;
         public override WeaponType WeaponType => CurrentWeaponType;
 
-        // ReSharper disable Unity.PerformanceAnalysis
         protected override void RunWeaponLogic()
         {
-            var currentRay = UI.AimInstance.GetRay();
-            
+            prevNoize = Mathf.Clamp(prevNoize + 0.32f * (Random.value - 0.5f), 0.15f, 0.85f);
+            stateMachine.SetFloat(blendId, prevNoize);
+            stateMachine.SetTrigger(noizeId);
+
+            var currentRay = Aim.GetRay();
             ShootingPatterns.ProcessRays(currentRay);
-            
-            UI.AimInstance.AimAnimation();
+
+            BulletCount--;
+
+            VisualizeFiring();
+            Aim.AimAnimation();
         }
-        
-        protected override bool LogicIsRunning() =>
-            shootAnimation.isPlaying;
         
         protected override void VisualizeFiring()
         {
             shellsParticle.Play();
-            shootAnimation.Play();
             flashParticle.Play(true);
-            Vibration.VibratePop();
-            
+
+            if (HapticsSupported) MMVibrationManager.Haptic(hapticType);
+
             if (AudioSource is null) return;
 
             AudioSource.loop = false;

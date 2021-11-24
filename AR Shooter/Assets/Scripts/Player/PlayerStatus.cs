@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
-using Mobs;
+using Game.Mobs;
+using Game.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ namespace Player
             HP = playerHP;
         }
 
-        public event Action<MobStats> OnApplyDamage;
+        public event Action<MobStats> ApplyDamageAction;
 
         public virtual void ApplyDamage(int damage)
         {
@@ -45,14 +46,14 @@ namespace Player
 
         public IEnumerator Death(int deathType)
         {
-            UI.AliveStateUI.SetActive(false);
+            CommonUI.AliveStateUI.SetActive(false);
 
             for (int i = 0; i < hpImages.childCount; i++)
             {
                 hpImages.GetChild(i).gameObject.SetActive(true);
             }
 
-            GameObject deadStateUI = UI.DeadStateUI;
+            GameObject deadStateUI = CommonUI.DeadStateUI;
             Image dark = deadStateUI.GetComponent<Image>();
             TextMeshProUGUI[] texts = deadStateUI.GetComponentsInChildren<TextMeshProUGUI>();
 

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections;
-using Mobs;
-using UnityEngine;
-using Weapons;
+using Game.Mobs;
+using TMPro;
+using Game.Weapons;
 
 public interface IDamageable
 {
     delegate void Apply(int damage);
-    
-    event Action<MobStats> OnApplyDamage;
     
     void ApplyDamage(int damage);
     
@@ -19,15 +17,18 @@ public interface IDamageable
     IEnumerator Death(int deathType);
 }
 
-public interface IWeaponConfig
+public interface IWeapon
 {
-    Vector3 PosToAim { get; }
-        
-    Vector3 PosFromAim { get; }
-        
+    WeaponName WeaponName { get; }
+
     WeaponType WeaponType { get; }
 
-    bool IsActive { get; }
+    MainWeapon InstantiateWeapon(UnityEngine.Transform saveFolder, int index, TextMeshPro bulletsText);
 
-    void SetActive(bool value);
+    string Name { get; set; }
+}
+
+internal interface IGameEvent
+{
+    
 }

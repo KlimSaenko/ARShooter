@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-using static Config;
+using static Game.Config;
 
 public class MainMenu : MonoBehaviour
 {
@@ -95,20 +95,20 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
 
     private void OnApplicationPause(bool pause)
     {
-        if (pause) Config.SaveGame();
+        if (pause) SaveGame();
         else
         {
-            Config.LoadGame();
+            LoadGame();
 
-            recordText.text = Config.RecordKills.ToString();
+            recordText.text = RecordKills.ToString();
         }
     }
-    
-    #endif
+
+#endif
 
     #region Background
 

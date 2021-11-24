@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4947d7ebcb566240a16d936725295fd, type: 3}
+  m_Name: Weapons Configs
+  m_EditorClassIdentifier: 
+  jsonToWrite: {fileID: 4900000, guid: 466bde3c86d48e947b346f78399ae5cc, type: 3}
+  profile: 2
+  weaponConfigs:
+    weapons:
+    - name: Pistol
+      type: 1
+      stats:
+        damageMin: 2
+        damageMax: 3
+        aimSpreadIncrement: 0.17
+        aimRecoveryTime: 0.35
+        bulletInMagazineCount: 20
+        allBullets: -1
+    - name: M4 Carbine
+      type: 2
+      stats:
+        damageMin: 3
+        damageMax: 4
+        aimSpreadIncrement: 0.2
+        aimRecoveryTime: 0.24
+        bulletInMagazineCount: 30
+        allBullets: 150
+    - name: Shotgun
+      type: 3
+      stats:
+        damageMin: 3
+        damageMax: 4
+        aimSpreadIncrement: 0.75
+        aimRecoveryTime: 1.8
+        bulletInMagazineCount: 5
+        allBullets: 30

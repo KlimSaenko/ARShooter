@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Arrow Look
+  m_Controller: {fileID: 9100000, guid: 384c58a2782cc9644833ac029a4cc10d, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: c7f68c36f15840444af4560fb97beddf, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 96911ec9f3d1ca04f961a70a125f774b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 1ad832542ff13d744891769c2b6f63cd, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 1ad832542ff13d744891769c2b6f63cd, type: 2}

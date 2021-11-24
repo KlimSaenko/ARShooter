@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-namespace Michsky.UI.FieldCompleteMainMenu
+namespace Game.UI
 {
     public class CustomInputField : MonoBehaviour
     {
@@ -10,7 +11,7 @@ namespace Michsky.UI.FieldCompleteMainMenu
 
         [Header("OBJECTS")]
         public GameObject fieldTrigger;
-        public Text inputText;
+        public TextMeshProUGUI inputText;
 
         // [Header("SETTINGS")]
         private bool isEmpty = true;
@@ -21,7 +22,7 @@ namespace Michsky.UI.FieldCompleteMainMenu
         void Start()
         {
             // Check if text is empty or not
-            if (inputText.text.Length == 0 || inputText.text.Length <= 0)
+            if (inputText.text.Length <= 0)
             {
                 isEmpty = true;
             }
@@ -45,7 +46,7 @@ namespace Michsky.UI.FieldCompleteMainMenu
 
         void Update()
         {
-            if (inputText.text.Length == 1 || inputText.text.Length >= 1)
+            if (inputText.text.Length >= 1)
             {
                 isEmpty = false;
                 inputFieldAnimator.Play(inAnim);

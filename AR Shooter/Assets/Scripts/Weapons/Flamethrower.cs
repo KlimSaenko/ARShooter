@@ -1,63 +1,63 @@
 using System.Collections;
-using Common;
-using DG.Tweening;
-using Mobs;
+using Game.Managers;
+using Game.Mobs;
+using Game.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Weapons
+namespace Game.Weapons
 {
     public class Flamethrower : MainWeapon
     {
-        private const WeaponType CurrentWeaponType = WeaponType.Flamethrower;
-        public override WeaponType WeaponType => CurrentWeaponType;
+        private const WeaponName CurrentWeaponType = WeaponName.Flamethrower;
+        public override WeaponName WeaponName => CurrentWeaponType;
 
         private static Transform MainCam => Camera.main.transform;
 
         private ParticleSystem[] _subParticles;
 
-        private protected override IEnumerator Shooting()
-        {
-            _subParticles ??= flashParticle.gameObject.GetComponentsInChildren<ParticleSystem>();
+        //private protected override IEnumerator Shooting()
+        //{
+        //    _subParticles ??= flashParticle.gameObject.GetComponentsInChildren<ParticleSystem>();
 
-            var emission = flashParticle.emission;
-            emission.enabled = true;
+        //    var emission = flashParticle.emission;
+        //    emission.enabled = true;
 
-            foreach (var subParticle in _subParticles)
-            {
-                emission = subParticle.emission;
-                emission.enabled = true;
-            }
+        //    foreach (var subParticle in _subParticles)
+        //    {
+        //        emission = subParticle.emission;
+        //        emission.enabled = true;
+        //    }
             
-            AudioSource.loop = true;
-            DOTween.Kill(TweenId);
-            AudioSource.volume = 1f;
-            AudioSource.pitch = Random.Range(0.94f, 1.06f);
-            AudioSource.clip = shootAudio;
-            AudioSource.Play();
+        //    AudioSource.loop = true;
+        //    DOTween.Kill(TweenId);
+        //    AudioSource.volume = 1f;
+        //    AudioSource.pitch = Random.Range(0.94f, 1.06f);
+        //    AudioSource.clip = shootAudio;
+        //    AudioSource.Play();
             
-            while (IsFiring && CanShoot)
-            {
-                VisualizeFiring();
+        //    while (IsFiring && CanShoot)
+        //    {
+        //        VisualizeFiring();
 
-                RunWeaponLogic();
+        //        RunWeaponLogic();
 
-                BulletCount--;
+        //        BulletCount--;
 
-                yield return new WaitWhile(LogicIsRunning);
-            }
+        //        yield return new WaitWhile(LogicIsRunning);
+        //    }
             
-            emission = flashParticle.emission;
-            emission.enabled = false;
+        //    emission = flashParticle.emission;
+        //    emission.enabled = false;
 
-            foreach (var subParticle in _subParticles)
-            {
-                emission = subParticle.emission;
-                emission.enabled = false;
-            }
+        //    foreach (var subParticle in _subParticles)
+        //    {
+        //        emission = subParticle.emission;
+        //        emission.enabled = false;
+        //    }
             
-            AudioSource.DOFade(0, 0.2f).OnComplete(() => AudioSource.Stop()).SetId(TweenId);
-        }
+        //    AudioSource.DOFade(0, 0.2f).OnComplete(() => AudioSource.Stop()).SetId(TweenId);
+        //}
 
         private const int TweenId = 101;
         
@@ -81,7 +81,7 @@ namespace Weapons
                 //     StartCoroutine(ApplyDamage(Vector3.Distance(transform.position, _hits[i].collider.transform.position) * 0.1f, enemy));
                 // }
 
-                StartCoroutine(ShootingPatterns.ProcessCapsuleRay(UI.AimInstance.CurrentAimSpreadDiameter / 2200f, 3.5f, 0.1f));
+                StartCoroutine(ShootingPatterns.ProcessCapsuleRay(CommonUI.Aim.CurrentAimSpreadDiameter / 2200f, 3.5f, 0.1f));
             }
             else
             {
@@ -97,7 +97,7 @@ namespace Weapons
                 StartCoroutine(RealApplyDamage(distance * 0.1f, currentRay.GetPoint(distance), (HitZone.ZoneType)hitZoneTypes[0]));
             }
             
-            UI.AimInstance.AimAnimation();
+            Aim.AimAnimation();
         }
 
         private IEnumerator ApplyDamage(float delay, HitZone enemy)
@@ -118,12 +118,12 @@ namespace Weapons
             Pool.Decals.ActivateHitMarker(pos, damage, hitZoneType, false);
         }
         
-        protected override bool LogicIsRunning() =>
-            shootAnimation.isPlaying;
+        //protected override bool LogicIsRunning() =>
+        //    shootAnimator.isPlaying;
         
         protected override void VisualizeFiring()
         {
-            shootAnimation.Play();
+            //shootAnimator.Play();
         }
     }
 }

@@ -7,9 +7,12 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.DD2EEDCB" = "timeli"
+	"last_search.DD2EEDCB" = "shadow"
 	"OpenInspectorPreview.DD2EEDCB" = "0"
-	"currentGroup.DD2EEDCB" = "all"
+	"currentGroup.DD2EEDCB" = "settings"
+	"last_search.F4034D60" = "listen"
+	"OpenInspectorPreview.F4034D60" = "0"
+	"currentGroup.F4034D60" = "menu"
 }
 providers = {
 	expression = {
@@ -89,6 +92,13 @@ providers = {
 	}
 }
 recentSearches = [
+	"shadow"
+	"listen"
+	"light"
+	"build"
+	"export"
+	"plane mana"
+	"driver"
 	"timeli"
 	"timeline"
 	"External"

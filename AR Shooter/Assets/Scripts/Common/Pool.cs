@@ -1,19 +1,20 @@
-using Mobs;
+using Game.Mobs;
 using UnityEngine;
 using UnityEngine.Pool;
-using Weapons;
+using Game.Weapons;
 
-namespace Common
+namespace Game.Managers
 {
     public class Pool : MonoBehaviour
     {
         private void Awake()
         {
-            DecalsInstance = new Decals(hitDecalPrefab, folder);
+            DecalsInstance = new Decals(hitDecalPrefab, decalsFolder);
+            MobsInstance = new Mobs(mobPrefab, mobsFolder);
         }
 
         [Header("Decals")] 
-        [SerializeField] private Transform folder;
+        [SerializeField] private Transform decalsFolder;
         [SerializeField] private GameObject hitDecalPrefab;
 
         internal static Decals DecalsInstance;
@@ -48,6 +49,46 @@ namespace Common
             internal static void DeactivateHitMarker(HitDecal hitDecal)
             {
                 _hitDecals.Release(hitDecal);
+            }
+        }
+
+        [Space]
+        [Header("Mobs")]
+        [SerializeField] private Transform mobsFolder;
+        [SerializeField] private GameObject mobPrefab;
+
+        internal static Mobs MobsInstance;
+
+        internal class Mobs
+        {
+            private static LinkedPool<MainMob> _mobs;
+            private static GameObject _mobPrefab;
+            private static Transform _folder;
+
+            internal Mobs(GameObject mobPrefab, Transform folder)
+            {
+                _mobPrefab = mobPrefab;
+                _folder = folder;
+
+                _mobs = new LinkedPool<MainMob>(mobPrefab.GetComponent<MainMob>,
+                    rt => rt.gameObject.SetActive(true),
+                    rt => rt.gameObject.SetActive(false),
+                    null, false, 50);
+            }
+
+            internal static void ActivateMob(Vector3 pos)
+            {
+                if (_mobs.CountInactive <= 0)
+                    _mobs.Release(Instantiate(_mobPrefab, Vector3.zero, Quaternion.identity, _folder).GetComponent<MainMob>());
+
+                var currentHitDecal = _mobs.Get();
+                currentHitDecal.transform.position = pos;
+                //currentHitDecal.ActivateHitMarker(damage, type, withMarker);
+            }
+
+            internal static void DeactivateHitMarker(MainMob hitDecal)
+            {
+                _mobs.Release(hitDecal);
             }
         }
     }

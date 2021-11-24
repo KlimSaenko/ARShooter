@@ -1,91 +1,74 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Michsky.UI.FieldCompleteMainMenu
+namespace Game.UI
 {
     public class TopPanelManager : MonoBehaviour
     {
-        [Header("PANEL LIST")]
-        public List<GameObject> panels = new List<GameObject>();
+        [Header("Panel List")]
+        [SerializeField] private Animator homePanelAnimator;
+        [SerializeField] private Animator inventoryPanelAnimator;
 
-        [Header("BUTTON LIST")]
-        public List<GameObject> buttons = new List<GameObject>();
+        [Space]
+        [SerializeField] private MenuPanelSwitchButton[] menuPanelSwitchButtons;
 
-        // [Header("PANEL ANIMS")]
-        private string panelFadeIn = "MM Panel In";
-        private string panelFadeOut = "MM Panel Out";
+        private static readonly Dictionary<MenuPanel, Animator> _panelAnimator = new();
 
-        // [Header("BUTTON ANIMS")]
-        private string buttonFadeIn = "TB Hover to Pressed";
-        private string buttonFadeOut = "TB Pressed to Normal";
+        private static MenuPanel _currentPanel = MenuPanel.Empty;
 
-        private GameObject currentPanel;
-        private GameObject nextPanel;
+        private static readonly int panelFadeIn = Animator.StringToHash("MM Panel In");
+        private static readonly int panelFadeOut = Animator.StringToHash("MM Panel Out");
 
-        private GameObject currentButton;
-        private GameObject nextButton;
-
-        [Header("SETTINGS")]
-        public int currentPanelIndex = 0;
-        private int currentButtonlIndex = 0;
-        public bool enableProfileModel = true;
-
-        [Header("RESOURCES")]
-        public GameObject profileModel;
-
-        private Animator currentPanelAnimator;
-        private Animator nextPanelAnimator;
-
-        private Animator currentButtonAnimator;
-        private Animator nextButtonAnimator;
-
-        void Start()
+        private void Awake()
         {
-            currentButton = buttons[currentPanelIndex];
-            currentButtonAnimator = currentButton.GetComponent<Animator>();
-            currentButtonAnimator.Play(buttonFadeIn);
+            if (!_panelAnimator.ContainsKey(MenuPanel.Home))
+                _panelAnimator.Add(MenuPanel.Home, homePanelAnimator);
 
-            currentPanel = panels[currentPanelIndex];
-            currentPanelAnimator = currentPanel.GetComponent<Animator>();
-            currentPanelAnimator.Play(panelFadeIn);
+            if (!_panelAnimator.ContainsKey(MenuPanel.Inventory))
+                _panelAnimator.Add(MenuPanel.Inventory, inventoryPanelAnimator);
 
-            if (enableProfileModel == true)
+            foreach (var switchButton in menuPanelSwitchButtons)
             {
-                profileModel.SetActive(true);
-            }
-            else
-            {
-                profileModel.SetActive(false);
+                switchButton.PressedAction += PanelOpen;
             }
         }
 
-        public void PanelAnim(int newPanel)
+        internal static void PanelFade(MenuPanel menuPanel, bool activate)
         {
-            if (newPanel != currentPanelIndex)
+            if (!activate) _currentPanel = MenuPanel.Empty;
+
+            if (_panelAnimator.TryGetValue(menuPanel, out var animator))
             {
-                currentPanel = panels[currentPanelIndex];
-
-                currentPanelIndex = newPanel;
-                nextPanel = panels[currentPanelIndex];
-
-                currentPanelAnimator = currentPanel.GetComponent<Animator>();
-                nextPanelAnimator = nextPanel.GetComponent<Animator>();
-
-                currentPanelAnimator.Play(panelFadeOut);
-                nextPanelAnimator.Play(panelFadeIn);
-
-                currentButton = buttons[currentButtonlIndex];
-
-                currentButtonlIndex = newPanel;
-                nextButton = buttons[currentButtonlIndex];
-
-                currentButtonAnimator = currentButton.GetComponent<Animator>();
-                nextButtonAnimator = nextButton.GetComponent<Animator>();
-
-                currentButtonAnimator.Play(buttonFadeOut);
-                nextButtonAnimator.Play(buttonFadeIn);
+                animator.Play(activate ? panelFadeIn : panelFadeOut);
             }
         }
+
+        private static void PanelOpen(MenuPanel menuPanel)
+        {
+            if (_currentPanel == menuPanel) return;
+
+            PanelFade(_currentPanel, false);
+            PanelFade(menuPanel, true);
+
+            _currentPanel = menuPanel;
+        }
+
+        private static void PanelOpen(int menuPanel) =>
+            PanelOpen((MenuPanel)menuPanel);
+
+        [Header("Modal Windows")]
+        [SerializeField] private Animator exitWindowAnimator;
+
+        public void ExitWindow(bool value)
+        {
+            exitWindowAnimator.Play(value ? panelFadeIn : panelFadeOut);
+        }
+    }
+
+    internal enum MenuPanel
+    {
+        Home,
+        Inventory,
+        Empty
     }
 }

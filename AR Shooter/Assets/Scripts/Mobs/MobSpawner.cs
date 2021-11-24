@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using Game.UI;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using static Config;
+using static Game.Config;
     
-namespace Mobs
+namespace Game.Mobs
 {
     public class MobSpawner : MonoBehaviour
     {
@@ -113,7 +114,7 @@ namespace Mobs
 
             while (true)
             {
-                if (!UI.IsPaused)
+                if (!CommonUI.IsPaused)
                 {
                     if (MobPool.Count > 0 && target != null)
                     {

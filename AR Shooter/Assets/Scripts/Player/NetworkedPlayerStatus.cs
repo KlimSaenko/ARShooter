@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Player;
+using Game.UI;
 
 public class NetworkedPlayerStatus : PlayerStatus
 {
@@ -25,7 +26,7 @@ public class NetworkedPlayerStatus : PlayerStatus
         {
             deathCounter++;
 
-            UI.KillsUI(deathCounter);
+            CommonUI.KillsUI(deathCounter);
             Debug.Log(deathCounter);
         }
 
@@ -70,8 +71,8 @@ public class NetworkedPlayerStatus : PlayerStatus
 
         if (photonView.IsMine)
         {
-            UI.AliveStateUI.SetActive(true);
-            UI.DeadStateUI.SetActive(false);
+            CommonUI.AliveStateUI.SetActive(true);
+            CommonUI.DeadStateUI.SetActive(false);
         }
     }
 }
