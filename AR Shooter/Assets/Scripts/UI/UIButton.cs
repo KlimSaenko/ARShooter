@@ -23,20 +23,23 @@ namespace Game.UI
             private set => _toggle = value;
         }
 
-        internal Action<int> PressedAction;
+        internal event Action<int> PressedAction;
 
         private protected static readonly int isActiveId = Animator.StringToHash("Is active");
         public virtual void OnValueChanged(bool value)
         {
             buttonAnimator.SetBool(isActiveId, value);
+            
+            if (value) OnButtonPressed();
         }
 
         private void OnEnable()
         {
-            if (transform.parent.TryGetComponent<ToggleGroup>(out var toggleGroup) && TryGetComponent<Toggle>(out var toggle))
+            if (transform.parent.TryGetComponent<ToggleGroup>(out var toggleGroup))
             {
-                Toggle = toggle;
-                toggle.group = toggleGroup;
+                Toggle.group = toggleGroup;
+
+                if (!toggleGroup.AnyTogglesOn()) Toggle.isOn = true;
             }
         }
 

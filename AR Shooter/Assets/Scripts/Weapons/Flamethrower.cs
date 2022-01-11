@@ -9,8 +9,8 @@ namespace Game.Weapons
 {
     public class Flamethrower : MainWeapon
     {
-        private const WeaponName CurrentWeaponType = WeaponName.Flamethrower;
-        public override WeaponName WeaponName => CurrentWeaponType;
+        private const WeaponName CurrentWeaponName = WeaponName.Flamethrower;
+        public override WeaponName WeaponName => CurrentWeaponName;
 
         private static Transform MainCam => Camera.main.transform;
 
@@ -104,7 +104,7 @@ namespace Game.Weapons
         {
             yield return new WaitForSeconds(delay);
             
-            var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+            var damage = Random.Range(Stats.damageMin, Stats.damageMax + 1);
             
             enemy.ApplyDamage(damage);
         }
@@ -113,7 +113,7 @@ namespace Game.Weapons
         {
             yield return new WaitForSeconds(delay);
             
-            var damage = Random.Range(weaponStats.damageMin, weaponStats.damageMax + 1);
+            var damage = Random.Range(Stats.damageMin, Stats.damageMax + 1);
                                                             
             Pool.Decals.ActivateHitMarker(pos, damage, hitZoneType, false);
         }

@@ -30,10 +30,6 @@ namespace Game.Managers
 
         private void Awake()
         {
-            DontDestroyOnLoad(transform.parent);
-
-            //OnScene = true;
-
             _notificationText = notificationText;
             _notificationTextTransform = notificationText.transform.parent.GetComponent<RectTransform>();
             _animator = GetComponent<Animator>();

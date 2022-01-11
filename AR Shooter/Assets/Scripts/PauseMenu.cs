@@ -1,4 +1,5 @@
 using Game.Managers;
+using System;
 using UnityEngine;
 
 public class PauseMenu : MonoBehaviour
@@ -6,24 +7,40 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private Animator pauseMenuAnimator;
     [SerializeField] private Animator gameEndAnimator;
 
-    internal static bool isPaused = false;
+    private static bool _isPaused = false;
+    internal static bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            PauseAction?.Invoke(value);
+            Time.timeScale = value ? 0 : 1;
+            _isPaused = value;
+        }
+    }
 
-    private static readonly int gameEnd = Animator.StringToHash("Game End");
-    private static readonly int panelFadeIn = Animator.StringToHash("Pause Panel In");
-    private static readonly int panelFadeOut = Animator.StringToHash("Pause Panel Out");
+    internal static event Action<bool> PauseAction;
+
+    private static readonly int gameEndId = Animator.StringToHash("Game End");
+    private static readonly int panelFadeInId = Animator.StringToHash("Pause Panel In");
+    private static readonly int panelFadeOutId = Animator.StringToHash("Pause Panel Out");
 
     public void Pause(bool pause)
     {
-        isPaused = pause;
+        IsPaused = pause;
 
-        pauseMenuAnimator.Play(pause ? panelFadeIn : panelFadeOut);
+        pauseMenuAnimator.Play(pause ? panelFadeInId : panelFadeOutId);
     }
 
-    private static readonly int exit = Animator.StringToHash("Exit");
-
+    private static readonly int exitId = Animator.StringToHash("Exit");
     public void Exit(bool value)
     {
-        pauseMenuAnimator.SetBool(exit, value);
+        pauseMenuAnimator.SetBool(exitId, value);
+    }
+
+    public void Restart()
+    {
+        GameScenesManager.LoadScene(GameScenesManager.GetCurrentScene());
     }
 
     public void Quit()
@@ -33,6 +50,7 @@ public class PauseMenu : MonoBehaviour
 
     internal void GameEnd()
     {
-        gameEndAnimator.Play(gameEnd);
+        IsPaused = true;
+        gameEndAnimator.Play(gameEndId);
     }
 }

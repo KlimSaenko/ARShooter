@@ -56,30 +56,6 @@ namespace Game.UI
         private static readonly int panelFadeOutId = Animator.StringToHash(panelFadeOut);
         public void PanelAnim(int newPanel)
         {
-            //if (newPanel != currentPanelIndex)
-            //{
-            //    currentPanel = panels[currentPanelIndex];
-
-            //    currentPanelIndex = newPanel;
-            //    nextPanel = panels[currentPanelIndex];
-
-            //    currentPanelAnimator = currentPanel.GetComponent<Animator>();
-            //    nextPanelAnimator = nextPanel.GetComponent<Animator>();
-
-            //    currentPanelAnimator.Play(panelFadeOut);
-            //    nextPanelAnimator.Play(panelFadeIn);
-
-            //    currentButton = buttons[currentButtonlIndex];
-
-            //    currentButtonlIndex = newPanel;
-            //    nextButton = buttons[currentButtonlIndex];
-
-            //    currentButtonAnimator = currentButton.GetComponent<Animator>();
-            //    nextButtonAnimator = nextButton.GetComponent<Animator>();
-
-            //    currentButtonAnimator.Play(buttonFadeOut);
-            //    nextButtonAnimator.Play(buttonFadeIn);
-            //}
             panelsAnimators[_prevPanel].Play(panelFadeOutId);
             panelsAnimators[newPanel].Play(panelFadeInId);
 

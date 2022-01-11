@@ -1,41 +1,74 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-//using UnityEditor;
 using UnityEngine;
 using Game.Weapons;
+using Game.Managers;
 
 namespace Game.SO
 {
     [CreateAssetMenu]
     public class PlayerProgress : ScriptableObject
     {
-        [SerializeField] private TextAsset jsonToRead;
+        private static PlayerProgressVariables _playerProgressVariables;
 
-        internal static PlayerProgressVariables PlayerProgressVariables;
+        internal static List<WeaponName> AllowableWeapons
+        {
+            get
+            {
+                if (_playerProgressVariables.allowableWeapons == null) return new();
 
-        private static string pathOfJson;
+                return _playerProgressVariables.allowableWeapons;
+            }
+        }
+
+        internal static WeaponName FavoriteWeapon =>
+            _playerProgressVariables.favoriteWeapon;
 
         private void OnEnable()
         {
-            if (jsonToRead is null) return;
+            GameScenesManager.ApplicationPauseAction += (pause) =>
+            {
+                if (pause) OnSaveData();
+            };
+            
+            //if (jsonToRead is null) return;
 
             //pathOfJson = AssetDatabase.GetAssetPath(jsonToRead.GetInstanceID());
             //PlayerProgressVariables.allowableWeapons = new() { WeaponType.Pistol, WeaponType.M4Carabine };
             //pathOfJson = AssetDatabase.GetAssetPath(jsonToRead.GetInstanceID());
             //var data = JsonSaver.SerializeData(PlayerProgressVariables);
             //File.WriteAllText(pathOfJson, data);
-            PlayerProgressVariables = JsonSaver.DeserializeData<PlayerProgressVariables>(jsonToRead.text);
+            //PlayerProgressVariables = JsonSaver.DeserializeData<PlayerProgressVariables>(jsonToRead.text);
+
+            if (JsonSaver.OpenJson(_fileName, out string json))
+                _playerProgressVariables = JsonSaver.DeserializeData<PlayerProgressVariables>(json);
         }
 
-        internal static void ChangeAllowableWeapons(WeaponName newWeapon)
+        internal static void ChangeAllowableWeapons(WeaponName weaponName, bool add = true)
         {
-            if (newWeapon == WeaponName.Unsigned || PlayerProgressVariables.allowableWeapons.Contains(newWeapon)) return;
+            if (weaponName == WeaponName.Unsigned) return;
 
-            PlayerProgressVariables.allowableWeapons.Add(newWeapon);
+            if (add && !_playerProgressVariables.allowableWeapons.Contains(weaponName))
+                _playerProgressVariables.allowableWeapons.Add(weaponName);
+            
+            else if (!add && _playerProgressVariables.allowableWeapons.Contains(weaponName))
+                _playerProgressVariables.allowableWeapons.Remove(weaponName);
+        }
 
-            var data = JsonSaver.SerializeData(PlayerProgressVariables);
-            //File.WriteAllText(pathOfJson, data);
+        private static readonly string _fileName = "player_progress";
+
+        internal static void ChangeAllowableWeapons(IEnumerable<WeaponName> weaponNames, bool add = true)
+        {
+            foreach (var weaponName in weaponNames)
+            {
+                ChangeAllowableWeapons(weaponName, add);
+            }
+        }
+
+        private static void OnSaveData()
+        {
+            var data = JsonSaver.SerializeData(_playerProgressVariables);
+            JsonSaver.SaveJson(_fileName, data);
         }
     }
 
@@ -43,5 +76,9 @@ namespace Game.SO
     public struct PlayerProgressVariables
     {
         public List<WeaponName> allowableWeapons;
+
+        public WeaponName favoriteWeapon;
+
+        public int gamesPlayed, kills;
     }
 }

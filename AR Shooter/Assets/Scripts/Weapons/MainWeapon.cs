@@ -21,36 +21,37 @@ namespace Game.Weapons
         private protected float prevNoize = 0.5f;
 
         [Header("Weapon config")]
-        [SerializeField] private protected WeaponStats weaponStats;
         [SerializeField] private protected HapticTypes hapticType;
+
+        private Weapon weaponConfig;
+        public Weapon WeaponConfig => weaponConfig;
+        private protected WeaponStats Stats => WeaponConfig.stats;
 
         [Space]
         [SerializeField] private Transform model;
         [SerializeField] private Transform magazine;
-
-        public string Name { get; set; }
 
         public virtual WeaponName WeaponName => WeaponName.Unsigned;
         public virtual WeaponType WeaponType => WeaponType.Unsigned;
 
         public void SetConfig(SO.WeaponsList weaponsList)
         {
-            weaponStats = weaponsList.CurrentWeaponStats(WeaponName, out var name);
-            Name = name;
+            weaponConfig = weaponsList.CurrentWeaponStats(WeaponName);
 
             WeaponsListAccess.AddWeaponPrefab(this);
         }
 
-        public MainWeapon InstantiateWeapon(Transform saveFolder, int index, TextMeshPro bulletsText)
+        public GameObject InstantiateWeapon(Transform saveFolder, int index, TextMeshPro bulletsText)
         {
             var script = Instantiate(gameObject, saveFolder).GetComponent<MainWeapon>();
             script.bulletsText = bulletsText;
+            script.weaponConfig = WeaponConfig;
             script.SetWeaponBehaviour(index);
 
-            return script;
+            return script.gameObject;
         }
 
-        internal Action<int, int> bulletsUpdateAction;
+        internal event Action<int, int> BulletsUpdateAction;
 
         private int _totalBulletCount;
         private int _bulletCount;
@@ -63,7 +64,7 @@ namespace Game.Weapons
                 if (_totalBulletCount > 0 && delta > 0) _totalBulletCount -= delta;
                 _bulletCount = value;
 
-                bulletsUpdateAction?.Invoke(value, _totalBulletCount);
+                BulletsUpdateAction?.Invoke(value, _totalBulletCount);
 
                 CanShoot = ValidateBullets(value);
             }
@@ -92,32 +93,32 @@ namespace Game.Weapons
 
             DynamicHolder.BulletsLabelRef = bulletUIRef;
             
-            bulletsUpdateAction += _bulletUI.UpdateCount;
+            BulletsUpdateAction += _bulletUI.UpdateCount;
             PlayerBehaviour.FiringAction += Fire;
             PlayerStates.WeaponReadyAction += SetReady;
 
-            bulletsUpdateAction?.Invoke(BulletCount, _totalBulletCount);
+            BulletsUpdateAction?.Invoke(BulletCount, _totalBulletCount);
         }
         
         private void OnDisable()
         {
-            bulletsUpdateAction -= _bulletUI.UpdateCount;
+            BulletsUpdateAction -= _bulletUI.UpdateCount;
             PlayerBehaviour.FiringAction -= Fire;
             PlayerStates.WeaponReadyAction -= SetReady;
         }
 
         private void SetWeaponBehaviour(int index)
         {
-            Aim = new CommonUI.Aim(weaponStats);
+            Aim = new CommonUI.Aim(Stats);
             reloadId = Animator.StringToHash("Reload " + (int)WeaponName);
 
             weaponSwitchButton = weaponSwitchButton.SetButton(index + 1);
-            bulletsUpdateAction += weaponSwitchButton.OnUpdateBullets;
+            BulletsUpdateAction += weaponSwitchButton.OnUpdateBullets;
 
             _reloadState ??= new ReloadState(OnChangeValue, reloadSlider);
             _bulletUI ??= new BulletUI(bulletsText);
-            _totalBulletCount = weaponStats.allBullets;
-            BulletCount = weaponStats.bulletInMagazineCount;
+            _totalBulletCount = Stats.allBullets;
+            BulletCount = Stats.bulletInMagazine;
 
             HapticsSupported = MMVibrationManager.HapticsSupported();
 
@@ -163,8 +164,8 @@ namespace Game.Weapons
             {
                 return _shootingPatterns ??= Config.CurrentGameplayMode switch
                 {
-                    Config.GameplayMode.Virtual => new Shooting(weaponStats),
-                    Config.GameplayMode.Real => new ShootingRealSpace(weaponStats),
+                    Config.GameplayMode.Virtual => new Shooting(Stats),
+                    Config.GameplayMode.Real => new ShootingRealSpace(Stats),
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }
@@ -216,7 +217,7 @@ namespace Game.Weapons
 
         private void CompleteReload()
         {
-            BulletCount = weaponStats.bulletInMagazineCount;
+            BulletCount = Stats.bulletInMagazine;
             model.localEulerAngles = Vector3.zero;
             magazine.localPosition = Vector3.zero;
 
@@ -322,20 +323,16 @@ namespace Game.Weapons
     }
 
     [Serializable]
+    public class Weapon
+    {
+        public string name;
+        public WeaponName weaponName;
+        public WeaponStats stats;
+    }
+
+    [Serializable]
     public struct WeaponStats
     {
-        //public WeaponStats(int damageMin, int damageMax, int aimedAimSpreadDiameter, int freeAimSpreadDiameter, float aimSpreadIncrement, float aimRecoveryTime, 
-        //    int bulletCount)
-        //{
-        //    this.damageMin = damageMin;
-        //    this.damageMax = damageMax;
-        //    this.aimedAimSpreadDiameter = aimedAimSpreadDiameter;
-        //    this.freeAimSpreadDiameter = freeAimSpreadDiameter;
-        //    this.aimSpreadIncrement = aimSpreadIncrement;
-        //    this.aimRecoveryTime = aimRecoveryTime;
-        //    this.bulletCount = bulletCount;
-        //}
-
         public int damageMin, damageMax;
 
         [Range(0.01f, 1)]
@@ -344,7 +341,7 @@ namespace Game.Weapons
         [Range(0.01f, 5)]
         public float aimRecoveryTime;
 
-        public int bulletInMagazineCount, allBullets;
+        public int bulletInMagazine, allBullets;
     }
 
     internal class Shooting

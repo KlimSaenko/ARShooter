@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Test.unity
     guid: 5fa9d1d7b79971c478acc4d1f9917b7d
+  - enabled: 1
+    path: Assets/Scenes/Show Weapon.unity
+    guid: b348ffcb26acc2f41a44f3bcafcf8a45
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 99c8c2059a46c324090c7c94479e7cc2, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 051177a785050be4698d0d1b7a5516fe, type: 2}

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using Game.Mobs;
 using TMPro;
 using Game.Weapons;
+using UnityEngine;
 
 public interface IDamageable
 {
@@ -19,13 +19,9 @@ public interface IDamageable
 
 public interface IWeapon
 {
-    WeaponName WeaponName { get; }
+    Weapon WeaponConfig { get; }
 
-    WeaponType WeaponType { get; }
-
-    MainWeapon InstantiateWeapon(UnityEngine.Transform saveFolder, int index, TextMeshPro bulletsText);
-
-    string Name { get; set; }
+    GameObject InstantiateWeapon(Transform saveFolder, int index, TextMeshPro bulletsText = null);
 }
 
 internal interface IGameEvent

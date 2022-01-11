@@ -54,7 +54,7 @@ namespace Game.Weapons
                 bulletsLabel.rotation = Quaternion.Lerp(bulletsLabel.rotation, localCamera.transform.rotation, 0.8f * _lerpValue);
             }
 
-            CommonUI.Aim.UpdateSize(10 * newDeltaPosition.magnitude);
+            CommonUI.Aim.UpdateSize(12 * newDeltaPosition.magnitude);
         }
 
         private void TiltSway(Vector3 deltaRotation)

@@ -1,40 +1,40 @@
 {
     "weapons": [
         {
-            "name": "Pistol",
-            "type": 1,
-            "stats": {
-                "damageMin": 2,
-                "damageMax": 3,
-                "aimSpreadIncrement": 0.17,
-                "aimRecoveryTime": 0.35,
-                "bulletInMagazineCount": 20,
-                "allBullets": -1
-            }
+          "name": "Glock",
+          "weaponName": 1,
+          "stats": {
+            "damageMin": 2,
+            "damageMax": 3,
+            "aimSpreadIncrement": 0.17,
+            "aimRecoveryTime": 0.35,
+            "bulletInMagazine": 20,
+            "allBullets": -1
+          }
         },
         {
-            "name": "M4 Carbine",
-            "type": 2,
-            "stats": {
-                "damageMin": 3,
-                "damageMax": 4,
-                "aimSpreadIncrement": 0.2,
-                "aimRecoveryTime": 0.24,
-                "bulletInMagazineCount": 30,
-                "allBullets": 150
-            }
+          "name": "M4 Carbine",
+          "weaponName": 2,
+          "stats": {
+            "damageMin": 3,
+            "damageMax": 4,
+            "aimSpreadIncrement": 0.2,
+            "aimRecoveryTime": 0.24,
+            "bulletInMagazine": 30,
+            "allBullets": 150
+          }
         },
         {
-            "name": "Shotgun",
-            "type": 3,
-            "stats": {
-                "damageMin": 3,
-                "damageMax": 4,
-                "aimSpreadIncrement": 0.75,
-                "aimRecoveryTime": 1.8,
-                "bulletInMagazineCount": 5,
-                "allBullets": 30
-            }
+          "name": "Shotgun",
+          "weaponName": 3,
+          "stats": {
+            "damageMin": 3,
+            "damageMax": 4,
+            "aimSpreadIncrement": 0.75,
+            "aimRecoveryTime": 1.8,
+            "bulletInMagazine": 5,
+            "allBullets": 30
+          }
         }
     ]
 }

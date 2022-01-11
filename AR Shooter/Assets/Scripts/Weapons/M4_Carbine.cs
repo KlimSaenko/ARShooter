@@ -14,7 +14,7 @@ namespace Game.Weapons
 
         protected override void RunWeaponLogic()
         {
-            prevNoize = Mathf.Clamp01(prevNoize + 0.4f * (Random.value - 0.5f));
+            prevNoize = Mathf.Clamp01(prevNoize + 0.35f * (Random.value - 0.5f));
             stateMachine.SetFloat(blendId, prevNoize);
             stateMachine.SetTrigger(noizeId);
 

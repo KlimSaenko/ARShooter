@@ -17,7 +17,7 @@ namespace Game.Mobs
         [SerializeField] internal Transform target;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private GameObject prediction;
-        [SerializeField] private AROcclusionManager AROcclusion;
+        //[SerializeField] private AROcclusionManager AROcclusion;
 
         private Transform _poolFolder;
         private int _mobsSpawned = 1;
@@ -32,7 +32,7 @@ namespace Game.Mobs
         {
             Instance = this;
 
-            AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)GameSettings.OcclusionLevel;
+            //AROcclusion.requestedEnvironmentDepthMode = (EnvironmentDepthMode)GameSettings.OcclusionLevel;
         }
 
         private float _spawnHeight = -0.1f;

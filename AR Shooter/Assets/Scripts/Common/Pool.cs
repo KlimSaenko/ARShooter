@@ -76,14 +76,15 @@ namespace Game.Managers
                     null, false, 50);
             }
 
-            internal static void ActivateMob(Vector3 pos)
+            internal static MainMob ActivateMob(Vector3 pos)
             {
                 if (_mobs.CountInactive <= 0)
                     _mobs.Release(Instantiate(_mobPrefab, Vector3.zero, Quaternion.identity, _folder).GetComponent<MainMob>());
 
-                var currentHitDecal = _mobs.Get();
-                currentHitDecal.transform.position = pos;
-                //currentHitDecal.ActivateHitMarker(damage, type, withMarker);
+                var currentMob = _mobs.Get();
+                currentMob.transform.position = pos;
+
+                return currentMob;
             }
 
             internal static void DeactivateHitMarker(MainMob hitDecal)

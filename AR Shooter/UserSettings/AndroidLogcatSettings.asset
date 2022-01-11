@@ -11,12 +11,6 @@
         {
             "deviceId": "8082f3dd",
             "name": "com.NewTech.MonsterAttack",
-            "processId": 22724,
-            "exited": true
-        },
-        {
-            "deviceId": "8082f3dd",
-            "name": "com.NewTech.MonsterAttack",
             "processId": 22726,
             "exited": true
         },
@@ -37,6 +31,18 @@
             "name": "com.NewTech.MonsterAttack",
             "processId": 17469,
             "exited": true
+        },
+        {
+            "deviceId": "8082f3dd",
+            "name": "com.NewTech.MonsterAttack",
+            "processId": 17668,
+            "exited": true
+        },
+        {
+            "deviceId": "8082f3dd",
+            "name": "net.oneplus.launcher",
+            "processId": 4931,
+            "exited": false
         }
     ],
     "m_Tags": {
@@ -67,6 +73,10 @@
             },
             {
                 "m_Name": "CRASH",
+                "m_Selected": false
+            },
+            {
+                "m_Name": "Debug",
                 "m_Selected": false
             }
         ]

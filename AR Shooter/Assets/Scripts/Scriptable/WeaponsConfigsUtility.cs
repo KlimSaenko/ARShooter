@@ -1,7 +1,6 @@
 using Game.Weapons;
 using System;
 using System.IO;
-//using UnityEditor;
 using UnityEngine;
 
 namespace Game.SO
@@ -61,42 +60,32 @@ namespace Game.SO
             id++;
         }
 
-        internal WeaponStats CurrentWeaponStats(WeaponName type)
+        //internal WeaponStats CurrentWeaponStats(WeaponName type)
+        //{
+        //    var weaponStats = new WeaponStats();
+
+        //    foreach (Weapon weapon in weapons)
+        //    {
+        //        if (weapon.type == type)
+        //            weaponStats = weapon.stats;
+        //    }
+
+        //    return weaponStats;
+        //}
+
+        internal Weapon CurrentWeaponStats(WeaponName type)
         {
-            var weaponStats = new WeaponStats();
+            var weaponStats = new Weapon();
 
             foreach (Weapon weapon in weapons)
             {
-                if (weapon.type == type)
-                    weaponStats = weapon.stats;
-            }
-
-            return weaponStats;
-        }
-
-        internal WeaponStats CurrentWeaponStats(WeaponName type, out string name)
-        {
-            var weaponStats = new WeaponStats();
-            name = "None";
-
-            foreach (Weapon weapon in weapons)
-            {
-                if (weapon.type == type)
+                if (weapon.weaponName == type)
                 {
-                    weaponStats = weapon.stats;
-                    name = weapon.name;
+                    weaponStats = weapon;
                 }
             }
 
             return weaponStats;
         }
-    }
-
-    [Serializable]
-    public class Weapon
-    {
-        public string name;
-        public WeaponName type;
-        public WeaponStats stats;
     }
 }

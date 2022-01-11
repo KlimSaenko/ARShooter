@@ -26,7 +26,7 @@ namespace Michsky.UI.FieldCompleteMainMenu
                 mainPanels.SetActive(true);
 
                 mainPanelsAnimator = mainPanels.GetComponent<Animator>();
-                mainPanelsAnimator.Play("Main Panel Opening");
+                //mainPanelsAnimator.Play("Main Panel Opening");
             }
 
             else if (isLoggedIn == false && alwaysShowLoginScreen == true)

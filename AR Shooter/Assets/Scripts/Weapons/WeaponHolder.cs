@@ -33,7 +33,7 @@ namespace Game.Weapons
         
         private static void SwitchWeapon(WeaponName toWeapon)
         {
-            if (_hideWeaponRef is null || CurrentWeaponConfig.WeaponName == toWeapon) return;
+            if (_hideWeaponRef is null || CurrentWeaponConfig.WeaponConfig.weaponName == toWeapon) return;
             
             HideWeapon(() => TakeWeapon(toWeapon));
         }

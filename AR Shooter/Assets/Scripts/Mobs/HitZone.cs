@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Game.Mobs
 {
+    [RequireComponent(typeof(Collider))]
     public class HitZone : MonoBehaviour
     {
         [SerializeField] private Transform transformWithController;
@@ -35,7 +36,7 @@ namespace Game.Mobs
 
         [SerializeField] internal ZoneType zoneType;
 
-        internal void ApplyDamage(int damage, Vector3 hitPos, float delay = 0)
+        internal void ApplyDamage(int damage, Vector3 hitPos)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
             
@@ -44,7 +45,7 @@ namespace Game.Mobs
             Damageable?.ApplyDamage(damage);
         }
 
-        internal void ApplyDamage(int damage, float delay = 0)
+        internal void ApplyDamage(int damage)
         {
             damage = zoneType == ZoneType.Critical ? damage * 3 : damage;
 
@@ -53,13 +54,6 @@ namespace Game.Mobs
             Decals.ActivateHitMarker(hitPos, damage, zoneType, false);
             
             Damageable?.ApplyDamage(damage);
-        }
-
-        private IEnumerator DelayedApplyDamage(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-
-            yield return null;
         }
     }
 }

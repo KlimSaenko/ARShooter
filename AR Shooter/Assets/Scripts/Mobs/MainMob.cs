@@ -39,6 +39,9 @@ namespace Game.Mobs
         }
         public bool IsAlive => HP > 0;
 
+        internal virtual bool Loaded() => false;
+        internal float PercentHP => HP / (float)mobHP;
+
         private void OnEnable()
         {
             MobAppeared();
@@ -75,6 +78,7 @@ namespace Game.Mobs
         {
             MobTransform = _mobTransform;
             HP = mobHP;
+
             //_target = MobSpawner.Instance.target;
             //PlayerStatusScript = _target.GetComponentInParent<PlayerStatus>();
 
@@ -84,6 +88,8 @@ namespace Game.Mobs
             //_mapMarker = Instantiate(mapMarkerPrefab, CommonUI.MapCircle).GetComponent<RectTransform>();
             //_mapMarker.anchoredPosition = new Vector2((TargetPos - MobTransform.position).x, (TargetPos - MobTransform.position).z) * -80;
         }
+
+
 
         private protected void MobMove(Vector3 moveDir, float closeDistance)
         {
@@ -126,7 +132,7 @@ namespace Game.Mobs
         }
 
         private float _prevDeltaRotation;
-        private protected float MobRotate(float lerp)
+        private protected float MobLookRotate(float lerp)
         {
             var newRotation = Quaternion.RotateTowards(MobTransform.rotation, CurrentLookRotation, 1000 * lerp * Time.deltaTime);
             var deltaRotation = Mathf.Lerp(_prevDeltaRotation, Quaternion.Angle(MobTransform.rotation, newRotation), 10 * Time.deltaTime);

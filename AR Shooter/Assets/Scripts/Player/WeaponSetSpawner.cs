@@ -42,8 +42,8 @@ namespace Game.Weapons
                 if (weaponType == WeaponName.Unsigned) continue;
 
                 currentWeaponsToUse.weaponPrefabs[i] = WeaponsListAccess.GetWeaponPrefab(weaponType, out var weaponScript);
-                
-                weaponScript.InstantiateWeapon(weaponContainers[i], i, bulletsText);
+
+                _ = weaponScript.InstantiateWeapon(weaponContainers[i], i, bulletsText);
             }
         }
     }
